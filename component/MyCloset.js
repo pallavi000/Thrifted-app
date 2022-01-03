@@ -127,30 +127,17 @@ container:{
     margin:20
 },
 closetCard:{
-  flex:'45%',
-  marginRight:'4%'
+  flex:0.5,
+  marginRight:10
 
 },
 
 
-cameraLogo:{
-        height:'100%',
-        width:'100%',
-        borderRadius:'50%',
-        textAlign:'center',
-        display:'flex',
-        alignItems:'center',
-        justifyContent:'center',
-       borderWidth:2,
-       borderColor:'#333',
-       paddingVertical:20,
-
-},
 
     userImage:{
         height:100,
         width:100,
-        borderRadius:'50%',
+        borderRadius:50,
         textAlign:'center',
         display:'flex',
         alignItems:'center',
@@ -219,6 +206,7 @@ cameraLogo:{
         flexDirection:'row',
         display:'flex',
         flexWrap:'wrap',
+        flex:1
     }
 
 

@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     icon:{
         backgroundColor:'green',
         padding:10,
-        borderRadius:'50%'
+        borderRadius:25
     },
     orderlist:{
         backgroundColor:'#333',

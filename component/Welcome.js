@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     category:{
         height:100,
         width:100,
-        borderRadius:'50%',
+        borderRadius:50,
     },
     cateWrapper:{
         marginHorizontal:10,

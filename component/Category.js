@@ -24,6 +24,8 @@ const Category = ({navigation,route}) => {
     const[start,setStart]= useState(0)
     const[end,setEnd] = useState(12)
 
+    
+
        const [prices,setPrices] = useState([
         {
             minprice:0,

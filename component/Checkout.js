@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     },
     address:{
         fontSize:16,
-        fontWeight:500,
+        fontWeight:'500',
         marginVertical:5,
         textTransform:'capitalize'
         

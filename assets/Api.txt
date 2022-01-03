@@ -1,0 +1,170 @@
+GET /api/user
+GET /api/user/currentuser
+GET /api/user/currentuser
+GET /api/user/admin
+GET /api/user/admin
+GET /api/user/admin/all
+POST /api/user
+GET /api/user/withdraw
+GET /api/user/withdraw
+POST /api/user/withdraw/status
+POST /api/user/withdraw/status
+POST /api/user/all
+POST /api/user/admin
+GET /api/user/:id
+PUT /api/user/:id
+DELETE /api/user/:id
+POST /api/user/withdraw
+POST /api/user/withdraw
+POST /api/user/change/profileimg
+POST /api/user/change/profileimg
+GET /api/category
+POST /api/category
+POST /api/category
+GET /api/category/:id
+GET /api/category/:id
+PUT /api/category/:id
+PUT /api/category/:id
+POST /api/category/filter
+POST /api/category/checkfilter
+DELETE /api/category/:id
+GET /api/brand
+POST /api/brand
+POST /api/brand
+GET /api/brand/:id
+GET /api/brand/:id
+PUT /api/brand/:id
+PUT /api/brand/:id
+POST /api/brand/filter
+POST /api/brand/brandcheck
+DELETE /api/brand/:id
+GET /api/product
+POST /api/product
+POST /api/product
+GET /api/product/:id
+GET /api/product/:id
+PUT /api/product/:id
+PUT /api/product/:id
+DELETE /api/product/:id
+GET /api/size
+POST /api/size
+POST /api/size
+GET /api/size/:id
+GET /api/size/:id
+PUT /api/size/:id
+PUT /api/size/:id
+DELETE /api/size/:id
+GET /api/color
+POST /api/color
+POST /api/color
+GET /api/color/:id
+GET /api/color/:id
+PUT /api/color/:id
+PUT /api/color/:id
+DELETE /api/color/:id
+GET /api/banner
+POST /api/banner
+POST /api/banner
+GET /api/banner/:id
+GET /api/banner/:id
+PUT /api/banner/:id
+PUT /api/banner/:id
+DELETE /api/banner/:id
+POST /api/addtocart/cart
+POST /api/addtocart/cart
+GET /api/addtocart/cartcount
+GET /api/addtocart/cartcount
+DELETE /api/addtocart/cartremove/:id
+DELETE /api/addtocart/cartremove/:id
+GET /api/address
+GET /api/address
+POST /api/address
+POST /api/address
+GET /api/address/edit
+GET /api/address/edit
+PUT /api/address/edit
+PUT /api/address/edit
+GET /api/order/transaction
+GET /api/order/transaction
+POST /api/order
+POST /api/order
+GET /api/order
+GET /api/order
+GET /api/order/all
+GET /api/order/all
+POST /api/order/orderstatus
+POST /api/order/orderstatus
+GET /api/shipping
+GET /api/shipping
+POST /api/shipping
+POST /api/shipping
+GET /api/shipping/:id
+GET /api/shipping/:id
+PUT /api/shipping/:id
+PUT /api/shipping/:id
+DELETE /api/shipping/:id
+GET /api/frontend/home
+GET /api/frontend/category
+GET /api/frontend/product-detail/:id
+GET /api/frontend/productall
+GET /api/frontend/productall
+GET /api/frontend/closet/:id
+GET /api/frontend/city
+GET /api/frontend/createpost
+GET /api/frontend/createpost
+POST /api/frontend/search-request
+GET /api/frontend/search-sidebar
+POST /api/frontend/search-filter
+GET /api/city
+GET /api/city
+POST /api/city
+POST /api/city
+GET /api/city/:id
+GET /api/city/:id
+PUT /api/city/:id
+PUT /api/city/:id
+DELETE /api/city/:id
+GET /api/district
+GET /api/district
+POST /api/district
+POST /api/district
+GET /api/district/:id
+GET /api/district/:id
+PUT /api/district/:id
+PUT /api/district/:id
+DELETE /api/district/:id
+
+
+
+
+    useEffect(() => {
+      console.log('hi')
+      setView('address')
+      const config = {
+        headers: {
+          'access-token':localStorage.getItem('token')
+        }
+      } 
+
+      axios.get('/address',config).then(response=>{
+        setCustomer(response.data)
+       }) 
+
+       axios.get('/shipping',config).then(response=>{
+         setShippings(response.data)
+       })
+    }, [props])
+
+    
+    useEffect(() => {
+      if(customer && Object.keys(customer).length!=0 && shippings && shippings.length!=0){
+
+    shippings.map(ship=>{
+      if(ship.location.toLowerCase()== customer.district.toLowerCase()){
+        setShippingFee(ship.fee)
+      } else {
+        setShippingFee(0)
+      }
+    })
+  }
+    }, [props,customer,shippings])

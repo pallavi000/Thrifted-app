@@ -54,28 +54,28 @@ function add(values){
                 style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter district"
-                    onChange={handleChange("district")}
+                   onChangeText={handleChange("district")}
                 />
                 <Text style={styles.error}>{errors.district}</Text>
                 <TextInput
                  style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter City"
-                    onChange={handleChange("city")}
+                   onChangeText={handleChange("city")}
                 />
                 <Text style={styles.error}>{errors.city}</Text>
                 <TextInput
                  style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter street"
-                    onChange={handleChange("street")}
+                   onChangeText={handleChange("street")}
                 />
                 <Text style={styles.error}>{errors.street}</Text>
                 <TextInput
                  style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter phone"
-                    onChange={handleChange("phone")}
+                   onChangeText={handleChange("phone")}
                 />
                 <Text style={styles.error}>{errors.phone}</Text>
                 <Text style={bbstyles.h1}>Shipping Address</Text>
@@ -84,28 +84,28 @@ function add(values){
                 style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter shipping_district"
-                    onChange={handleChange("shipping_district")}
+                   onChangeText={handleChange("shipping_district")}
                 />
                 <Text style={styles.error}>{errors.shipping_district}</Text>
                 <TextInput
                  style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter City"
-                    onChange={handleChange("shipping_city")}
+                   onChangeText={handleChange("shipping_city")}
                 />
                 <Text style={styles.error}>{errors.shipping_city}</Text>
                 <TextInput
                  style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter street"
-                    onChange={handleChange("shipping_street")}
+                   onChangeText={handleChange("shipping_street")}
                 />
                 <Text style={styles.error}>{errors.shipping_street}</Text>
                 <TextInput
                  style={bbstyles.formControl}
                     keyboardType='default'
                     placeholder="Enter phone"
-                    onChange={handleChange("shipping_phone")}
+                   onChangeText={handleChange("shipping_phone")}
                 />
                 <Text style={styles.error}>{errors.shipping_phone}</Text>
 

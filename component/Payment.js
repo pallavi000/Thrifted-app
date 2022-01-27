@@ -3,6 +3,7 @@ import { View, Text,StyleSheet,TouchableWithoutFeedback } from 'react-native'
 import { AuthContext } from './Context'
 import bbstyles from './Styles'
 import axios from 'axios'
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -13,7 +14,7 @@ const {subtotal} = data
 const shippingFee = route.params
 const {cartItems} = data
 const {token} = data
-console.log(shippingFee)
+
 
 
 function esewa(){

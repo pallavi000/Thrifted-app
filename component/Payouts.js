@@ -7,6 +7,7 @@ import * as Yup from 'yup'
 import axios from 'axios'
 import { AuthContext } from './Context'
 import {Picker} from '@react-native-picker/picker'
+import { greaterOrEq, tan } from 'react-native-reanimated'
 
 
 
@@ -24,7 +25,6 @@ const Payouts = ({navigation}) => {
     const data = useContext(AuthContext)
     const {token} = data
 
-   
         const config = {
         headers: {
           'access-token':token
@@ -39,24 +39,23 @@ function payoutForm(values){
         setError(err.request.response)
     })
 }
-
-
     return (
         <View style={bbstyles.container}>
             <Text style={bbstyles.h1}>Payouts</Text>
             {error?(
-                <Text>{error}</Text>
+                <Text style={bbstyles.alertDanger}>{error}</Text>
             ):(null)}
             <Formik
         initialValues={{balance:'',payment_method:'',account_detail:''}}
         onSubmit={values=>payoutForm(values)}
         validationSchema={validationSchema}
         >
-        {({handleChange, handleSubmit,errors,setFieldValue })=>(
+        {({handleChange, handleSubmit,errors,setFieldValue,values })=>(
             <>
 
             <Picker
                     style={styles.formControl}
+                     selectedValue={values.payment_method}
                         onValueChange={itemValue =>
                         setFieldValue('payment_method',itemValue)
                     }>
@@ -72,7 +71,7 @@ function payoutForm(values){
            autoCorrect={false}
            placeholder="Account No/Id"
            keyboardType="default"
-           onChange={handleChange("account_detail")}
+           onChangeText={handleChange("account_detail")}
            />
        <Text style={{color:'red'}}>{errors.account_detail}</Text>
            <TextInput style={styles.formControl}
@@ -80,8 +79,8 @@ function payoutForm(values){
            autoCorrect={false}
            placeholder="Enter amount for withdraw"
            keyboardType="default"
-           secureTextEntry
-           onChange={handleChange("balance")}
+    
+           onChangeText={handleChange("balance")}
            />
           <Text style={{color:'red'}}>{errors.balance}</Text>
             <TouchableWithoutFeedback onPress={handleSubmit}>
@@ -95,6 +94,7 @@ function payoutForm(values){
     )
 }
 
+
 const styles = StyleSheet.create({
     formControl: {
         fontSize: 16,
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingHorizontal: 12,
         paddingVertical: 10,
-        marginTop: 10,
+        marginBottom: 10,
     },
 })
 

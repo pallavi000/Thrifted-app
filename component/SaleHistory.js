@@ -65,17 +65,17 @@ useEffect(() => {
            <View>
            {items.map(item=>{
                             return(
-                            <View style={styles.itemWrapper}>
-                            <Image source={{uri:imageLink+item.product_id?.image}} style={styles.itemImage}/>
-                            <View style={styles.detailWrapper}>
-                            <Text style={styles.itemName}>{item.product_id?.name}</Text>
-                            <Text style={styles.itemSize}>Size: {item.size}</Text>
-                            <Text style={styles.itemSize}>Quantity: {item.quantity} </Text>
-                            <Text style={styles.itemSize}>{item.order_status}</Text>
 
+                        <View key={item.id} style={styles.productContainer}>
+                            <Image source={{uri:imageLink+item.product_id?.image}} style={styles.productImage} />
+                            <View style={styles.productRight}>
+                                <Text style={styles.productTitle} numberOfLines={2}>{item.product_id?.name}</Text>
+                                 <Text style={styles.productPrice}>Quantity: {item.quantity}</Text>
+                                <Text style={styles.productPrice}>Rs. {item.product_id?.price}</Text>
+                                   <Text style={styles.productPrice}>{item.order_status}</Text>
                             </View>
                          </View>
-                       
+
                             )
                         })}
            </View>
@@ -136,7 +136,39 @@ h1:{
         fontWeight:'500',
         marginBottom:5,
         textTransform:'capitalize'
-    }
+    },
+     productContainer: {
+        flexDirection: 'row',
+        marginVertical: 10,
+        borderWidth: 1,
+        borderColor: '#e5e5e5',
+        borderRadius: 5,
+        backgroundColor: '#fff',
+        padding: 10
+    },
+    productRight: {
+        padding: 10,
+        flex: 3
+    },
+    productImage: {
+        height: 150,
+        flex: 2,
+        resizeMode: 'contain'
+    },
+    productTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        textTransform: 'capitalize'
+    },
+    ratingContainer: {
+        marginTop: 10,
+        flexDirection: 'row',
+    },
+    productPrice:{
+        fontWeight: 'bold',
+        marginTop: 10,
+        textTransform: 'capitalize'
+    },
 
    
     

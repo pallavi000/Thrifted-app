@@ -4,7 +4,7 @@ import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import bbstyles from './Styles'
 
-function Profile() {
+function Profile({navigation}) {
     const[user,setUser] = useState([])
 
    async function ProfileScreen(){
@@ -47,11 +47,11 @@ function Profile() {
             <Text style={styles.value}>{user.balance}</Text>
         </View>
 
-        <TouchableWithoutFeedback >
+        <TouchableWithoutFeedback onPress={()=>navigation.navigate('editAddress')} >
             <Text style={bbstyles.buyNow}>Edit Info</Text>
         </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback >
+        <TouchableWithoutFeedback onPress={()=>navigation.navigate('changepassword')} >
          <Text style={bbstyles.btnPrimary}>Change Password</Text>
         </TouchableWithoutFeedback>
 

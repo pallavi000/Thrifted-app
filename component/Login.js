@@ -1,11 +1,12 @@
 import React,{useEffect,useContext} from 'react'
-import { StyleSheet, TextInput, Button, Text,View, TouchableWithoutFeedback} from 'react-native'
+import { StyleSheet, TextInput, Button, Text,View, TouchableWithoutFeedback, Alert} from 'react-native'
 import {Formik} from 'formik'
 import *  as Yup from 'yup'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import { AuthContext } from './Context'
 import bbstyles from './Styles'
+import { useState } from 'react/cjs/react.development'
 
 
 const validationSchema= Yup.object().shape({
@@ -16,20 +17,23 @@ const validationSchema= Yup.object().shape({
 
 
 function Login({navigation}) {
-
+    const[error,setError] = useState('')
     const {setIsLoggedIn} = useContext(AuthContext)
 
 
-
     function loginForm(values){
+        console.log(values)
         axios.post('/user',values).then(async response=>{
             console.log(response.data)
-           await AsyncStorage.setItem('token',response.data.token)
-           setIsLoggedIn(true)
-
-
+            try {
+                await AsyncStorage.setItem('token',response.data.token)
+            setIsLoggedIn(true)
+            } catch (error) {
+                setError(error.message)
+            }
         }).catch(err=>{
             console.log(err.request.response)
+            setError(err.request.response)
         })
     }
     
@@ -44,10 +48,11 @@ function google(){
 
     return (
         <View style={styles.loginContainer}>
+        <Text style={{color:'red'}}>{error}</Text>
         <Formik
         initialValues={{email:'',password:''}}
         onSubmit={values=>loginForm(values)}
-        validationSchema={validationSchema}
+
         >
         {({handleChange, handleSubmit,errors })=>(
             <>
@@ -56,7 +61,7 @@ function google(){
            autoCorrect={false}
            placeholder="Email"
            keyboardType="email-address"
-           onChange={handleChange("email")}
+           onChangeText={handleChange("email")}
            />
        <Text style={{color:'red'}}>{errors.email}</Text>
            <TextInput style={bbstyles.formControl}
@@ -65,14 +70,17 @@ function google(){
            placeholder="password"
            keyboardType="default"
            secureTextEntry
-           onChange={handleChange("password")}
+           onChangeText={handleChange("password")}
            />
           <Text style={{color:'red'}}>{errors.password}</Text>
             <TouchableWithoutFeedback onPress={handleSubmit}>
             <Text style={bbstyles.btnPrimary}>Login</Text>
             </TouchableWithoutFeedback>
 
-            <Text style={styles.forgot}>Forgot Password ?</Text>
+             <TouchableWithoutFeedback onPress={()=>navigation.navigate('forgotpassword')}>
+            <Text style={styles.forgot}> Forgot Password ?</Text>
+            </TouchableWithoutFeedback>
+
             <TouchableWithoutFeedback onPress={()=>facebook()}>
             <Text style={styles.facebook}>Login with Facebook</Text>
             </TouchableWithoutFeedback>
@@ -84,7 +92,6 @@ function google(){
             <TouchableWithoutFeedback onPress={()=>navigation.navigate('register')}>
             <Text style={styles.forgot}> Sign Up</Text>
             </TouchableWithoutFeedback>
-
             </>
         )}
         </Formik>

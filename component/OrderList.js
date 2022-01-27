@@ -17,7 +17,6 @@ const OrderList = () => {
       } 
      
     axios.get('/order/transaction',config).then(response=>{
-        console.log(response.data)
         setItems(response.data)
     })
 },[])
@@ -30,11 +29,16 @@ const OrderList = () => {
         {items.map(item=>{
             return(
                 <>
+
+             
+
                 <View style={styles.transaction}>
+                   <View  style={styles.shipping}>
                     <Text style={styles.orderId}>Order #{item._id} </Text>
                     <Text style={styles.order}>Placed On {item.createdAt}</Text>
                     <Text style={styles.order}>Shipping Fee: {item.shipping}</Text>
                     <Text style={styles.order}>Total: {item.total}</Text>
+                    </View>
                     
                     <View>
                         {item.orders.map(item=>{
@@ -42,7 +46,7 @@ const OrderList = () => {
                             <View style={styles.itemWrapper}>
                             <Image source={{uri:imageLink+item.product_id?.image}} style={styles.itemImage}/>
                             <View style={styles.detailWrapper}>
-                            <Text style={styles.itemName}>{item.product_id?.name}</Text>
+                            <Text style={styles.itemName} numberOfLines={2}>{item.product_id?.name}</Text>
                             <Text style={styles.itemSize}>Size: {item.size}</Text>
                             <Text style={styles.itemSize}>Quantity: {item.quantity} </Text>
                             <Text style={styles.itemSize}>{item.order_status}</Text>
@@ -69,6 +73,14 @@ const styles = StyleSheet.create({
         padding:10,
         marginBottom:10
     },
+        shipping:{
+        backgroundColor:'#fff',
+        padding:10,
+        borderColor:'#663399',
+        borderWidth:1,
+        borderRadius:9,
+       
+    },
     orderId:{
         fontSize:20,
         fontWeight:'500',
@@ -80,9 +92,7 @@ const styles = StyleSheet.create({
        marginTop:5
     },
     itemWrapper:{
-        display:'flex',
         flexDirection:'row',
-        flex:1,
         backgroundColor:'#fff',
        paddingHorizontal:10,
        paddingVertical:20
@@ -90,8 +100,7 @@ const styles = StyleSheet.create({
     },
     itemImage:{
         height:150,
-        width:'100%',
-        resizeMode:'contain',
+        resizeMode:'cover',
         flex:2 
     },
     detailWrapper:{

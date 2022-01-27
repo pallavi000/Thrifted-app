@@ -7,6 +7,8 @@ import axios from 'axios'
 import { AuthContext } from './Context'
 import {Picker} from '@react-native-picker/picker';
 import MainImage from './Image/MainImage'
+import { tan } from 'react-native-reanimated'
+import { saveToLibraryAsync } from 'expo-media-library'
 
 
 
@@ -70,7 +72,25 @@ const CreatePost = () => {
             setShowBrand(true)
         }else setShowBrand(false)
      }
-    
+
+
+     function renderChildren(categories,n){
+         var inc = n;
+        function increment(n){
+            var ele = "\u00A0 \u00A0 \u00A0"
+            inc += 1;
+            return ele.repeat(n)
+        }
+         if(categories&&categories.length!=0){
+             const arr=[]
+             categories.map(category=>{
+               arr.push(<Picker.Item  label={increment(n)+ category.name} value={category._id} />,renderChildren(category.childrens,inc))
+               
+             })
+             return arr
+         }
+     }
+     
      
     return (
         <ScrollView style={bbstyles.container}>
@@ -81,7 +101,7 @@ const CreatePost = () => {
            validationSchema={validationSchema}
            
            >
-           {({handleChange,handleSubmit,errors,setFieldValue})=>(
+           {({handleChange,handleSubmit,errors,setFieldValue,values})=>(
                <>
                <MainImage/>
                <Text style={styles.title}>Product Name</Text>
@@ -89,7 +109,7 @@ const CreatePost = () => {
                 style={styles.formcontrol}
                     keyboardType='default'
                     placeholder="Enter product name"
-                    onChange={handleChange("name")}
+                    onChangeText={handleChange("name")}
                 />
                   <Text style={styles.error}>{errors.name}</Text>
 
@@ -98,23 +118,25 @@ const CreatePost = () => {
                 style={styles.formcontrol}
                     keyboardType='default'
                     placeholder="Product Description"
-                    onChange={handleChange("detail")}
+                    onChangeText={handleChange("detail")}
                 />
                 <Text style={styles.error}>{errors.detail}</Text>
 
                 <Text style={styles.title}>Category</Text>
                 <Picker
                     style={styles.formcontrol}
+                     selectedValue={values.category}
                         onValueChange={itemValue =>
+                        
                         setFieldValue('category',itemValue)
                     }>
                   <Picker.Item  label="Selelct Product Category" value="" />
                     {categories.map(category=>{
                         return(
-                            <>
-                            <Picker.Item  label={category.name} value={category._id} />
-                            <Nasted categories= {category.childrens} n={1}/>
-                            </>
+                           
+                            [<Picker.Item  label={category.name} value={category._id} />,
+                            renderChildren(category.childrens,1)]
+                            
                         )
                     })}
                 </Picker>
@@ -125,13 +147,14 @@ const CreatePost = () => {
                 style={styles.formcontrol}
                     keyboardType='default'
                     placeholder="Product quantity"
-                    onChange={handleChange("stock")}
+                    onChangeText={handleChange("stock")}
                 />
                 <Text style={styles.error}>{errors.stock}</Text>
 
                 <Text style={styles.title}>Product Size</Text>
                 <Picker
                     style={styles.formcontrol}
+                     selectedValue={values.size}
                         onValueChange={itemValue =>
                         setFieldValue('size',itemValue)
                     }>
@@ -147,8 +170,10 @@ const CreatePost = () => {
                 <Text style={styles.title}>Brand</Text>
                 <Picker
                     style={styles.formcontrol}
+                    selectedValue={values.brand}
                         onValueChange={itemValue =>
                         brandValue(itemValue,setFieldValue)
+                        
                     }>
                      <Picker.Item  label="Selelct Brand" value="" />
                     {brands.map(brand=>{
@@ -167,22 +192,18 @@ const CreatePost = () => {
                         style={styles.formcontrol}
                             keyboardType='default'
                             placeholder="Enter brand name"
-                            onChange={handleChange("custombrand")}
+                            onChangeText={handleChange("custombrand")}
                         />
                         <Text style={styles.error}>{errors.custombrand}</Text>
                     </View>
                     ):(null)}
                     
-
-
-
-
-
                 <Text style={styles.error}>{errors.brand}</Text>
 
                 <Text style={styles.title}>Color</Text>
                 <Picker
                     style={styles.formcontrol}
+                     selectedValue={values.color}
                         onValueChange={itemValue =>
                         setFieldValue('color',itemValue)
                     }>
@@ -204,7 +225,7 @@ const CreatePost = () => {
                 style={styles.formcontrol}
                     keyboardType='default'
                     placeholder="Product original price"
-                    onChange={handleChange("original")}
+                    onChangeText={handleChange("original")}
                 />
                 <Text style={styles.error}>{errors.original}</Text>
                 <Text style={styles.title}>Listing Price</Text>
@@ -212,7 +233,7 @@ const CreatePost = () => {
                 style={styles.formcontrol}
                     keyboardType='default'
                     placeholder="Product listing price"
-                    onChange={handleChange("price")}
+                    onChangeText={handleChange("price")}
                 />
                 <Text style={styles.error}>{errors.price}</Text>
 
@@ -220,12 +241,13 @@ const CreatePost = () => {
                 <TextInput
                 style={styles.formcontrol}
                     keyboardType='default'
-                    onChange={handleChange("earning_price")}
+                    onChangeText={handleChange("earning_price")}
                 />
                 <Text style={styles.error}>{errors.earning_price}</Text>
                 <Text style={styles.title}>Product Type</Text>
                 <Picker
                     style={styles.formcontrol}
+                     selectedValue={values.type}
                         onValueChange={itemValue =>
                         setFieldValue('type',itemValue)
                     }>
@@ -256,13 +278,15 @@ function Nasted({categories, n}){
       return ele.repeat(n)
     }
 
+  
+
     return(
         categories.map(category=>{
             return(
-                <>
-                <Picker.Item  label= {increment(n) + category.name} value={category._id} />
-                <Nasted categories={category.childrens} n={inc}/>
-                </>
+                [
+                <Picker.Item  label= {increment(n) + category.name} value={category._id} />,
+                renderPickerItem(category.childrens)
+                ]
             )
         })
     )

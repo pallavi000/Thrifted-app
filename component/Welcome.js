@@ -1,10 +1,11 @@
 import React,{useEffect,useState,usestate} from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Image, StyleSheet, Text, ListView,TouchableOpacity,Dimensions, TouchableWithoutFeedback, View } from 'react-native'
 import axios from 'axios'
 import { NavigationContainer } from '@react-navigation/native'
 import { ScrollView } from 'react-native-gesture-handler'
 import bbstyles from './Styles'
 import { imageLink } from './ImageLink'
+import Carousel from 'react-native-banner-carousel';
 
 
 function Welcome({navigation}) {
@@ -17,9 +18,7 @@ function Welcome({navigation}) {
     const[rentProducts,setRentProducts] = useState([])
 
 useEffect(() => {
-
     axios.get('/frontend/home').then(response=>{
-        console.log(response.data)
         setProducts(response.data.product)
         setBanners(response.data.banner)
         setRentProducts(response.data.rentProduct)
@@ -29,19 +28,29 @@ useEffect(() => {
 }, [])
 
 
-    return (
-        
-       <ScrollView style={styles.container}>
-       {banners.map(banner=>{
-           return(
-               banner.section=="top"?(
-                <Image style={styles.banner} source={{uri:imageLink+banner.image}}/>
-               ):(null)
-            
-           )
-       })}
-         
-          <View style={styles.wrapper}>
+    return ( 
+       <ScrollView  style={styles.container}>
+
+             <Carousel
+                    autoplay
+                    autoplayTimeout={5000}
+                    loop
+                    index={0}
+                    pageSize={Dimensions.get('window').width}
+                >
+              
+                    {banners.map(banner=>{
+                        return(
+                            banner.section=="top"?(
+                                <Image style={styles.banner} source={{uri:imageLink+banner.image}}/>
+                            ):(null)
+                        )
+                    })}
+                </Carousel>
+
+       
+          <Text style={styles.topcategory}>Top Categories</Text>
+          <ScrollView   horizontal={true} showsHorizontalScrollIndicator={false} style={styles.wrapper}>
           {categories.map(category=>{
               return(
                 <TouchableOpacity onPress={()=>navigation.navigate('category',category)} style={styles.cateWrapper}>
@@ -50,46 +59,62 @@ useEffect(() => {
              </TouchableOpacity>
               )
           })}
-          </View>
+          </ScrollView>
           
           <View style={styles.productWrapper}>
-          <Text style={bbstyles.h1}>New Arrival</Text>
+          <Text style={styles.h1}>New Arrival</Text>
           {products.slice(0,4).map(product=>{
               return(
                   <TouchableOpacity style={styles.product} onPress={()=>navigation.navigate('productdetail',product)}>
                   <Image source={{uri:imageLink+product.image}} style={styles.productImage}/>
                   <View style={styles.productDesc}>
                       <Text style={styles.productTitle} numberOfLines={3}>{product.name}</Text>
-                      <Text style={styles.productPrice}>{product.price}</Text>
-                      <Text style={styles.productCategory}>{product.category}</Text>
+                      <Text style={styles.productPrice}>Rs. {product.price}</Text>
+                      <Text style={styles.productCategory}>{product.category_id?.name}</Text>
                   </View>
                   </TouchableOpacity>
               )
           })}
           </View>
-          {banners.map(banner=>{
-           return(
-               banner.section=="middle"?(
-                <Image style={styles.banner} source={{uri:imageLink+banner.image}}/>
-               ):(null)
-            
-           )
-       })}
+             <Carousel
+                    autoplay
+                    autoplayTimeout={5000}
+                    loop
+                    index={0}
+                    pageSize={Dimensions.get('window').width}
+                >
+                    {banners.map(banner=>{
+                            return(
+                                banner.section=="middle"?(
+                                    <Image style={styles.banner} source={{uri:imageLink+banner.image}}/>
+                                ):(null)
+                            )
+                        })}
+
+                </Carousel>
+          
           <View style={styles.productWrapper}>
-          <Text style={bbstyles.h1}>Product For Rent</Text>
+          <Text style={styles.h1}>Product For Rent</Text>
           {rentProducts.slice(0,4).map(product=>{
               return(
                   <TouchableOpacity style={styles.product} onPress={()=>navigation.navigate('productdetail',product)}>
                   <Image source={{uri:imageLink+product.image}} style={styles.productImage}/>
                   <View style={styles.productDesc}>
                       <Text style={styles.productTitle} numberOfLines={3}>{product.name}</Text>
-                      <Text style={styles.productPrice}>{product.price}</Text>
-                      <Text style={styles.productCategory}>{product.category}</Text>
+                      <Text style={styles.productPrice}>Rs. {product.price}</Text>
+                      <Text style={styles.productCategory}>{product.category_id?.name}</Text>
                   </View>
                   </TouchableOpacity>
               )
           })}
           </View>
+          <Carousel
+                    autoplay
+                    autoplayTimeout={5000}
+                    loop
+                    index={0}
+                    pageSize={Dimensions.get('window').width}
+                >
 
           {banners.map(banner=>{
            return(
@@ -99,29 +124,44 @@ useEffect(() => {
             
            )
        })}
+
+       </Carousel>
+
+
+      
+               
+                   
           <View style={styles.productWrapper}>
-          <Text style={bbstyles.h1}>Product For Sell</Text>
+          <Text style={styles.h1}>Product For Sell</Text>
           {sellProducts.slice(0,4).map(product=>{
               return(
-                  <TouchableOpacity style={styles.product} onPress={()=>navigation.navigate('productdetail',product)}>
+                   <TouchableOpacity  onPress={()=>navigation.navigate('productdetail',product)}>
+                       <View style={styles.product}>
+                 
                   <Image source={{uri:imageLink+product.image}} style={styles.productImage}/>
                   <View style={styles.productDesc}>
                       <Text style={styles.productTitle} numberOfLines={3}>{product.name}</Text>
-                      <Text style={styles.productPrice}>{product.price}</Text>
-                      <Text style={styles.productCategory}>{product.category}</Text>
+                      <Text style={styles.productPrice}>Rs. {product.price}</Text>
+                      <Text style={styles.productCategory}>{product.category_id?.name}</Text>
                   </View>
-                  </TouchableOpacity>
+                
+                  </View>
+                    </TouchableOpacity>
+
+
               )
           })}
-          </View>
-
-
-
+        </View>
        </ScrollView>
     )
 }
 
+
+
 const styles = StyleSheet.create({
+    container:{
+
+    },
     card:{
         padding:10,
         borderWidth:1,
@@ -134,14 +174,18 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },
     banner:{
-        height:200,
-        width:'100%',
-        resizeMode:'contain'
+     
+   flex: 1,
+    width: '100%',
+    height: 150,
+    resizeMode: 'contain',
+    marginTop:0
     },
     wrapper:{
         flexDirection:'row',
-        margin:20
-      
+        marginHorizontal:10,
+        marginTop:0,
+        marginBottom:10
     },
     category:{
         height:100,
@@ -163,30 +207,27 @@ const styles = StyleSheet.create({
         fontWeight:'500'
     },
     product:{
-        flex:1,
+      
         flexDirection:'row',
-        margin:20
+        margin:10
     },
  
-    
 
-    
 
     productImage:{
-        height:200,
-        width:'100%',
-        resizeMode:'contain',
+        height:150,
+        resizeMode:'cover',
         flex:2
     },
 
     productDesc:{
         fontWeight:'500',
         fontSize:16,
-        flex:3,
+        flex:2,
         marginLeft:20,
     },
     productWrapper:{
-      flex:1,
+ 
       margin:20
     },
     productTitle:{
@@ -202,14 +243,24 @@ const styles = StyleSheet.create({
     productCategory:{
         textTransform:'capitalize'
     },
-
-
-    container:{
-        flex:1,
-        flexWrap:'wrap',
+    h1:{
+         margin: 20,
+         marginLeft:10,
+        fontSize: 20,
+        fontWeight: 'bold'
+    },
+    topcategory:{
+          margin: 20,
+          marginTop:5,
+         marginLeft:10,
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign:'center'   
+    },
     
-        
-    }
+
+
+ 
 })
 
 export default Welcome

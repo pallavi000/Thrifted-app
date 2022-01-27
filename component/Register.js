@@ -52,7 +52,7 @@ function Register({navigation}) {
            autoComplete = {false}
            placeholder="enter name"
            keyboardType = 'default'
-           onChange = {handleChange('name')}
+           onChangeText = {handleChange('name')}
            />
          <Text style={{color:'red'}}>{errors.name}</Text>
 
@@ -60,7 +60,7 @@ function Register({navigation}) {
            autoComplete = {false}
            placeholder="Email"
            keyboardType = 'email-address'
-           onChange = {handleChange('email')}
+           onChangeText = {handleChange('email')}
            />
           <Text style={{color:'red'}}>{errors.email}</Text>
 
@@ -69,7 +69,7 @@ function Register({navigation}) {
            placeholder="password"
            keyboardType = 'default'
            secureTextEntry
-           onChange = {handleChange('password')}
+           onChangeText = {handleChange('password')}
            />
           <Text style={{color:'red'}}>{errors.password}</Text>
 

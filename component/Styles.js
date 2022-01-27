@@ -1,3 +1,4 @@
+import ImageTile from 'expo-image-picker-multiple/src/ImageTile'
 import {StyleSheet} from 'react-native'
 
 
@@ -11,6 +12,10 @@ const bbstyles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold'
     },
+      error:{
+        color:'red',
+        marginTop:5
+    },  
     link: {
         color: 'rebeccapurple'
     },
@@ -69,8 +74,29 @@ const bbstyles = StyleSheet.create({
     }, 
     container:{
         margin:20
-    }
+    },
 
+      alertDanger:{
+        color: '#721c24',
+    backgroundColor: '#f8d7da',
+    borderColor: '#f5c6cb',
+    borderWidth:1,
+    paddingVertical:8,
+    paddingHorizontal:10,
+    textTransform:'capitalize',
+    marginBottom:15
+      },
+
+    alertSuccess:{
+    color: '#155724',
+    backgroundColor:'#d4edda',
+    borderColor: '#c3e6cb',
+    borderWidth:1,
+    paddingVertical:8,
+    paddingHorizontal:10,
+    textTransform:'capitalize',
+    marginBottom:15
+      }
 })
 
 export default bbstyles

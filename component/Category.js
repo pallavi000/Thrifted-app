@@ -242,6 +242,8 @@ let temp = brands.map((brand) => {
     return (
        <ScrollView style={bbstyles.container}>
             <Text style={bbstyles.h1}>Categories</Text>
+            <View style={{height:150}}>
+              <ScrollView >
             {categories.map(category=>{
                 return(
                     <View style={styles.section}>
@@ -250,8 +252,12 @@ let temp = brands.map((brand) => {
                     </View>
                 )
             })}
-
+            </ScrollView>
+            </View>
              <Text style={bbstyles.h1}>Brands</Text>
+            
+             <View style={{height:150}}>
+              <ScrollView >
             {brands.map(brand=>{
                 return(
                     <View style={styles.section}>
@@ -260,6 +266,9 @@ let temp = brands.map((brand) => {
                     </View>
                 )
             })}
+            </ScrollView>
+            </View>
+            
 
              <Text style={bbstyles.h1}>Colors</Text>
             {colors.map(color=>{
@@ -288,7 +297,7 @@ let temp = brands.map((brand) => {
                             <TouchableOpacity onPress={()=>navigation.navigate('productdetail',product)} style={styles.itemWrapper}>
                             <Image source={{uri:imageLink+product.image}} style={styles.itemImage}/>
                             <View style={styles.detailWrapper}>
-                            <Text style={styles.itemName}>{product.name}</Text>
+                            <Text style={styles.itemName} numberOfLines={3}>{product.name}</Text>
                             <Text style={styles.itemSize}>Size: {product.size_id?.name}</Text>
                              <Text style={styles.itemPrice}>Rs.{product.price}</Text>
                             </View>
@@ -305,7 +314,7 @@ let temp = brands.map((brand) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+
     marginHorizontal: 16,
     marginVertical: 32,
   },
@@ -320,17 +329,15 @@ const styles = StyleSheet.create({
     margin: 8,
   },
 itemWrapper:{
-        display:'flex',
         flexDirection:'row',
-        flex:1,
-       paddingHorizontal:10,
+    
        paddingVertical:20
      
     },
     itemImage:{
         height:150,
-        width:'100%',
-        resizeMode:'contain',
+      
+        resizeMode:'cover',
         flex:2 
     },
     detailWrapper:{
@@ -338,23 +345,21 @@ itemWrapper:{
         flex:3
     },
     itemName:{
-        fontSize:20,
+        fontSize:17,
         fontWeight:'bold',
         marginBottom:5,
         textTransform:'capitalize'
     },
     itemSize:{
-        fontSize:18,
-        color:'#777',
+        fontSize:16,
         fontWeight:'500',
         marginBottom:5,
         textTransform:'capitalize'
 
     },
         itemPrice:{
-        fontSize:20,
-       color:'#777',
-        fontWeight:'500',
+        fontSize:16,
+        fontWeight:'bold',
         marginBottom:5
     },
 
@@ -370,7 +375,6 @@ itemWrapper:{
 
     productImage:{
         height:200,
-        width:'100%',
         resizeMode:'contain',
         flex:2
     },
@@ -382,8 +386,8 @@ itemWrapper:{
         marginLeft:20,
     },
     productWrapper:{
-      flex:1,
-      margin:20
+   
+      margin:15
     },
     productTitle:{
         fontWeight:'500',

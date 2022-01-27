@@ -42,7 +42,7 @@ const EditAddress = ({navigation}) => {
     function add(values){
         axios.put('/address/edit',values,config).then(response=>{
             console.log(response.data)
-            navigation.navigate('address')
+            navigation.navigate('Address')
     })
 }
     
@@ -65,7 +65,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter district"
                         defaultValue={address.billing?.district}
-                        onChange={handleChange("district")}
+                        onChangeText={handleChange("district")}
                     />
                     <Text style={styles.error}>{errors.district}</Text>
                     <TextInput
@@ -73,7 +73,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter City"
                        defaultValue={address.billing?.city}
-                        onChange={handleChange("city")}
+                        onChangeText={handleChange("city")}
                       
                     />
                     <Text style={styles.error}>{errors.city}</Text>
@@ -82,7 +82,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter street"
                         defaultValue={address.billing?.street}
-                        onChange={handleChange("street")}
+                        onChangeText={handleChange("street")}
                       
                     />
                     <Text style={styles.error}>{errors.street}</Text>
@@ -91,7 +91,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter phone"
                         defaultValue={address.billing?.phone}
-                        onChange={handleChange("phone")}
+                        onChangeText={handleChange("phone")}
                       
                     />
                     <Text style={styles.error}>{errors.phone}</Text>
@@ -102,7 +102,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter shipping_district"
                         defaultValue={address.shipping?.district}
-                        onChange={handleChange("shipping_district")}
+                        onChangeText={handleChange("shipping_district")}
                       
                     />
                     <Text style={styles.error}>{errors.shipping_district}</Text>
@@ -111,7 +111,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter City"
                         defaultValue={address.shipping?.city}
-                        onChange={handleChange("shipping_city")}
+                        onChangeText={handleChange("shipping_city")}
                       
                     />
                     <Text style={styles.error}>{errors.shipping_city}</Text>
@@ -120,7 +120,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter street"
                         defaultValue={address.shipping?.street}
-                        onChange={handleChange("shipping_street")}
+                        onChangeText={handleChange("shipping_street")}
                       
                     />
                     <Text style={styles.error}>{errors.shipping_street}</Text>
@@ -129,7 +129,7 @@ const EditAddress = ({navigation}) => {
                         keyboardType='default'
                         placeholder="Enter phone"
                         defaultValue={address.shipping?.phone}
-                        onChange={handleChange("shipping_phone")}
+                        onChangeText={handleChange("shipping_phone")}
                       
                     />
                     <Text style={styles.error}>{errors.shipping_phone}</Text>

@@ -11,19 +11,14 @@ import { DEFAULT_ICON_SIZE } from '@expo/vector-icons/build/createIconSet'
 
 
 
-export default function MyCloset({navigation}) {
+export default function MyCloset(props) {
 
     const[products,setProducts] = useState([])
     const[users,setUsers] = useState([])
-    
-
-    
-    
-
+    const navigation = props.navigation
     const data = useContext(AuthContext)
     const {decode} = data
     const {token} = data
-
 
      const config = {
         headers:{
@@ -31,22 +26,19 @@ export default function MyCloset({navigation}) {
         }
     }
 
-
     useEffect(() => {
-        axios.get('/frontend/closet/'+decode._id).then(response=>{
+        axios.post('/frontend/closet/'+decode._id).then(response=>{
             console.log(response.data)
             setProducts(response.data.product)
             setUsers(response.data.user)
+            console.log('closet')
+        }).catch(err=>{
+            console.log(err.request.response)
         }) 
-    }, [])
-
-
-
-
+    }, [props])
 
 
     async function avatarImage(){
- 
      const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
     if(!granted){
         alert("Permission denied")
@@ -97,7 +89,7 @@ export default function MyCloset({navigation}) {
 
                   </View>
                   </View>
-                  <TouchableWithoutFeedback>
+                  <TouchableWithoutFeedback onPress={()=>navigation.navigate('Create Post')}>
                     <Text style={bbstyles.secondary}>Create Product</Text>
                     </TouchableWithoutFeedback>
                     </View>
@@ -106,10 +98,10 @@ export default function MyCloset({navigation}) {
                         return(
                             <TouchableOpacity style={styles.closetCard} onPress={()=>navigation.navigate('productdetail',product)}>
                             <Image source={{uri:imageLink+product.image}} style={styles.postImage}/>
-                            <Text>{product.name}</Text>
-                            <Text>{product.brand_id?.name}</Text>
-                            <Text>Rs.{product.price}</Text>
-                            <Text>Size:{product.size}</Text>
+                            <Text numberOfLines={2} style={styles.productname}>{product.name}</Text>
+                            <Text style={styles.brandname}>{product.brand_id?.name}</Text>
+                            <Text style={styles.productprice}>Rs.{product.price}</Text>
+                            <Text style={styles.productsize}>Size:{product.size_id?.name}</Text>
                             </TouchableOpacity>
                         )
                     })}
@@ -127,8 +119,9 @@ container:{
     margin:20
 },
 closetCard:{
-  flex:0.5,
-  marginRight:10
+  width:'47%',
+  marginRight:10,
+  marginBottom:15
 
 },
 
@@ -168,9 +161,7 @@ closetCard:{
     },
     productImage:{
         height:100,
-        width:'100%',
         resizeMode:'contain',
-        flex:1,
       alignItems:'center'
     },
 
@@ -198,15 +189,37 @@ closetCard:{
     postImage:{
         height:200,
         width:'100%',
-        resizeMode:'cover'
+        resizeMode:'cover',
+        marginBottom:5
     },
 
     closet:{
         marginTop:20,
-        flexDirection:'row',
         display:'flex',
         flexWrap:'wrap',
-        flex:1
+        flexDirection:'row',
+        justifyContent:'space-between'
+    },
+    productname:{
+        fontSize:16,
+        fontWeight:'600',
+        marginBottom:5
+
+    },
+    brandname:{
+         fontSize:16,
+        fontWeight:'400',
+        marginBottom:5
+    },
+    productprice:{
+        fontSize:16,
+        fontWeight:'bold',
+        marginBottom:5 
+    },
+    productsize:{
+         fontSize:16,
+        fontWeight:'400',
+        marginBottom:5
     }
 
 

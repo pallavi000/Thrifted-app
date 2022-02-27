@@ -1,5 +1,5 @@
 import React, { useContext, useState,useEffect } from 'react'
-import { View, Text,Image, StyleSheet, ScrollView,TouchableWithoutFeedback,TouchableOpacity} from 'react-native'
+import { View, Text,Image, StyleSheet,Modal,Dimensions, ScrollView,TouchableWithoutFeedback,TouchableOpacity} from 'react-native'
 import axios from 'axios'
 import { AuthContext } from './Context'
 import bbstyles from './Styles'
@@ -8,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { FontAwesome } from '@expo/vector-icons'
 import * as imagePicker from 'expo-image-picker'
 import { DEFAULT_ICON_SIZE } from '@expo/vector-icons/build/createIconSet'
+import {Picker} from '@react-native-picker/picker';
 
 
 
@@ -19,13 +20,14 @@ export default function MyCloset(props) {
     const data = useContext(AuthContext)
     const {decode} = data
     const {token} = data
+    const[sorting,setSorting] = useState('-_id')
+    const[modalVisible,setModalVisible] = useState(false)
 
      const config = {
         headers:{
             'access-token': token
         }
     }
-
     useEffect(() => {
         axios.post('/frontend/closet/'+decode._id).then(response=>{
             console.log(response.data)
@@ -60,13 +62,57 @@ export default function MyCloset(props) {
         }
 
     }
-
-    
-
     }
 
     return (
         <ScrollView style={styles.container}>
+
+          <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+       >
+
+             <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+          
+          <View style={styles.modalHeader}>
+           <TouchableOpacity onPress={()=>setModalVisible(false)}>
+               <View style={styles.modalClose}>
+                   <FontAwesome  name="times-circle" size={20} color={'red'}/>
+                  
+               </View>
+           </TouchableOpacity>
+          </View>
+
+            <View style={styles.modalContent}>
+                <Picker
+                    selectedValue={sorting}
+                    onValueChange={(itemValue, itemIndex) =>
+                        setSorting(itemValue)
+                    }>
+                    <Picker.Item label="Date" value="-_id" />
+                    <Picker.Item label="Alphabet" value="name" />
+                    </Picker>
+            </View>
+
+
+          </View>
+        </View>
+        </Modal>
+
+        <View style={styles.filterWrapper}>
+         <View style={styles.sort} >
+         <TouchableOpacity style={styles.sort}   onPress={()=>setModalVisible(true) }>
+         <FontAwesome name="sort" size={15} color={'rebeccapurple'}/>
+        <Text style={styles.sorttext}> Sort</Text>
+      
+       </TouchableOpacity>
+         </View>
+         </View>
+
+
+
         <View style={styles.line}>
             <View  style={styles.product} >
                 <View style={styles.productImage}>
@@ -78,15 +124,12 @@ export default function MyCloset(props) {
                    
                     <Image source={{uri:imageLink+'/images/camera.png'}} style={styles.userImage}/>
                )}
-       
-
            </TouchableOpacity>
                   <Text style={styles.userName}>{users.name}</Text>
                     </View>
                   <View style={styles.productDesc}>
                       <Text style={styles.userDetail}>Posts</Text>
                       <Text style={styles.count}>{products.length}</Text>
-
                   </View>
                   </View>
                   <TouchableWithoutFeedback onPress={()=>navigation.navigate('Create Post')}>
@@ -106,9 +149,6 @@ export default function MyCloset(props) {
                         )
                     })}
                     </View>
-
-
-           
         </ScrollView>
     )
 }
@@ -119,14 +159,11 @@ container:{
     margin:20
 },
 closetCard:{
-  width:'47%',
+  width:'46%',
   marginRight:10,
   marginBottom:15
 
 },
-
-
-
     userImage:{
         height:100,
         width:100,
@@ -220,7 +257,80 @@ closetCard:{
          fontSize:16,
         fontWeight:'400',
         marginBottom:5
-    }
+    },
+     centeredView: {
+    flex: 1, 
+  },
+  modalView: {
+   
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+
+    elevation: 5,
+
+    flex:1,
+    width:Dimensions.get('window').width
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalClose:{
+    
+  },
+  modalHeader:{
+    //   borderBottomWidth:1,
+    //   borderBottomColor:'#ddd',
+      padding:15,
+     flexDirection:'row',
+     justifyContent:'flex-end',
+      shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalContent:{
+      margin:10
+  },
+  pickerWrapper:{
+      marginBottom:5,
+      padding:5,
+      borderBottomColor:'#ddd',
+      borderBottomWidth:1,
+      paddingBottom:10
+  },
+  filterTitle:{
+    fontSize:16,
+    fontWeight:'500',
+    marginBottom:3
+  }
+    
 
 
 })

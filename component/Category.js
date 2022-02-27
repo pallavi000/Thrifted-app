@@ -1,13 +1,27 @@
 import React,{useState,useEffect} from 'react'
-import { View, Text, StyleSheet, ScrollView,TouchableOpacity,Image } from 'react-native'
+import { View, Text, StyleSheet, ScrollView,TouchableOpacity,Image, Dimensions , useWindowDimensions,Modal, Pressable} from 'react-native'
+import {Picker} from '@react-native-picker/picker';
 import Checkbox from 'expo-checkbox';
 import axios from 'axios';
 import bbstyles from './Styles';
 import { imageLink } from './ImageLink';
+import {FontAwesome} from '@expo/vector-icons'
+import { NavigationContainer } from '@react-navigation/native';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+} from '@react-navigation/drawer';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 
-const Category = ({navigation,route}) => {
-    
+
+
+
+const Category = (props) => {
+    const [modalVisible, setModalVisible] = useState(false)
+    const[filterModalVisible,setFilterModalVisible] = useState(false)
     const[products,setProducts] = useState([])
     const[categories,setCategories] = useState([])
     const[brands,setBrands] = useState([])
@@ -18,13 +32,24 @@ const Category = ({navigation,route}) => {
     const[maxprice,setMaxprice] = useState([])
     const[category_id,setCategory_id] = useState([])
     const[currentcatId,setCurrentcatId] = useState(null)
+    const[currentCategory,setCurrentCategory] = useState([])
 
+    const[selectedCategory,setSelectedCategory]= useState()
+    const[selectedBrand,setSelectedBrand] = useState()
+    const[selectedPrice,setSelectedPrice] = useState()
+    const[selectedColor,setSelectedColor] = useState()
+
+
+
+
+     const[totalProduct,setTotalProduct] = useState(24)
     const[pageno,setPageno] = useState(1)
-    const[itemsPerPage,setItemsPerPage] = useState(12)
-    const[start,setStart]= useState(0)
-    const[end,setEnd] = useState(12)
+    const[itemsPerPage,setItemsPerPage] = useState(24)
+    const[sorting,setSorting] = useState('-_id')
+    const[isShow,setIsShow] = useState(false)
 
-    
+
+    const {navigation,route} = props
 
        const [prices,setPrices] = useState([
         {
@@ -65,345 +90,494 @@ const Category = ({navigation,route}) => {
         }
 
     ])
-
-    useEffect(() => {
-        const data={
-        category_slug:route.params.slug
-        }       
-      axios.post('/category/filter',data).then(response=>{
-          console.log(response.data)
-
-       setProducts(response.data.products)
+            useEffect(() => {
+            
+            const data={
+                category_slug:'footwear',
+                pageNo:pageno,
+                sorting
+            }    
+            if(brand_id && brand_id.length!=0|| color_id &&color_id.length!=0 || minprice &&minprice.length!=0 || category_id && category_id.length!=0) {
+                getProduct()
+            } else {
+                axios.post('/category/filter',data).then(response=>{
+                setProducts(response.data.products)
+               
+                
                 var temp_brands = []
                 response.data.brands.map(brand=>{
                     if(temp_brands.some(temp=>temp.name == brand.name)){
                     }else{
-                        brand.isChecked= false
                         temp_brands.push(brand)
                     }
                 })
                 setBrands(temp_brands)
-
-               const tempCat =  response.data.categories.map(cat=>{
-                    cat.isChecked=false
-                    return cat                   
-                })
-                setCategories(tempCat)
+                setCategories(response.data.categories)
                 setCurrentcatId(response.data.category._id)
-              const tempColor = response.data.colors.map(color=>{
-                  color.isChecked = false
-                  return color
-              })
-                setColors(tempColor)
-
-      }).catch(err=>{
-          console.log(err.request.response)
-      })
-    }, [])
-
-
-    function getProduct(catid,bid,cid,min,max) {  
-        var data={
-            brand_id:bid,
-            color_id:cid,
-            minprice:min,
-            maxprice:max,
-            category_id:catid
-        }    
-
-      
-           if(catid && catid.length>0){
-           } else {
-             data={
-                brand_id:bid,
-                color_id:cid,
-                minprice:min,
-                maxprice:max,
-                category_id:[currentcatId],
-            }
-           }     
-
-           console.log(data)
-               
-           axios.post('/category/checkfilter',data).then(response=>{
-               console.log(response.data)
-               var x = response.data.filter((v,i,a)=>a.findIndex(t=>(t._id === v._id))===i)
-               setProducts(x)
+                setCurrentCategory(response.data.category)
+                setColors(response.data.colors)
+                setTotalProduct(response.data.count)
+              
+                
             }).catch(err=>{
-                console.log(err.request.response)
+                console.log(err)
             })
+            }  
+            
+        
+        }, [props,pageno,sorting,brand_id,color_id,category_id,minprice])
+
+
+
+
+    function getProduct() {
+
+        var data={
+            brand_id,
+            color_id,
+            minprice,
+            maxprice,
+            category_id,
+            pageNo:pageno,
+            sorting
         }
-
-      
-function category_filter(id){
-
-    let temp = categories.map((category) => {
-      if (id === category._id) {
-        return { ...category, isChecked: !category.isChecked };
-      }
-      return category;
-    });
-    setCategories(temp);
-
-
-    if(category_id.includes(id)){
-        var x = category_id.filter(cate=>cate !=id)
-        setCategory_id(x)
-        getProduct(x,brand_id,color_id,minprice,maxprice);
-
-    }else{
-        var y = [...category_id,id]
-        setCategory_id(y)
-        getProduct(y,brand_id,color_id,minprice,maxprice);
-    }
-}
-
-
- function brand_filter(id){
-
-let temp = brands.map((brand) => {
-      if (id === brand._id) {
-        return { ...brand, isChecked: !brand.isChecked };
-      }
-      return brand;
-    });
-    setBrands(temp);
-
-    if(brand_id.includes(id)){
-        var x = brand_id.filter(br=>br !=id)
-        setBrand_id(x)
-        getProduct(category_id,x,color_id,minprice,maxprice);
-    }else{
-        var b = [...brand_id, id];
-        setBrand_id(b)
-        getProduct(category_id,b,color_id,minprice,maxprice);
-
-    }
-}
-
-        function color_filter(id){
-        let temp = colors.map((color) => {
-            if (id === color._id) {
-                return { ...color, isChecked: !color.isChecked };
+    
+        if(category_id && category_id.length>0){
+        } else {
+             data={
+                brand_id,
+                color_id,
+                minprice,
+                maxprice,
+                category_id:[currentcatId],
+                pageNo:pageno,
+                sorting
             }
-            return color;
-            });
-            setColors(temp);
+        }     
+ 
+        axios.post('/category/checkfilter',data).then(response=>{
+            console.log(response.data)
+            var x = response.data.products.filter((v,i,a)=>a.findIndex(t=>(t._id === v._id))===i)
+            setProducts(x)
+            setTotalProduct(response.data.total)
+            
 
 
-            if(color_id.includes(id)){
-                var y = color_id.filter(c=>c!=id)
-                setColor_id(y)
-                getProduct(category_id,brand_id,y,minprice,maxprice);
+             var currentPageNo = response.data.total/itemsPerPage
+            currentPageNo=  Math.ceil(currentPageNo)
+            if(currentPageNo<pageno){
+                setPageno(currentPageNo)
+            }
+
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+
+    function brand_filter(id){
+        setSelectedBrand(id)
+        if(id){
+setBrand_id([id])
+        }else{
+            setBrand_id([])
+            
+        }
+            
+    }
+
+
+
+    function color_filter(id){
+        setSelectedColor(id)
+        if(id){
+            setColor_id([id])
+        }else{
+            setColor_id([])
+        }
+    }
+
+        function price_filter(value){
+            setSelectedPrice(value)
+            var price = value.split('|')
+            var min = price[0]
+            var max = price[1]
 
             
-            }else{
-                var z = [...color_id,id]
-                setColor_id(z)
-                getProduct(category_id,brand_id,z,minprice,maxprice);
-
-               
-            }
-
+           if(max!='false'){
+             setMaxprice([max])  
+             setMinprice([min])
+           }else{
+               setMaxprice([])
+               setMinprice([])
+           }
         }
 
-           function price_filter(id,min,max){
+function category_filter(id){
+    setSelectedCategory(id)
+if(id){
+  setCategory_id([id])
+}else{
+    setCategory_id([])
+}
+  
 
-            let temp = prices.map((price) => {
-            if (id === price.id) {
-                return { ...price, isChecked: !price.isChecked };
-            }
-            return price;
-            });
-            setPrices(temp);
+// if(category_id.includes(id)){
+//     var x = category_id.filter(cate=>cate !=id)
+//     setCategory_id(x)
+// console.log(x)
+// }else{
+//     var y = [...category_id,id]
+//     console.log(y)
+//     setCategory_id(y)
+// }
+}
 
-            if(minprice.includes(min) && maxprice.includes(max)){
-                var x = minprice.filter(m=>m!=min)
-                var y = maxprice.filter(x=>x!=max)
-                setMinprice(x)
-                setMaxprice(y)
-                getProduct(category_id,brand_id,color_id,x,y);
 
-              
-            }else{
-            var x = [...minprice,min]
-            var y = [...maxprice,max]
-            setMaxprice(y)
-            setMinprice(x)
-            getProduct(category_id,brand_id,color_id,x,y);
-           
-            }
-          
-        }
+function closetSort(e){
+    if(e.target.value=="date"){
+
+        setSorting('-_id')
+    }
+    if(e.target.value=="alphabet"){
+
+        setSorting('name')
+    }
+
+}
+
+
+function paginate(value){
+    setPageno(value)
+}
+
+
 
 
 
 
     return (
-       <ScrollView style={bbstyles.container}>
-            <Text style={bbstyles.h1}>Categories</Text>
-            <View style={{height:150}}>
-              <ScrollView >
-            {categories.map(category=>{
-                return(
-                    <View style={styles.section}>
-                        <Checkbox style={styles.checkbox} value={category.isChecked} onValueChange={()=>category_filter(category._id)} />
-                        <Text style={styles.paragraph}>{category.name}</Text>
-                    </View>
-                )
-            })}
-            </ScrollView>
-            </View>
-             <Text style={bbstyles.h1}>Brands</Text>
-            
-             <View style={{height:150}}>
-              <ScrollView >
-            {brands.map(brand=>{
-                return(
-                    <View style={styles.section}>
-                        <Checkbox style={styles.checkbox} value={brand.isChecked} onValueChange={()=>brand_filter(brand._id)} />
-                        <Text style={styles.paragraph}>{brand.name}</Text>
-                    </View>
-                )
-            })}
-            </ScrollView>
-            </View>
-            
+       <ScrollView style={styles.container}>
+        {/* sort Modal */}
+          <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+       >
 
-             <Text style={bbstyles.h1}>Colors</Text>
-            {colors.map(color=>{
-                return(
-                    <View style={styles.section}>
-                        <Checkbox style={styles.checkbox} value={color.isChecked} onValueChange={()=>color_filter(color._id)} />
-                        <Text style={styles.paragraph}>{color.name}</Text>
-                    </View>
-                )
-            })}
-        <Text style={bbstyles.h1}>Prices</Text>
-            {prices.map(price=>{
-                return(
-                    <View style={styles.section}>
-                        <Checkbox style={styles.checkbox} value={price.isChecked} onValueChange={()=>price_filter(price.id,price.minprice,price.maxprice)} />
-                        <Text style={styles.paragraph}>Rs. {price.minprice} - Rs.{price.maxprice}</Text>
-                    </View>
-                )
-            })}
-
-
-<View style={styles.productWrapper}>
-          {/* <Text style={bbstyles.h1}>New Arrival</Text> */}
-          {products.map(product=>{
-                            return(
-                            <TouchableOpacity onPress={()=>navigation.navigate('productdetail',product)} style={styles.itemWrapper}>
-                            <Image source={{uri:imageLink+product.image}} style={styles.itemImage}/>
-                            <View style={styles.detailWrapper}>
-                            <Text style={styles.itemName} numberOfLines={3}>{product.name}</Text>
-                            <Text style={styles.itemSize}>Size: {product.size_id?.name}</Text>
-                             <Text style={styles.itemPrice}>Rs.{product.price}</Text>
-                            </View>
-                         </TouchableOpacity>
-                       
-                            )
-                        })}
+             <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+          
+          <View style={styles.modalHeader}>
+           <TouchableOpacity onPress={()=>setModalVisible(false)}>
+               <View style={styles.modalClose}>
+                   <FontAwesome  name="times-circle" size={20} color={'red'}/>
+                  
+               </View>
+           </TouchableOpacity>
           </View>
 
-       </ScrollView>
+            <View style={styles.modalContent}>
+                <Picker
+                    selectedValue={sorting}
+                    onValueChange={(itemValue, itemIndex) =>
+                        setSorting(itemValue)
+                    }>
+                    <Picker.Item label="Date" value="-_id" />
+                    <Picker.Item label="Alphabet" value="name" />
+                    </Picker>
+            </View>
 
+
+          </View>
+        </View>
+        </Modal>
+
+    {/* filter modal */}
+          <Modal
+        animationType="slide"
+        transparent={true}
+        visible={filterModalVisible}
+       >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+                <View style={styles.modalHeader}>
+           <TouchableOpacity onPress={()=>setFilterModalVisible(false)}>
+               <View style={styles.modalClose}>
+                   <FontAwesome  name="times-circle" size={20} color={'red'}/>
+                  
+               </View>
+           </TouchableOpacity>
+          </View>
+
+            <ScrollView style={styles.modalContent}>
+            <View style={styles.pickerWrapper}>
+                    <Text style={styles.filterTitle}>Categories</Text>
+                <Picker
+                selectedValue={selectedCategory}
+                    onValueChange={(itemValue, itemIndex) =>
+                       category_filter(itemValue)
+                    }>
+                    <Picker.Item label = "All" value=""/>
+                        {categories.map(category=>{
+                            return(
+                                <Picker.Item label={category.name} value={category._id} />
+                            )
+                        })}
+                </Picker>
+                </View>
+
+                <View style={styles.pickerWrapper}>
+                    <Text style={styles.filterTitle}>Brands</Text>
+                <Picker
+                selectedValue={selectedBrand}
+                    onValueChange={(itemValue, itemIndex) =>
+                       brand_filter(itemValue)
+                    }>
+                    <Picker.Item label = "All" value=""/>
+                        {brands.map(brand=>{
+                            return(
+                                <Picker.Item label={brand.name} value={brand._id} />
+                            )
+                        })}
+                </Picker>
+                </View>
+                <View style={styles.pickerWrapper}>
+                    <Text style={styles.filterTitle}>Colors</Text>
+                <Picker
+                    selectedValue={selectedColor}
+                    onValueChange={(itemValue, itemIndex) =>
+                       color_filter(itemValue)
+                    }>
+                    <Picker.Item label = "All" value=""/>
+                        {colors.map(color=>{
+                            return(
+                                <Picker.Item label={color.name} value={color._id} />
+                            )
+                        })}
+                </Picker>
+                </View>
+                <View style={styles.pickerWrapper}>
+                    <Text style={styles.filterTitle}>Prices</Text>
+                <Picker
+                selectedValue={selectedPrice}
+                    onValueChange={(itemValue, itemIndex) =>
+                       price_filter(itemValue)
+                    }>
+                
+                    <Picker.Item label = "All" value={`false|false`}/>
+                        {prices.map(price=>{
+                            return(
+                                <Picker.Item label={`Rs. ${price.minprice} - Rs. ${price.maxprice}`} value={`${price.minprice}|${price.maxprice}`} />
+                            )
+                        })}
+                </Picker>
+                </View>
+            </ScrollView>
+
+          </View>
+        </View>
+        </Modal>
+
+
+    
+        <View style={styles.filterWrapper}>
+         <View style={styles.sort} >
+         <TouchableWithoutFeedback style={styles.sort}   onPress={()=>setModalVisible(true) }>
+        
+         <FontAwesome name="sort" size={15} color={'rebeccapurple'}/>
+        <Text style={styles.sorttext}> Sort</Text>
+       </TouchableWithoutFeedback>
+         </View>
+            <View style={styles.filter}>
+             <TouchableWithoutFeedback  style={styles.filter}  onPress={()=>setFilterModalVisible(true)}> <FontAwesome  name="filter" size={15} color={'rebeccapurple'}/><Text style={styles.sorttext}> Filter</Text></TouchableWithoutFeedback>
+                </View>
+        </View>
+        <View style={bbstyles.container}>
+            <View style={styles.wrapper}>
+            {products.map(product=>{
+                return(
+                 <View style={styles.productWrapper}>
+                    <Image style={styles.productImage} source={{uri:imageLink+product.image}}/>
+                    <View style={styles.detailWrapper}>
+                        <Text style={styles.productName} numberOfLines={1}>{product.name}</Text>
+                        <Text style={styles.brand}>{product.brand_id?.name}</Text>
+                        <View style={styles.sizeWrapper}>
+                            <Text style={styles.price}>Rs. {product.price}</Text> <Text>|</Text> <Text style={styles.size}>Size: {product.size_id?.name}</Text>
+                        </View>
+                    </View>
+                 </View>
+                )
+            })}
+            </View>
+        </View>
+        </ScrollView>
+
+        
     )
 }
 
+
 const styles = StyleSheet.create({
-  container: {
-
-    marginHorizontal: 16,
-    marginVertical: 32,
-  },
-  section: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  paragraph: {
-    fontSize: 15,
-  },
-  checkbox: {
-    margin: 8,
-  },
-itemWrapper:{
+    filterWrapper:{
+        display:'flex',
         flexDirection:'row',
-    
-       paddingVertical:20
-     
+        justifyContent:'center',
+        alignItems:'center',
+      shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
     },
-    itemImage:{
-        height:150,
-      
-        resizeMode:'cover',
-        flex:2 
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+ marginBottom:5,
+
+        padding:10,
+        textAlign:'center',
+       paddingVertical:15
     },
-    detailWrapper:{
-        marginLeft:15,
-        flex:3
+    container:{
+        backgroundColor:'#fff'
     },
-    itemName:{
-        fontSize:17,
-        fontWeight:'bold',
-        marginBottom:5,
-        textTransform:'capitalize'
+    sort:{
+     flex:2,
+     flexDirection:'row',
+     alignItems:'center',
+     justifyContent:'center'
     },
-    itemSize:{
-        fontSize:16,
+    filter:{
+    flex:2,
+    flexDirection:'row',
+     alignItems:'center',
+     justifyContent:'center',
+    },
+    sorttext:{
         fontWeight:'500',
-        marginBottom:5,
-        textTransform:'capitalize'
-
+        fontSize:16
     },
-        itemPrice:{
-        fontSize:16,
-        fontWeight:'bold',
-        marginBottom:5
-    },
-
-  product:{
-        flex:1,
+    wrapper:{
+        display:'flex',
         flexDirection:'row',
-        margin:20
-    },
- 
-    
-
-    
-
-    productImage:{
-        height:200,
-        resizeMode:'contain',
-        flex:2
-    },
-
-    productDesc:{
-        fontWeight:'500',
-        fontSize:16,
-        flex:3,
-        marginLeft:20,
+        flexWrap:'wrap'
+        
     },
     productWrapper:{
-   
-      margin:15
+     width: (Dimensions.get('window').width/2)-28,
+     marginRight:8,
+     marginBottom:15
+
     },
-    productTitle:{
-        fontWeight:'500',
+    productImage:{
+        height:150,
+        width:'auto',
+        resizeMode:'cover'
+
+    },
+    detailWrapper:{
+        marginTop:15,
+        display:'flex',
+    },
+    productName:{
         fontSize:16,
-        marginBottom:5,
-        textTransform:'capitalize'
-    },
-    productPrice:{
-        fontWeight:'bold',
+        fontWeight:'600',
         marginBottom:5
     },
-    productCategory:{
-        textTransform:'capitalize'
+    brand:{
+        fontSize:15,
+        fontWeight:'500',
+        marginBottom:5
     },
+    sizeWrapper:{
+        display:'flex',
+        flexDirection:'row',
+    
+    },
+    price:{
+        fontSize:15,
+        fontWeight:'bold',
+        marginRight:5
+    },
+    size:{
+        fontSize:15,
+        fontWeight:'500',
+        marginLeft:5
+    },
+     centeredView: {
+    flex: 1, 
+  },
+  modalView: {
+   
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+
+    elevation: 5,
+
+    flex:1,
+    width:Dimensions.get('window').width
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalClose:{
+    
+  },
+  modalHeader:{
+    //   borderBottomWidth:1,
+    //   borderBottomColor:'#ddd',
+      padding:15,
+     flexDirection:'row',
+     justifyContent:'flex-end',
+      shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalContent:{
+      margin:10
+  },
+  pickerWrapper:{
+      marginBottom:5,
+      padding:5,
+      borderBottomColor:'#ddd',
+      borderBottomWidth:1,
+      paddingBottom:10
+  },
+  filterTitle:{
+    fontSize:16,
+    fontWeight:'500',
+    marginBottom:3
+  }
+    
 
 
-});
+})
 
 export default Category

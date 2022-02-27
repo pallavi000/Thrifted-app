@@ -33,6 +33,7 @@ import Category from './component/Category'
 import ForgotPassword from './component/ForgotPassword'
 import ResetPassword from './component/ResetPassword';
 import ChangePassword from './component/ChangePassword'
+import Setting from './component/Setting';
 
 axios.defaults.baseURL="http://167.86.77.80:5000/api"
 
@@ -90,15 +91,9 @@ export default function App(props) {
     if(authConfig){
       setIsLoggedIn(true)   
     }
-    } catch (error) {
-      
+    } catch (error) {  
     }
-
-    
   }
-
-
-  
   useEffect(() => {
     getToken()
 }, [props])
@@ -109,9 +104,10 @@ function homeStackNavigator({navigation}){
 
   return(
         <Stack.Navigator screenOptions={{
-          headerShown:true
+          headerShown:true,
+          
         }}>
-    
+      <Stack.Screen name="category" component = {Category} />
           <Stack.Screen name="welcome" component={Welcome}/>
           <Stack.Screen  name="productdetail" component={ProductDetail}/>
           <Stack.Screen name="checkout" component={Checkout}/>
@@ -119,7 +115,7 @@ function homeStackNavigator({navigation}){
           <Stack.Screen name="orderReceived" component={OrderReceived}/>
           <Stack.Screen name="orderList" component={OrderList}/>
           <Stack.Screen name="editAddress" component={EditAddress}/>
-          <Stack.Screen name="category" component = {Category} />
+        
           <Stack.Screen name="changepassword" component={ChangePassword}/>
           
           </Stack.Navigator>
@@ -143,7 +139,7 @@ function CartNavigation(){
   )
 }
 
- function Logout({navigation}){
+  function Logout({navigation}){
   useEffect(async () => {
     await AsyncStorage.removeItem('token')
     setIsLoggedIn(false)
@@ -155,19 +151,47 @@ function CartNavigation(){
   )
 }
 
-function toggleNavigaton(){  
-  return(
-    <Drawer.Navigator>
-      <Drawer.Screen name="Profile" component={Profile}/>
-      <Drawer.Screen name="Address" component={Address}/>
-      <Drawer.Screen name="My Closet" component={MyCloset}/>
-      <Drawer.Screen name="Order List" component={OrderList}/>
-      <Drawer.Screen name="Create Post" component={CreatePost}/>
-      <Drawer.Screen name="Sales History" component={SaleHistory}/>
-      <Drawer.Screen name="Payouts" component={Payouts}/>
-      <Drawer.Screen name="Logout" component={Logout}/>
+// function toggleNavigaton(){  
+//   return(
+//     <Drawer.Navigator>
+//       <Drawer.Screen name="Profile" component={Profile}/>
+//       <Drawer.Screen name="Address" component={Address}/>
+//       <Drawer.Screen name="My Closet" component={MyCloset}/>
+//       <Drawer.Screen name="Order List" component={OrderList}/>
+//       <Drawer.Screen name="Create Post" component={CreatePost}/>
+//       <Drawer.Screen name="Sales History" component={SaleHistory}/>
+//       <Drawer.Screen name="Payouts" component={Payouts}/>
+//       <Drawer.Screen name="Logout" component={Logout}/>
 
-    </Drawer.Navigator>
+//     </Drawer.Navigator>
+//   )
+// }
+
+
+function accountNavigation(){
+  return(
+  <Stack.Navigator
+  screenOptions={{
+    headerStyle:{
+      shadowColor: '#ddd',
+          shadowOffset: {
+            width: 0,
+            height: 2
+          },
+          shadowRadius: 3.5,
+          elevation: 5
+    }
+  }}
+  >
+    <Stack.Screen  name="Setting" component={Setting}/>
+      <Stack.Screen name="Profile" component={Profile}/>
+      <Stack.Screen name="Address" component={Address}/>
+      <Stack.Screen name="My Closet" component={MyCloset}/>
+      <Stack.Screen name="Order List" component={OrderList}/>
+      <Stack.Screen name="Sales History" component={SaleHistory}/>
+      <Stack.Screen name="Payouts" component={Payouts}/>
+      <Stack.Screen name="Logout" component={Logout}/>
+  </Stack.Navigator>
   )
 }
 
@@ -201,14 +225,17 @@ function toggleNavigaton(){
             <FontAwesome name="home" size={30}/>
             )
           }}/> 
-        <Tab.Screen  name="profile" component={profileNavigation} options={{
-          tabBarIcon:()=>(<FontAwesome name="user" size={30} />)
+        <Tab.Screen  name="categories" component={profileNavigation} options={{
+          tabBarIcon:()=>(<FontAwesome name="th-large" size={30} />)
+        }}/>
+         <Tab.Screen  name="Create Post" component={CreatePost} options={{
+          tabBarIcon:()=>(<FontAwesome name="camera" size={30} />)
         }}/>
         <Tab.Screen name="addtocart" component={CartNavigation} options={{
           tabBarIcon:()=>(<><FontAwesome name="shopping-cart" size={30}/><Text style={styles.cartcount}>{cartCount}</Text></>)
         }}/>
-        <Tab.Screen name="toggle" component={toggleNavigaton} options={{
-          tabBarIcon:()=>(<FontAwesome name="bars" size={30}/>)
+        <Tab.Screen name="account" component={accountNavigation} options={{
+          tabBarIcon:()=>(<FontAwesome name="user" size={30}/>)
         }}/>
 
       </Tab.Navigator>

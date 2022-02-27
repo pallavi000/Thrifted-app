@@ -73,7 +73,10 @@ const bbstyles = StyleSheet.create({
         marginVertical: 10
     }, 
     container:{
-        margin:20
+        padding:20,
+        flex:1,
+        backgroundColor:'#fff'
+
     },
 
       alertDanger:{

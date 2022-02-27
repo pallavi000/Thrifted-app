@@ -7,10 +7,8 @@ import bbstyles from './Styles'
 import { imageLink } from './ImageLink'
 import Carousel from 'react-native-banner-carousel';
 
-
-function Welcome({navigation}) {
-
-
+export default function Welcome({navigation}) {
+    
     const[products,setProducts] = useState([])
     const[banners,setBanners] = useState([])
     const [categories, setCategories] = useState([])
@@ -24,33 +22,13 @@ useEffect(() => {
         setRentProducts(response.data.rentProduct)
         setSellProducts(response.data.saleProduct)
         setCategories(response.data.categories)
+        console.log(response.data.product)
     })
 }, [])
 
-
-    return ( 
+  return (
        <ScrollView  style={styles.container}>
-
-             <Carousel
-                    autoplay
-                    autoplayTimeout={5000}
-                    loop
-                    index={0}
-                    pageSize={Dimensions.get('window').width}
-                >
-              
-                    {banners.map(banner=>{
-                        return(
-                            banner.section=="top"?(
-                                <Image style={styles.banner} source={{uri:imageLink+banner.image}}/>
-                            ):(null)
-                        )
-                    })}
-                </Carousel>
-
-       
-          <Text style={styles.topcategory}>Top Categories</Text>
-          <ScrollView   horizontal={true} showsHorizontalScrollIndicator={false} style={styles.wrapper}>
+         <ScrollView   horizontal={true} showsHorizontalScrollIndicator={false} style={styles.wrapper}>
           {categories.map(category=>{
               return(
                 <TouchableOpacity onPress={()=>navigation.navigate('category',category)} style={styles.cateWrapper}>
@@ -58,209 +36,155 @@ useEffect(() => {
                 <Text style={styles.cateText}>{category.name}</Text>
              </TouchableOpacity>
               )
-          })}
+                })}
           </ScrollView>
-          
+           {products.map(product=>{
+               return(
           <View style={styles.productWrapper}>
-          <Text style={styles.h1}>New Arrival</Text>
-          {products.slice(0,4).map(product=>{
-              return(
-                  <TouchableOpacity style={styles.product} onPress={()=>navigation.navigate('productdetail',product)}>
-                  <Image source={{uri:imageLink+product.image}} style={styles.productImage}/>
-                  <View style={styles.productDesc}>
-                      <Text style={styles.productTitle} numberOfLines={3}>{product.name}</Text>
-                      <Text style={styles.productPrice}>Rs. {product.price}</Text>
-                      <Text style={styles.productCategory}>{product.category_id?.name}</Text>
-                  </View>
-                  </TouchableOpacity>
-              )
-          })}
+          <TouchableOpacity  onPress={()=>navigation.navigate('productdetail',product)}>
+            <View style={styles.userWrapper}>
+               <Image style={styles.userimage} source={{uri:'http://167.86.77.80:3000/images/1642749540268.jpg'}}></Image> 
+               <Text style={styles.username}>username</Text>   
+            </View>
+            <View style={styles.product}>
+                <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image>
+                <View style={styles.typeWrapper}> 
+                    <View><Text style={styles.productname} numberOfLines={1}>{product.name}</Text></View> 
+                    <View><Text style={styles.type}>{product.type}</Text></View> 
+                </View>
+                <View style={styles.detailWrapper}>
+                    <Text style={styles.price}>Rs. {product.price}</Text><Text>|</Text><Text style={styles.size}>Size: {product.size_id?.name}</Text><Text>|</Text><Text style={styles.brand}>{product.brand_id?.name}</Text>
+                </View>   
+            </View>
+            </TouchableOpacity>
           </View>
-             <Carousel
-                    autoplay
-                    autoplayTimeout={5000}
-                    loop
-                    index={0}
-                    pageSize={Dimensions.get('window').width}
-                >
-                    {banners.map(banner=>{
-                            return(
-                                banner.section=="middle"?(
-                                    <Image style={styles.banner} source={{uri:imageLink+banner.image}}/>
-                                ):(null)
-                            )
-                        })}
-
-                </Carousel>
-          
-          <View style={styles.productWrapper}>
-          <Text style={styles.h1}>Product For Rent</Text>
-          {rentProducts.slice(0,4).map(product=>{
-              return(
-                  <TouchableOpacity style={styles.product} onPress={()=>navigation.navigate('productdetail',product)}>
-                  <Image source={{uri:imageLink+product.image}} style={styles.productImage}/>
-                  <View style={styles.productDesc}>
-                      <Text style={styles.productTitle} numberOfLines={3}>{product.name}</Text>
-                      <Text style={styles.productPrice}>Rs. {product.price}</Text>
-                      <Text style={styles.productCategory}>{product.category_id?.name}</Text>
-                  </View>
-                  </TouchableOpacity>
-              )
+                 )
           })}
-          </View>
-          <Carousel
-                    autoplay
-                    autoplayTimeout={5000}
-                    loop
-                    index={0}
-                    pageSize={Dimensions.get('window').width}
-                >
+       
 
-          {banners.map(banner=>{
-           return(
-               banner.section=="last"?(
-                <Image style={styles.banner} source={{uri:imageLink+banner.image}}/>
-               ):(null)
-            
-           )
-       })}
-
-       </Carousel>
-
-
-      
-               
-                   
-          <View style={styles.productWrapper}>
-          <Text style={styles.h1}>Product For Sell</Text>
-          {sellProducts.slice(0,4).map(product=>{
-              return(
-                   <TouchableOpacity  onPress={()=>navigation.navigate('productdetail',product)}>
-                       <View style={styles.product}>
-                 
-                  <Image source={{uri:imageLink+product.image}} style={styles.productImage}/>
-                  <View style={styles.productDesc}>
-                      <Text style={styles.productTitle} numberOfLines={3}>{product.name}</Text>
-                      <Text style={styles.productPrice}>Rs. {product.price}</Text>
-                      <Text style={styles.productCategory}>{product.category_id?.name}</Text>
-                  </View>
-                
-                  </View>
-                    </TouchableOpacity>
-
-
-              )
-          })}
-        </View>
        </ScrollView>
-    )
+  );
 }
 
-
-
 const styles = StyleSheet.create({
-    container:{
 
-    },
-    card:{
-        padding:10,
-        borderWidth:1,
-        borderColor:'red',
-        width:250,
-        height:300,
-        margin: 10,
-        display:'flex',
-        justifyContent:'center',
-        alignItems:'center'
-    },
-    banner:{
-     
-   flex: 1,
-    width: '100%',
-    height: 150,
-    resizeMode: 'contain',
-    marginTop:0
-    },
-    wrapper:{
+     wrapper:{
         flexDirection:'row',
-        marginHorizontal:10,
-        marginTop:0,
+        marginTop:5,
         marginBottom:10
     },
     category:{
-        height:100,
-        width:100,
-        borderRadius:50,
+        height:70,
+        width:70,
+        borderRadius:35,
+        borderColor:'rebeccapurple',
+        borderWidth:2
     },
     cateWrapper:{
-        marginHorizontal:10,
+        marginHorizontal:4,
         display:'flex',
         justifyContent:'center',
         alignItems:'center',
-        textAlign:'center'
+        textAlign:'center',
     },
     cateText:{
         textAlign:'center',
-        marginTop:10,
+        marginTop:4,
         textTransform:'capitalize',
-        fontSize:16,
+        fontSize:14,
         fontWeight:'500'
     },
-    product:{
-      
-        flexDirection:'row',
-        margin:10
-    },
- 
 
-
-    productImage:{
-        height:150,
-        resizeMode:'cover',
-        flex:2
-    },
-
-    productDesc:{
-        fontWeight:'500',
-        fontSize:16,
-        flex:2,
-        marginLeft:20,
-    },
     productWrapper:{
- 
-      margin:20
+        borderWidth:1,
+        borderColor:'lightgray',
+        marginHorizontal:5,
+        marginBottom:20
+        
     },
-    productTitle:{
-        fontWeight:'500',
+    userWrapper:{
+        display:'flex',
+        flexDirection:'row',
+        alignItems:'center',
+       paddingHorizontal:5,
+       paddingVertical:10,
+        borderBottomWidth:1,
+        borderBottomColor:'lightgray',
+
+
+    },
+    userimage:{
+        height:34,
+        width:34,
+        borderWidth:2,
+        borderColor:'rebeccapurple',
+        padding:5,
+        borderRadius:17
+
+
+
+    },
+    username:{
         fontSize:16,
-        marginBottom:5,
-        textTransform:'capitalize'
+        textTransform:'capitalize',
+        marginLeft:6
+
     },
-    productPrice:{
-        fontWeight:'bold',
+    product:{
+
+    },
+    productImage:{
+        height:300,
+        width:'auto',
+        resizeMode:'cover'
+        
+    },
+    typeWrapper:{
+        display:'flex',
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'space-between',
+        paddingHorizontal:15,
+        marginTop:10,
         marginBottom:5
+
     },
-    productCategory:{
+    detailWrapper:{
+        display:'flex',
+        alignItems:'center',
+        flexDirection:'row',
+        marginBottom:15,
+        paddingHorizontal:15
+    },
+    productname:{
+        fontSize:16,
+        fontWeight:'600',
+        textTransform:'capitalize',
+        width:180
+    },
+    type:{
+        fontSize:14,
+        paddingHorizontal:9,
+        paddingVertical:1,
+        borderRadius:10,
+        borderWidth:1,
+        borderColor:'#ddd',
         textTransform:'capitalize'
+      
     },
-    h1:{
-         margin: 20,
-         marginLeft:10,
-        fontSize: 20,
-        fontWeight: 'bold'
+    price:{
+        fontSize:15,
+        fontWeight:'bold',
+        marginRight:5
     },
-    topcategory:{
-          margin: 20,
-          marginTop:5,
-         marginLeft:10,
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign:'center'   
+    size:{
+        fontSize:15,
+        marginHorizontal:5
     },
+    brand:{
+          fontSize:15,
+        marginLeft:5
+    }
     
 
-
- 
-})
-
-export default Welcome
+});

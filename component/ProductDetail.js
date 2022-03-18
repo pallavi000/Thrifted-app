@@ -1,6 +1,10 @@
+import { getDrawerStatusFromState } from '@react-navigation/drawer'
+import { BaseNavigationContainer, NavigationRouteContext } from '@react-navigation/native'
 import axios from 'axios'
 import React, { useContext, useState } from 'react'
 import { View ,Text, Image, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent, TouchableOpacity} from 'react-native'
+import { tan } from 'react-native-reanimated'
+import { ScreenStackHeaderBackButtonImage } from 'react-native-screens'
 import { cartContext } from './CartContext'
 import { AuthContext } from './Context'
 import { imageLink } from './ImageLink'
@@ -47,7 +51,7 @@ function ProductDetail({route}) {
 
 
     return (
-       <ScrollView style={styles.container} >
+       <ScrollView style={[styles.container,bbstyles.bgWhite]} >
        <View style={styles.imageContainer}>
            <Image source={{uri:imageLink+activeImage}} style={styles.productImg}/>
            </View>
@@ -120,11 +124,13 @@ const styles = StyleSheet.create({
         fontSize:16,
         marginBottom:7
     },
+   
 
     desc:{
         fontSize:16,
         fontWeight:'400',
-        marginBottom:20
+        marginBottom:20,
+        opacity:0.6
     },
     type:{
          fontSize:15,

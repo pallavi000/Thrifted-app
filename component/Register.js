@@ -75,7 +75,7 @@ function Register({navigation}) {
 
      
         <TouchableWithoutFeedback onPress={handleSubmit}>
-            <Text style={bbstyles.btnPrimary}>Login</Text>
+            <Text style={[bbstyles.btnPrimary,{marginTop:20}]}>Register</Text>
             </TouchableWithoutFeedback>
 
             <TouchableWithoutFeedback onPress={()=>facebook()}>

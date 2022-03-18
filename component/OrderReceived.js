@@ -2,6 +2,7 @@ import React,{useContext,useEffect} from 'react'
 import { View, Text,StyleSheet,TouchableWithoutFeedback } from 'react-native'
 import {AuthContext} from './Context'
 import {FontAwesome} from '@expo/vector-icons'
+import bbstyles from './Styles'
 
 const OrderReceived = ({navigation}) => {
 
@@ -14,7 +15,7 @@ const OrderReceived = ({navigation}) => {
 
 
     return (
-        <View style={styles.wrapper}>
+        <View style={[styles.wrapper,bbstyles.bgWhite]}>
        <Text style={styles.icon} ><FontAwesome name="check" size={30} color='white'/></Text>
             <Text style={styles.success}> Order Success</Text>
             

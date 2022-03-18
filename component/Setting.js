@@ -6,7 +6,7 @@ import { FontAwesome } from '@expo/vector-icons';
 const Setting = ({navigation}) => {
 
   return (
-    <ScrollView style={bbstyles.container}>
+    <ScrollView style={[bbstyles.container,bbstyles.bgWhite]}>
         <View style={styles.setting}>
         <TouchableOpacity onPress={()=>navigation.navigate('My Closet')} >
             <View style={styles.settingLink}>

@@ -3,6 +3,8 @@ import { View, Text,StyleSheet ,Image, ScrollView} from 'react-native'
 import axios from 'axios'
 import { AuthContext } from './Context'
 import { imageLink } from './ImageLink'
+import bbstyles from './Styles'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 const OrderList = () => {
     const[items,setItems] = useState([])
@@ -25,7 +27,7 @@ const OrderList = () => {
 
 
     return (
-        <ScrollView>
+        <ScrollView style={[bbstyles.bgWhite]}>
         {items.map(item=>{
             return(
                 <>

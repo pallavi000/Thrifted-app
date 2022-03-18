@@ -56,7 +56,7 @@ export default function Checkout({navigation}) {
 
 
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView style={[styles.containerm,bbstyles.bgWhite]}>
         
 <Text style={bbstyles.h1}>Shipping Address</Text>
 {shipping && shipping.length!=0?(

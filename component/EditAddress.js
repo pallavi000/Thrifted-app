@@ -49,7 +49,7 @@ const EditAddress = ({navigation}) => {
     
     
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView style={[styles.container,bbstyles.bgWhite]}>
                <Formik 
                initialValues={{district:address.billing?.district,city:address.billing?.city,street:address.billing?.street,phone:address.billing?.phone,shipping_district:address.shipping?.district,shipping_city:address.shipping?.city,shipping_street:address.shipping?.street,shipping_phone:address.shipping?.phone}}
                onSubmit={(values)=>add(values)}

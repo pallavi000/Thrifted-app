@@ -256,7 +256,7 @@ function paginate(value){
 
 
     return (
-       <ScrollView style={styles.container}>
+       <ScrollView style={[styles.container,bbstyles.bgWhite]}>
         {/* sort Modal */}
           <Modal
         animationType="slide"

@@ -2,7 +2,7 @@ import React,{useState,useEffect, useContext} from 'react'
 import { View, Text,StyleSheet,Image,TouchableWithoutFeedback,ScrollView} from 'react-native'
 import axios from 'axios'
 import { AuthContext } from './Context'
-import { MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { imageLink } from './ImageLink'
 
 
@@ -10,10 +10,26 @@ const CartItem = (props) => {
     const {navigation} = props
     const[items,setItems] = useState([])
     const data = useContext(AuthContext)
-    const {cartItems} = data
+    const {cartItems,setCartItems,token} = data
 
+    const config = {
+        headers:{
+            'access-token': token
+        }
+    }
+
+
+    function removeCart(item){
+        axios.delete('/addtocart/cartremove/'+item._id,config).then(response=>{
+            var products =  cartItems.filter(product=>product.product_id?._id!=item.product_id._id)     
+            setCartItems(products)
+            console.log(products)
+            retotal(products)
+      
+        })
+      
   
-
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -27,18 +43,20 @@ const CartItem = (props) => {
                                  <Text style={styles.productPrice}>Quantity: {item.quantity}</Text>
                                 <Text style={styles.productPrice}>Rs. {item.product_id?.price}</Text>
                             </View>
+                            <View>
+                            <TouchableWithoutFeedback onPress={()=>removeCart(item)}>
+                            <FontAwesome name="trash" size={20} color={'red'}/>
+                            </TouchableWithoutFeedback>
+                            </View>
                     </View>
 
-
-                   
-                    
                 )
             })}
+          
+            <View>
             <TouchableWithoutFeedback onPress={()=>navigation.navigate('checkout')}>
                     <Text style={styles.Proceed}>Proceed to Checkout</Text>
                     </TouchableWithoutFeedback>
-            <View>
-           
             </View>
         </ScrollView>
     )

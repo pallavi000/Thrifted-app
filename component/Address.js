@@ -5,6 +5,10 @@ import axios from 'axios'
 import { AuthContext } from './Context'
 import bbstyles from './Styles'
 import AddAddress from './AddAddress'
+import { withDecay } from 'react-native-reanimated'
+import { yupToFormErrors } from 'formik'
+
+
 
 export default function Address({navigation}) {
     const[shipping,setShipping] = useState([])
@@ -34,7 +38,7 @@ export default function Address({navigation}) {
     }, [IsFocused])
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container,bbstyles.bgWhite]}>
         {shipping && shipping.length!=0?(
             <>
             <Text style={bbstyles.h1}>My Address</Text> 

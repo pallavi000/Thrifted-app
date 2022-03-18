@@ -42,7 +42,7 @@ function esewa(){
 }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container,bbstyles.bgWhite]}>
         <Text style={bbstyles.h1}>Payment Detail</Text>
            <View style={styles.subtotal}>
         <Text style={styles.total}><Text>SubTotal: </Text><Text>Rs. {subtotal}</Text></Text>

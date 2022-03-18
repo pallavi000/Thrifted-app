@@ -49,7 +49,7 @@ function changePassword(values){
          <Text style={styles.error}>{errors.email}</Text>
 
                 <TouchableOpacity  onPress={()=>handleSubmit()}>
-                    <Text style={bbstyles.btnPrimary}>Submit</Text>
+                    <Text style={[bbstyles.btnPrimary,{marginTop:20}]}>Submit</Text>
                 </TouchableOpacity>
                  </>
                  

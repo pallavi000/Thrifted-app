@@ -23,11 +23,13 @@ useEffect(() => {
         setSellProducts(response.data.saleProduct)
         setCategories(response.data.categories)
         console.log(response.data.product)
+        
     })
 }, [])
 
+
   return (
-       <ScrollView  style={styles.container}>
+       <ScrollView  style={bbstyles.bgWhite}>
          <ScrollView   horizontal={true} showsHorizontalScrollIndicator={false} style={styles.wrapper}>
           {categories.map(category=>{
               return(
@@ -67,6 +69,7 @@ useEffect(() => {
 }
 
 const styles = StyleSheet.create({
+   
 
      wrapper:{
         flexDirection:'row',
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
 
     },
     productImage:{
-        height:300,
+        height:400,
         width:'auto',
         resizeMode:'cover'
         

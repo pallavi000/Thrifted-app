@@ -4,6 +4,9 @@ import {StyleSheet} from 'react-native'
 
 
 const bbstyles = StyleSheet.create({
+    bgWhite:{
+        backgroundColor:'white',
+    },
     body: {
         backgroundColor: '#f5f5ff',
     },

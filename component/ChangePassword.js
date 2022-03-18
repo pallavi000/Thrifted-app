@@ -35,7 +35,7 @@ function changePassword(values){
 }
 
     return (
-       <View style={bbstyles.container}>
+       <View style={[bbstyles.container,bbstyles.bgWhite]}>
             <Text style={bbstyles.h1}>Reset Password</Text>
              {error?(<Text style={bbstyles.alertDanger}>{error}</Text>):(null)}
             <Formik

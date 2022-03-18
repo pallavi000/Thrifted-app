@@ -45,7 +45,7 @@ useEffect(() => {
 
 
     return (
-        <ScrollView style={bbstyles.container}>
+        <ScrollView style={[bbstyles.container,bbstyles.bgWhite]}>
             <Text style={bbstyles.h1}> SaleHistory</Text>
            <View style={styles.wrapper}>
                 <View style={styles.header}>

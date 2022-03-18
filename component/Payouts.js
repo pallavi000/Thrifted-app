@@ -40,7 +40,7 @@ function payoutForm(values){
     })
 }
     return (
-        <View style={bbstyles.container}>
+        <View style={[bbstyles.container,bbstyles.bgWhite]}>
             <Text style={bbstyles.h1}>Payouts</Text>
             {error?(
                 <Text style={bbstyles.alertDanger}>{error}</Text>

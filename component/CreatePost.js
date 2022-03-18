@@ -23,7 +23,7 @@ const validationSchema = Yup.object().shape({
     price:Yup.string().required(),
     type:Yup.string().required(),
     detail:Yup.string().required(),
-    image:Yup.string().required()
+    image1:Yup.string().required()
     
 })
 
@@ -34,6 +34,7 @@ const CreatePost = () => {
     const[brands,setBrands] = useState([])
     const[categories,setCategories] = useState([])
     const[showBrand,setShowBrand] = useState(false)
+   
 
     const data = useContext(AuthContext)
     const {token} = data
@@ -59,6 +60,8 @@ const CreatePost = () => {
      }, [])
 
      function createPost(values){
+         console.log(values)
+         return false
         axios.post('/product/create/post',values,config).then(response=>{
             console.log(response.data)
        }).catch(err=>{
@@ -90,13 +93,22 @@ const CreatePost = () => {
              return arr
          }
      }
+
+     function calcEarning(e,setFieldValue){
+       var  price= e.target.value
+       var profit = price- price*20/100
+       console.log(profit)
+       
+       setFieldValue('earning_price',profit)
+   
+     }
      
      
     return (
-        <ScrollView style={bbstyles.container}>
+        <ScrollView style={[bbstyles.container, bbstyles.bgWhite]}>
         
             <Formik 
-           initialValues={{name:'',detail:'',category:'',stock:'',size:'',brand:'',color:'',original:'',price:'',earning_price:'',type:'',image:'',custombrand:''}}
+           initialValues={{name:'',detail:'',category:'',stock:'',size:'',brand:'',color:'',original:'',price:'',earning_price:'',type:'',image1:'',custombrand:'',image2:'',image3:'',image4:''}}
            onSubmit={(values)=>createPost(values)}
            validationSchema={validationSchema}
            
@@ -233,7 +245,12 @@ const CreatePost = () => {
                 style={styles.formcontrol}
                     keyboardType='default'
                     placeholder="Product listing price"
-                    onChangeText={handleChange("price")}
+                    onChangeText={
+                        handleChange('price')
+                        
+                    }
+
+                    onChange={(e)=>calcEarning(e,setFieldValue)}
                 />
                 <Text style={styles.error}>{errors.price}</Text>
 
@@ -241,7 +258,8 @@ const CreatePost = () => {
                 <TextInput
                 style={styles.formcontrol}
                     keyboardType='default'
-                    onChangeText={handleChange("earning_price")}
+                    value={values.earning_price}
+
                 />
                 <Text style={styles.error}>{errors.earning_price}</Text>
                 <Text style={styles.title}>Product Type</Text>

@@ -27,12 +27,13 @@ function Profile({navigation}) {
 
 
     useEffect(() => {
+        console.log('profile')
         ProfileScreen()
     }, [])
 
 
     return (
-       <View style={styles.container}>
+       <View style={[styles.container, bbstyles.bgWhite]}>
         <Text style={bbstyles.h1}>My Profile</Text>
         <View style={styles.profileText}>
             <Text style={styles.header}>Name</Text>

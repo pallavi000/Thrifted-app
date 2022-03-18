@@ -74,8 +74,10 @@ function google(){
            />
           <Text style={{color:'red'}}>{errors.password}</Text>
             <TouchableWithoutFeedback onPress={handleSubmit}>
-            <Text style={bbstyles.btnPrimary}>Login</Text>
+            <Text style={[bbstyles.btnPrimary,{marginTop:20}]}>Login</Text>
             </TouchableWithoutFeedback>
+
+          
 
              <TouchableWithoutFeedback onPress={()=>navigation.navigate('forgotpassword')}>
             <Text style={styles.forgot}> Forgot Password ?</Text>

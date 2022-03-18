@@ -67,10 +67,11 @@ function resetPassword(values){
                 secureTextEntry
                 onChangeText={handleChange("verifykey")}
                 />
+
                 <Text style={bbstyles.error}>{errors.verifykey}</Text> 
 
                 <TouchableOpacity onPress={()=>handleSubmit()}>
-                    <Text style={bbstyles.btnPrimary}>Submit</Text>
+                    <Text style={[bbstyles.btnPrimary,{marginTop:20}]}>Submit</Text>
                 </TouchableOpacity>
                 </>
             )}

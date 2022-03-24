@@ -3,86 +3,86 @@ import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
 import { AuthContext } from '../Context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios'
+import axios from 'axios';
+import bbstyles from '../Styles'
 
-export default function Register({navigation}) {
-    const [email,setEmail] = useState('')
-    const [password,setPassword] = useState('')
-    const [ fullName,setFullName] = useState('')
-    const {setIsLoggedIn} = useContext(AuthContext)
-    const[error,setError] = useState('')
+export default function ResetPassword() {
+    const [newPassword,setNewPassword] = useState('')
+    const [confirmPassword,setConfirmPassword] = useState('')
+    const [verifyKey,setVerifyKey] = useState('')
+    const[error,setError] =useState('')
+    const[success,setSuccess] = useState('')
 
-    function registerForm(){
-           //validation
-
-    if(fullName.trim().length==0) {
-    setError('User name is required.')
-    return false
-    }
-
-    if(email.trim().length==0) {
-        setError('Email is required.')
+function resetPassword(){
+    if(newPassword.trim().length==0) {
+        setError('New Password is required.')
         return false
       }
-      if(password.trim().length==0) {
-        setError('Password is required')
+      if(confirmPassword.trim().length==0) {
+        setError('Confirm Password is required.')
         return false
       }
-    
-    const data = {
-        name:fullName,
-        email,
-        password
+      if(verifyKey.trim().length==0) {
+        setError('Verify Key is required.')
+        return false
+      }
+
+
+
+    const data={
+        newPassword,
+        confirmPassword,
+        verifykey:verifyKey
     }
-    axios.post('/user/all',data).then(async response=>{ 
-        console.log(response.data)     
-        await AsyncStorage.setItem('token',response.data)
-      setIsLoggedIn(true)
-     
-     }).catch(err=>{
-         console.log(err)
-     })
-    }
+    axios.post('/user/reset/password',data).then(response=>{
+              console.log(response.data)
+              setSuccess('your password has been successfully updated')
+  
+          }).catch(err=>{
+              setError(err.request.response)
+          })
+  }
+
 
   return (
-    <ScrollView style={{height:Dimensions.get('window').height}}>
+<ScrollView style={{height:Dimensions.get('window').height}}>
     <View style={styles.container}>
-      <Text style={styles.title}>Create an Account</Text>
+      <Text style={styles.title}>Welcome Back</Text>
       <View style={styles.loginForm}>
-        <Text style={styles.login}>Register</Text>
+        <Text style={styles.login}>Reset Password</Text>
         {error?(
           <Text style={bbstyles.alertDanger}>{error}</Text>
         ):(null)}
-        <View style={styles.formgroup}>
-          <View style={styles.labelWrapper}>
-            <Ionicons name="person" size={20} color={'#868686'}></Ionicons>
-            <Text style={styles.label} >Full Name</Text>
-          </View>
-          <TextInput keyboardType='default' style={styles.inputField} onChange={(e)=>setFullName(e.target.value)}></TextInput>
-        </View>
-        <View style={styles.formgroup}>
-          <View style={styles.labelWrapper}>
-            <Ionicons name="mail-outline" size={20} color={'#868686'}></Ionicons>
-            <Text style={styles.label}>Email</Text>
-          </View>
-          <TextInput keyboardType='email' style={styles.inputField} onChange={(e)=>setEmail(e.target.value)}></TextInput>
-        </View>
+        {success?(
+          <Text style={bbstyles.alertSuccess}>{success}</Text>
+        ):(null)}
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label} >New Password</Text>
           </View>
-          <TextInput keyboardType='default' onFocus={()=>{}} style={styles.inputField} secureTextEntry={true} onChange={(e)=>setPassword(e.target.value)}></TextInput>
+          <TextInput keyboardType='default' secureTextEntry={true} style={styles.inputField} onChange={(e)=>setNewPassword(e.target.value)} ></TextInput>
+        </View>
 
+        <View style={styles.formgroup}>
+          <View style={styles.labelWrapper}>
+            <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
+            <Text style={styles.label} >Confirm Password</Text>
+          </View>
+          <TextInput keyboardType='default' secureTextEntry={true} style={styles.inputField} onChange={(e)=>setConfirmPassword(e.target.value)} ></TextInput>
+        </View>
+
+        <View style={styles.formgroup}>
+          <View style={styles.labelWrapper}>
+            <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
+            <Text style={styles.label} >Verify Key</Text>
+          </View>
+          <TextInput keyboardType='default'  style={styles.inputField} onChange={(e)=>setVerifyKey(e.target.value)} ></TextInput>
         </View>
         
-        <TouchableOpacity onPress={()=>registerForm()}>
-          <View><Text style={styles.loginBtn}>Register</Text></View>
-        </TouchableOpacity>
-        <Text style={styles.already}>Already have an account?</Text>
-        <TouchableOpacity onPress={()=>navigation.navigate('login')} >
-          <Text style={styles.create}>Login</Text>
+       
+        <TouchableOpacity onPress={()=>resetPassword()}>
+          <View><Text style={styles.loginBtn}>Submit</Text></View>
         </TouchableOpacity>
       </View>
     </View>
@@ -94,8 +94,6 @@ export default function Register({navigation}) {
 const styles = StyleSheet.create({
     container:{
         backgroundColor:'#663399',
-   
-   
     },
    
     title:{
@@ -174,13 +172,6 @@ const styles = StyleSheet.create({
      color:'#663399',
      marginTop:10,
      textAlign:'center'
-    },
-    already: {
-        fontSize:15,
-        fontWeight:'600',
-        fontFamily:'Raleway_600SemiBold',
-        color:'#868686',
-        marginTop:20,
-        textAlign:'center'
     }
+    
 })

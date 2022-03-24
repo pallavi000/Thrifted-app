@@ -12,26 +12,26 @@ import ProductDetail from './component/ProductDetail';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import Profile from './component/Profile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import {FontAwesome} from '@expo/vector-icons'
+import {Feather, FontAwesome} from '@expo/vector-icons'
 import CartItem from './component/CartItem';
 import axios from 'axios'
 import { AuthContext } from './component/Context';
 import CartContext, { cartContext } from './component/CartContext';
 import { spring } from 'react-native-reanimated';
 import Address from './component/Address';
-import MyCloset from './component/MyCloset';
+import Closet from './component/Profile/Closet';
 import jwt_decode from "jwt-decode";
 import Checkout from './component/Checkout';
 import Payment from './component/Payment';
 import OrderReceived from './component/OrderReceived';
-import OrderList from './component/OrderList';
+import OrderHistory from './component/Order/OrderHistory';
 import EditAddress from './component/EditAddress';
 import CreatePost from './component/CreatePost'
 import SaleHistory from './component/SaleHistory';
 import Payouts from './component/Payouts';
 import Category from './component/Category'
-import ForgotPassword from './component/ForgotPassword'
-import ResetPassword from './component/ResetPassword';
+import ForgotPassword from './component/Auth/ForgotPassword'
+import ResetPassword from './component/Auth/ResetPassword';
 import ChangePassword from './component/ChangePassword'
 import Setting from './component/Setting';
 import { accountNavigation, CartNavigation, homeNavigation, profileNavigation } from './component/StackNavigator';
@@ -50,6 +50,11 @@ export default function App(props) {
   const[decode,setDecode] = useState([])
   const[cartItems,setCartItems] = useState([])
   const[subtotal,setSubtotal] = useState([])
+  const[titleShown,setTitleShown] = useState(
+    {
+      display: 'flex',
+    }
+  )
 
   const {navigation} = props
 
@@ -65,13 +70,10 @@ export default function App(props) {
      setCartCount(a)
      setSubtotal(total)
      setCartItems(cartitems)
-
-
   }
   
   async function getToken(){
-    try {
-      
+    try {  
       const authConfig = await  AsyncStorage.getItem('token') 
     setToken(authConfig)
     var token = authConfig;
@@ -100,9 +102,6 @@ export default function App(props) {
 }, [props])
 
 
-
-
-
 // function toggleNavigaton(){  
 //   return(
 //     <Drawer.Navigator>
@@ -119,55 +118,55 @@ export default function App(props) {
 //   )
 // }
 
-
-
-
   return (
     <>
       <NavigationContainer>
-      <AuthContext.Provider value={{isLoggedIn,getToken,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal}}>
+      <AuthContext.Provider value={{isLoggedIn,getToken,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown}}>
       {isLoggedIn ?( 
         
         <Tab.Navigator  screenOptions={{
-        
         headerShown:false,
         tabBarShowLabel:false,
-        tabBarActiveTintColor:'red',
+        tabBarActiveTintColor:'#663399',
         tabBarLabelPosition:'below-icon',
         tabBarStyle: {
-          padding: 10,
-          display: 'flex',
+          ...titleShown,    
+          paddingHorizontal: 10,
           justifyContent: 'center',
-          height: 70,
+          height: 60,
           shadowColor: '#ddd',
           shadowOffset: {
             width: 0,
-            height: 10
+            height: 10,
           },
           shadowRadius: 3.5,
-          elevation: 5
+          elevation: 5,
+          backgroundColor:'#663399',
         },
       }}>
-    
-    
 
+    
         <Tab.Screen name="home"  component={homeNavigation} options={{
+         
             tabBarIcon:()=>(
-            <FontAwesome name="home" size={30}/>
-            
+            <Feather name="home" size={25}  color={'white'}/>
             )
           }}/> 
-        <Tab.Screen  name="categories" component={profileNavigation} options={{
-          tabBarIcon:()=>(<FontAwesome name="th-large" size={30} />)
+        <Tab.Screen name="Profile" component={accountNavigation}
+        options= {{
+          tabBarStyle: {
+            display:'none'
+          },
+          tabBarIcon:()=>(<Feather name="grid" size={25}  color={'white'} />)
         }}/>
          <Tab.Screen  name="Create Post" component={CreatePost} options={{
-          tabBarIcon:()=>(<FontAwesome name="camera" size={30} />)
+          tabBarIcon:()=>(<Feather name="camera" size={25}  color={'white'}/>)
         }}/>
         <Tab.Screen name="addtocart" component={CartNavigation} options={{
-          tabBarIcon:()=>(<><FontAwesome name="shopping-cart" size={30}/><Text style={styles.cartcount}>{cartCount}</Text></>)
+          tabBarIcon:()=>(<><Feather name="shopping-bag" size={25}  color={'white'}/><Text style={styles.cartcount}>{cartCount}</Text></>)
         }}/>
-        <Tab.Screen name="account" component={accountNavigation} options={{
-          tabBarIcon:()=>(<FontAwesome name="user" size={30}/>)
+        <Tab.Screen name="account" component={profileNavigation} options={{
+          tabBarIcon:()=>(<Feather name="user" size={25}  color={'white'}/>)
         }}/>
 
       </Tab.Navigator>
@@ -202,11 +201,13 @@ const styles = StyleSheet.create({
     width:20,
     borderRadius:10,
     textAlign:'center',
-    backgroundColor:'rebeccapurple',
+    backgroundColor:'#663399',
     color:'white',
     fontSize:15,
     fontWeight:'500',
-    lineHeight:20
+    lineHeight:20,
+    borderWidth: 1,
+    borderColor: '#fff'
     
   }
 });

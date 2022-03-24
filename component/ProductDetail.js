@@ -12,11 +12,11 @@ import bbstyles from './Styles'
 
 function ProductDetail({route}) {
     const[activeImage,setActiveImage] = useState(route.params.image)
+    
     const data = useContext(AuthContext)
     const {cartCount,setCartCount,token} = data
     const {getToken} = data
-    
-    
+  
     const product = route.params
 
     console.log(product)

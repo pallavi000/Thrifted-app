@@ -1,14 +1,20 @@
 import { StyleSheet, Text, View,Image,Dimensions,ScrollView } from 'react-native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { useFonts,Raleway_700Bold,Raleway_800ExtraBold  } from '@expo-google-fonts/raleway';
-
-
+import { useFonts, Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular } from '@expo-google-fonts/raleway';
 
 
 export default function Welcome({navigation}) {
+
+    let [fontsLoaded] = useFonts({
+        Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular
+    });
+    if (!fontsLoaded) {
+        return null;
+    }
+
   return (
-    <ScrollView>
+    <ScrollView style={{height:Dimensions.get('window').height}}>
     <View style={styles.container}>
     <Text style={styles.title}>Affordable Thrift Store</Text>
         <View>
@@ -22,13 +28,10 @@ export default function Welcome({navigation}) {
   )
 }
 
-
-
 const styles = StyleSheet.create({
     container:{
        padding:20,
         backgroundColor:'#663399',
-        height:Dimensions.get('window').height,
         paddingTop:50
 
     },
@@ -37,7 +40,7 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         fontSize: 50,
         color:'white',
-        fontFamily:Raleway_800ExtraBold,    
+        fontFamily:'Raleway_800ExtraBold',    
     },
     imagecss:{
      width:Dimensions.get('window').width-40,
@@ -55,7 +58,7 @@ const styles = StyleSheet.create({
         borderRadius:10,
         marginTop:120,
         textAlign:'center',
-        fontFamily:Raleway_700Bold
+        fontFamily:'Raleway_700Bold'
     }
 
 })

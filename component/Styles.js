@@ -1,5 +1,7 @@
 import ImageTile from 'expo-image-picker-multiple/src/ImageTile'
-import {StyleSheet} from 'react-native'
+import {StyleSheet,Dimensions} from 'react-native'
+import { SpringUtils } from 'react-native-reanimated'
+
 
 
 
@@ -79,11 +81,10 @@ const bbstyles = StyleSheet.create({
         padding:20,
         flex:1,
         backgroundColor:'#fff'
-
     },
 
-      alertDanger:{
-        color: '#721c24',
+    alertDanger:{
+    color: '#721c24',
     backgroundColor: '#f8d7da',
     borderColor: '#f5c6cb',
     borderWidth:1,
@@ -92,7 +93,7 @@ const bbstyles = StyleSheet.create({
     textTransform:'capitalize',
     marginBottom:15
       },
-
+    
     alertSuccess:{
     color: '#155724',
     backgroundColor:'#d4edda',
@@ -102,7 +103,10 @@ const bbstyles = StyleSheet.create({
     paddingHorizontal:10,
     textTransform:'capitalize',
     marginBottom:15
-      }
+      },
+    scrollHeight:{
+        backgroundColor:'white',
+    }
 })
 
 export default bbstyles

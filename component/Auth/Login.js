@@ -5,6 +5,7 @@ import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } fr
 import { AuthContext } from '../Context';
 import axios from 'axios';
 import bbstyles from '../Styles'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login({navigation}) {
   const [email,setEmail] = useState('')
@@ -43,7 +44,7 @@ export default function Login({navigation}) {
   }
 
   return (
-  <ScrollView>
+  <ScrollView style={{height:Dimensions.get('window').height}}>
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
       <View style={styles.loginForm}>
@@ -54,16 +55,16 @@ export default function Login({navigation}) {
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="mail-outline" size={20} color={'#868686'}></Ionicons>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label} >Email</Text>
           </View>
-          <TextInput keyboardType='email' style={styles.inputField} onChange={(e)=>setEmail(e.target.value)}></TextInput>
+          <TextInput keyboardType='email-address' style={styles.inputField} onChangeText={(text)=>setEmail(text)} ></TextInput>
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label}>Password</Text>
           </View>
-          <TextInput keyboardType='default' onFocus={()=>{}} style={styles.inputField} secureTextEntry={true} onChange={(e)=>setPassword(e.target.value)}></TextInput>
+          <TextInput keyboardType='default' onFocus={()=>{}} style={styles.inputField} secureTextEntry={true} onChangeText={(text)=>setPassword(text)}></TextInput>
 
         </View>
         <TouchableOpacity onPress={()=>navigation.navigate('forgotpassword')}>
@@ -83,34 +84,30 @@ export default function Login({navigation}) {
 }
 
 const styles = StyleSheet.create({
-
-
   container:{
      backgroundColor:'#663399',
-     height:Dimensions.get('window').height,
-
-
  },
 
  title:{
      fontWeight: '800',
      fontSize: 50,
      color:'white',
-     fontFamily:Raleway_800ExtraBold, 
+     fontFamily:'Raleway_800ExtraBold', 
      padding:20 ,
      paddingTop:50  
  },
  loginForm:{
    backgroundColor:'white',
    color:'black',
-   borderRadius:18,
+  borderTopRightRadius:18,
+  borderTopLeftRadius:18,
 flex:1,
 padding:30
  },
  login:{
    fontWeight:'700',
    fontSize:18,
-   fontFamily:Raleway_700Bold,
+   fontFamily:'Raleway_700Bold',
    marginBottom:30
  
  },
@@ -130,7 +127,7 @@ padding:30
  label:{
    fontSize:15,
    fontWeight:'600',
-   fontFamily:Raleway_700Bold,
+   fontFamily:'Raleway_700Bold',
    color:'#868686',
    marginLeft:5,
   
@@ -143,7 +140,7 @@ padding:30
  forgot:{
    fontSize:15,
    fontWeight:'600',
-   fontFamily:Raleway_600SemiBold,
+   fontFamily:'Raleway_600SemiBold',
    color:'#663399',
    marginTop:10
 
@@ -158,13 +155,13 @@ padding:30
   borderRadius:10,
   marginTop:70,
   textAlign:'center',
-  fontFamily:Raleway_700Bold,
+  fontFamily:'Raleway_700Bold',
   
  },
  create:{
   fontSize:15,
   fontWeight:'600',
-  fontFamily:Raleway_600SemiBold,
+  fontFamily:'Raleway_600SemiBold',
   color:'#663399',
   marginTop:10,
   textAlign:'center'

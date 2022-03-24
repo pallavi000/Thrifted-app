@@ -18,7 +18,7 @@ const Setting = ({navigation}) => {
              <FontAwesome name='user' size={15}  /><Text style={styles.link}>My Profile</Text>
             </View>
         </TouchableOpacity>
-         <TouchableOpacity onPress={()=>navigation.navigate('Order List')} >
+         <TouchableOpacity onPress={()=>navigation.navigate('Order History')} >
            <View style={styles.settingLink}>
              <FontAwesome name='shopping-cart' size={15}  /><Text style={styles.link}>My Purchases</Text>
             </View>

@@ -5,7 +5,7 @@ import React,{useEffect} from 'react'
 import nil from 'uuid/dist/nil'
 import Address from './Address'
 import CartItem from './Cart/CartItem'
-import Category from './Category'
+import Category from './category/Category'
 import ChangePassword from './ChangePassword'
 import Checkout from './Cart/Checkout'
 import CreatePost from './CreatePost'
@@ -22,6 +22,14 @@ import Setting from './Setting'
 import Welcome from './Welcome'
 import Home from './Home/Home'
 import OrderHistory from './Order/OrderHistory'
+import OrderSuccess from './Order/OrderSuccess'
+import OrderTrack from './Order/OrderTrack'
+import CategoryPage from './category/CategoryPage'
+import ChildCat from './category/ChildCat'
+import Shipping from './address/Shipping'
+import AddShipping from './address/AddShipping'
+import MyOrder from './Order/MyOrder'
+import OrderDetail from './Order/OrderDetail'
 
 const Stack = createNativeStackNavigator()
 
@@ -35,16 +43,115 @@ function homeNavigation() {
           headerShown:true,
         }}
         >
-
-<Stack.Screen name="My Closet" options={{
+        <Stack.Screen name="Order Details" options={{
             headerStyle:{
               backgroundColor:'#fff',
               borderWidth:0,
             },
             headerTitleAlign: 'center',
             headerShadowVisible: false,
-          }} component={Closet}/>
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={OrderDetail}/>   
 
+        <Stack.Screen name="My Orders" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={MyOrder}/>    
+
+        <Stack.Screen name="Add Shipping Address" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={AddShipping}/>
+<Stack.Screen name="Shipping Address" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={Shipping}/>
+
+<Stack.Screen name="Child Category" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            }
+            
+          }} component={ChildCat}/>
+
+      <Stack.Screen name="Category Title" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            }
+            
+          }} component={CategoryPage}/>
+        <Stack.Screen name="Category" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+//               shadowColor: "#000000",
+// shadowOffset: {
+// 	width: 0,
+// 	height: 10,
+// },
+// shadowOpacity: 0.6,
+// shadowRadius: 16.00,
+
+// elevation: 24,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            }
+            
+          }} component={Category}/>
+
+
+         <Stack.Screen options={{
+            headerShown: false,
+          }} name="Track Order" component={OrderTrack}/>
+
+        <Stack.Screen options={{
+            headerShown: false,
+          }} name="Order Success" component={OrderSuccess}/>
 
           <Stack.Screen options={{
             headerShown: false,
@@ -65,6 +172,15 @@ function homeNavigation() {
           <Stack.Screen name="category" component = {Category} />
           <Stack.Screen name='tst' component={CreatePost}/>
           <Stack.Screen name="changepassword" component={ChangePassword}/>
+
+          <Stack.Screen name="My Closet" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+          }} component={Closet}/>
           </Stack.Navigator>
     )
   }

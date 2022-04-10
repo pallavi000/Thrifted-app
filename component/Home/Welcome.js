@@ -1,13 +1,13 @@
 import { StyleSheet, Text, View,Image,Dimensions,ScrollView } from 'react-native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { useFonts, Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular } from '@expo-google-fonts/raleway';
+import { useFonts, Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway';
 
 
 export default function Welcome({navigation}) {
 
     let [fontsLoaded] = useFonts({
-        Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular
+        Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular,Raleway_500Medium
     });
     if (!fontsLoaded) {
         return null;

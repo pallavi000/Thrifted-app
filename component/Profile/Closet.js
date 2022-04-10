@@ -12,9 +12,6 @@ import { DEFAULT_ICON_SIZE } from '@expo/vector-icons/build/createIconSet'
 import {Picker} from '@react-native-picker/picker';
 
 
-
-
-
 export default function Closet(props) {
 
     const[products,setProducts] = useState([])
@@ -54,8 +51,6 @@ export default function Closet(props) {
 <View style={styles.imageWrapper}>
 <Image source ={require('../../assets/Saly-11.png')} style={styles.image}></Image>
 </View>
-
-
 <View style={styles.records}>
 <View style={styles.recordContainer}>
 <Text style={styles.recordCount}>10,000</Text>

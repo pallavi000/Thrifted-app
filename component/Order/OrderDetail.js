@@ -51,7 +51,6 @@ return (
             </View>
 
             <View style={styles.addressCard}>
-               
                     <View style={styles.row}>
                         <Image source={require('../../assets/order1.png')} style={styles.image}></Image>
                         <View>

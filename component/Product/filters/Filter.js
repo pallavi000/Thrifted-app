@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View,SafeAreaView,ScrollView } from 'react-native'
+import { StyleSheet, Text, View,SafeAreaView,ScrollView ,TouchableOpacity} from 'react-native'
 import React from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import {Fontisto} from '@expo/vector-icons'
 
-export default function Filter() {
+export default function Filter({navigation}) {
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
     <ScrollView>
@@ -15,12 +15,12 @@ export default function Filter() {
                 <Text style={styles.title}>Colors</Text>
                 <View style={styles.filterContainer}>
                     <View style={styles.colorFilter}>
-                        <View style={styles.colorBlack}></View>
+                        <View style={[styles.colorActive,{backgroundColor:'#020202'}]}></View>
                     </View>
-                        <View style={styles.colorWhite}></View>
-                        <View style={styles.colorGray}></View>
-                        <View style={styles.colorOrange}></View>
-                        <View style={styles.colorBlue}></View>
+                        <View style={[styles.color,{backgroundColor:'rgb(246, 246, 246)'}]} ></View>
+                        <View style={[styles.color,{backgroundColor:'rgb(190, 169, 169)'}]}></View>
+                        <View style={[styles.color,{backgroundColor:'rgb(244, 129, 23)'}]}></View>
+                        <View style={[styles.color,{backgroundColor:'rgb(44, 177, 177)'}]}></View>
                         <View ></View>
                         <View ></View>
                         <View ></View>
@@ -50,14 +50,14 @@ export default function Filter() {
                         </View>
                     </View>
 
-                    <View style={styles.filterSection}>
+                    <TouchableOpacity style={styles.filterSection} onPress={()=>navigation.navigate('Brand Filters')}>
                         <Text style={styles.title}>Brand</Text>
                         <View style={styles.BrandFilter}>
                             <Text style={styles.subtitle}>adidas Originals, Jack & Jones, s.Oliver</Text>
                             <Fontisto name='angle-right' size={20}></Fontisto>
                            
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
                 <View style={styles.filterApplySection}>
                     <Text style={styles.discard}>Discard</Text>
@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
     filterContainer:{
         flexDirection:'row',
         alignItems:'center',
-        justifyContent:'space-between',
         paddingVertical:10,
         flexWrap:'wrap',
         marginTop:20
@@ -108,50 +107,31 @@ const styles = StyleSheet.create({
         borderWidth:1,
         textAlign:'center',
         alignItems:'center',
-        justifyContent:'center'
+
+        justifyContent:'center',
+        marginRight:20,
+        marginBottom:10
       
     },
-    colorBlack:{
+    colorActive: {
         height:36,
         width:36,
         borderRadius:18,
         backgroundColor:'#020202',
         borderColor:'rgba(0, 0, 0, 0.25)',
-        borderWidth:1
+        borderWidth:1,
     },
-    colorWhite:{
+    color:{
         height:36,
         width:36,
         borderRadius:18,
-        backgroundColor:' #F6F6F6',
+        backgroundColor:'#020202',
         borderColor:'rgba(0, 0, 0, 0.25)',
-        borderWidth:1
+        borderWidth:1,
+        marginRight:20,
+        marginBottom:10
     },
-    colorOrange:{
-        height:36,
-        width:36,
-        borderRadius:18,
-        backgroundColor:'#F48117',
-        borderColor:'rgba(0, 0, 0, 0.25)',
-        borderWidth:1
-
-    },
-    colorBlue:{
-        height:36,
-        width:36,
-        borderRadius:18,
-        backgroundColor:'#2CB1B1',
-        borderColor:'rgba(0, 0, 0, 0.25)',
-        borderWidth:1
-    },
-    colorGray:{
-        height:36,
-        width:36,
-        borderRadius:18,
-        backgroundColor:'#BEA9A9',
-        borderColor:'rgba(0, 0, 0, 0.25)',
-        borderWidth:1
-    },
+   
 
     size:{
         fontSize:14,
@@ -160,9 +140,11 @@ const styles = StyleSheet.create({
         borderColor:'#ABB4BD',
         borderWidth:0.4,
         paddingVertical:10,
-        paddingHorizontal:14,
+        width:47,
         borderRadius:7,
-       
+        textAlign:'center',
+        marginRight:20,
+        marginBottom:10
     },
 
     activeSize:{
@@ -174,18 +156,24 @@ const styles = StyleSheet.create({
         borderColor:'#ABB4BD',
         borderWidth:0.4,
         paddingVertical:10,
-        paddingHorizontal:14,
         borderRadius:7,
+        width:47,
+        textAlign:'center',
+        marginRight:20,
+        marginBottom:10
     },
     category:{
         fontSize:14,
         fontFamily:"Raleway_500Medium",
         fontWeight:'500',
         paddingVertical:10,
-        paddingHorizontal:20,
+        width:93,
         borderRadius:10,
         borderColor:'#ABB4BD',
         borderWidth:0.4,
+        marginBottom:10,
+        textAlign:'center',
+        marginRight:20,
         marginBottom:10
     },
     activeCategory:{
@@ -193,12 +181,15 @@ const styles = StyleSheet.create({
         fontFamily:"Raleway_500Medium",
         fontWeight:'500',
         paddingVertical:10,
-        paddingHorizontal:30,
+        width:93,
         borderRadius:10,
         borderColor:'#ABB4BD',
         borderWidth:0.4,
         backgroundColor:'#663399',
         color:'white',
+        marginBottom:10,
+        textAlign:'center',
+        marginRight:20,
         marginBottom:10
     },
     subtitle:{
@@ -225,12 +216,12 @@ const styles = StyleSheet.create({
         elevation: 1,
         flexDirection:'row',
         flexWrap:'wrap',
-        justifyContent:'space-between',
+        justifyContent:'space-evenly',
         alignItems:'center',
         paddingHorizontal:20
     },
     apply:{
-        paddingVertical:15,
+        paddingVertical:10,
         paddingHorizontal:60,
         fontSize:14,
         fontFamily:"Raleway_500Medium",
@@ -240,17 +231,17 @@ const styles = StyleSheet.create({
         color:'#f5f5ff',
         backgroundColor:'#663399',
         borderRadius:25,
-        marginVertical:20
+        marginVertical:10
     },
     discard:{
-        paddingVertical:15,
+        paddingVertical:10,
         paddingHorizontal:50,
         fontSize:14,
         fontFamily:"Raleway_500Medium",
         fontWeight:'500',
         borderColor:'#663399',
         borderWidth:0.4, 
-        marginVertical:20,
+        marginVertical:10,
         borderRadius:25
     }
 

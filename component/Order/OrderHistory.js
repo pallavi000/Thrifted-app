@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
         fontWeight:'700',
         fontFamily:'Raleway_700Bold',
         lineHeight:33,
-        marginBottom:20,
         textAlign:'center'
 
     },
@@ -58,14 +57,15 @@ const styles = StyleSheet.create({
         fontFamily:'Raleway_400Regular',
         opacity:0.5,
         color:'#000',
-        marginBottom:20,
+        marginBottom:10,
         textAlign:'center'
     },
 
     loginBtn:{
 
-        paddingVertical:20,
-        paddingHorizontal:50,
+        paddingVertical:10,
+        paddingHorizontal:10,
+        width:Dimensions.get('window').width-60,
         backgroundColor:'#663399',
         borderRadius:10,
         marginTop:50,

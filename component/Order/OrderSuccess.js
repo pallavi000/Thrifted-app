@@ -1,17 +1,17 @@
 import { StyleSheet, Text, SafeAreaView,ScrollView,Dimensions, View,TouchableOpacity,Image, } from 'react-native'
 import React from 'react'
 
-export default function OrderSuccess() {
+export default function OrderSuccess({navigation}) {
   return (
-    <SafeAreaView style={{backgroundColor:'white',flex:1}} >
-    <ScrollView >
+    <SafeAreaView style={{backgroundColor:'white',flex:1,justifyContent:'center',alignItems:'center'}} >
+    <ScrollView>
        <View style={styles.cardWrapper}>
-       <Image source={require('../../assets/congrats.png')} style={styles.image}></Image>
-       <View style={styles.successwrapper}>
+        <Image source={require('../../assets/congrats.png')} style={styles.image}></Image>
+        <View style={styles.successwrapper}>
        <Text style={styles.title}>Congratulations !!!</Text>
        <Text style={styles.subtitle}>Your order have been taken and is being attended to</Text>
        </View>
-       <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Checkout')} >
+       <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Track Order')} >
             <Text style={styles.login}>Start Ordering</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.continueBtn} onPress={()=>navigation.navigate('Checkout')} >
@@ -30,15 +30,15 @@ const styles = StyleSheet.create({
     textAlign:'center',
     display:'flex',
     justifyContent:'center',
-    alignItems:'center'
-
+    alignItems:'center',
+    height: Dimensions.get('window').height
   },
   image:{
     width:Dimensions.get('window').width,
     height:180,
  resizeMode:'contain',
     marginBottom:30,
-    marginTop:200,
+    marginTop:20,
     textAlign:'center',
 
 },
@@ -69,23 +69,26 @@ subtitle:{
 
 loginBtn:{
 
-    paddingVertical:20,
-    paddingHorizontal:70,
+    paddingVertical:10,
+    paddingHorizontal:10,
     backgroundColor:'#663399',
     borderRadius:10,
     marginTop:50,
-    marginHorizontal:30
+    marginHorizontal:30,
+    width:Dimensions.get('window').width-60,
    },
    continueBtn:{
-    paddingVertical:20,
-    paddingHorizontal:50,
+    width:Dimensions.get('window').width-60,
+    paddingVertical:10,
+    paddingHorizontal:10,
     backgroundColor:'white',
     borderRadius:10,
-    marginTop:50,
+    marginTop:20,
     marginHorizontal:30,
     borderWidth:1,
     borderColor:'#663399',
     shadowColor: "#663399",
+   
 shadowOffset: {
 	width: 0,
 	height: 10,

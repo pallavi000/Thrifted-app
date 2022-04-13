@@ -41,7 +41,7 @@ export default function Closet(props) {
 
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{backgroundColor:'white',flex:1}} >
        <ScrollView style={[bbstyles.scrollHeight]}>
        <View style={{paddingHorizontal:20}}>
        <View style={styles.header}>
@@ -174,24 +174,26 @@ const styles = StyleSheet.create({
            marginTop:5
        },
        closetView:{
-paddingVertical:20,
+        paddingVertical:20,
 
-borderTopRightRadius:20,
-borderTopLeftRadius:20,
+        borderTopRightRadius:20,
+        borderTopLeftRadius:20,
+       
 
-shadowColor: "#000",
-shadowOffset: {
-    width: 0,
-    height: -4,
-},
-shadowOpacity: 0.1,
-shadowRadius: 3,
-elevation: 4,
-       },
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 0,
+        elevation: 4,
+            },
        closetTab:{
            flexDirection:'row',
            justifyContent:'space-around',
-           alignItems:'center'
+           alignItems:'center',
+           
        },
        listing:{
            fontSize:14,
@@ -208,7 +210,6 @@ elevation: 4,
         flexDirection:'row',
         justifyContent:'space-between',
         alignItems:'center',
-       
         flexWrap:'wrap'
         
     },

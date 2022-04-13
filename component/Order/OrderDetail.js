@@ -19,45 +19,43 @@ return (
                 </View>
                 <Text style={styles.delivered}>Delivered</Text>
             </View>
-            <Text style={styles.orderValue}> 3 items</Text>
+            <Text style={styles.orderValue}>3 items</Text>
             <View style={styles.addressCard}>
-               
-                    <View style={styles.row}>
-                        <Image source={require('../../assets/order1.png')} style={styles.image}></Image>
-                        <View>
-                            <Text style={styles.name}>Pullover</Text>
-                            <Text style={styles.brand}>Nike</Text>
+                <View style={styles.row}>
+                    <Image source={require('../../assets/order1.png')} style={styles.image}></Image>
+                    <View>
+                        <Text style={styles.name}>Pullover</Text>
+                        <Text style={styles.brand}>Nike</Text>
+                        <View style={styles.row}>
+                            <View style={[styles.row,{marginRight:5}]}>
+                                <Text style={styles.brand}>Color: </Text>
+                                <Text style={styles.value}>Gray</Text>
+                            </View>
                             <View style={styles.row}>
-                                <View style={styles.row}>
-                                    <Text style={styles.brand}>Color: </Text>
-                                    <Text style={styles.value}>Gray</Text>
-                                </View>
-                                <View style={styles.row}>
-                                    <Text style={styles.brand}>Size: </Text>
-                                    <Text style={styles.value}>L</Text>
-                                </View>
+                                <Text style={styles.brand}>Size: </Text>
+                                <Text style={styles.value}>L</Text>
                             </View>
-                            <View style={styles.spaceBtwn}>
-                                <View style={styles.row}>
-                                    <Text style={styles.brand}>Quantity: </Text>
-                                    <Text style={styles.value}>1</Text>
-                                </View>
-                                <Text style={styles.orderValue}>Rs.2</Text>
+                        </View>
+                        <View style={styles.spaceBtwn}>
+                            <View style={styles.row}>
+                                <Text style={styles.brand}>Quantity: </Text>
+                                <Text style={styles.value}>1</Text>
                             </View>
-
+                            <Text style={styles.orderValue}>Rs.2</Text>
                         </View>
                     </View>
-               
+                </View>
             </View>
 
             <View style={styles.addressCard}>
+               
                     <View style={styles.row}>
                         <Image source={require('../../assets/order1.png')} style={styles.image}></Image>
-                        <View>
+                        <View >
                             <Text style={styles.name}>Pullover</Text>
                             <Text style={styles.brand}>Nike</Text>
                             <View style={styles.row}>
-                                <View style={styles.row}>
+                                <View style={[styles.row,{marginRight:5}]}>
                                     <Text style={styles.brand}>Color: </Text>
                                     <Text style={styles.value}>Gray</Text>
                                 </View>
@@ -81,30 +79,52 @@ return (
             <View style={styles.shipping} >
                 <Text style={styles.orderTitle}>Order Information</Text>
                 <View style={styles.row}>
-                    <View style={styles.half}><Text style={styles.shippingTitle}>Shipping Address</Text></View>
-                    <View style={styles.half}><Text style={styles.shippingValue}>Hetauda-1, Hetauda, Makwanpur,
-                    44107, Nepal</Text></View>
-                </View>
-                <View style={styles.row}>
-                <View style={styles.half}><Text style={styles.shippingTitle}>Payment method:</Text></View>
-                <View style={styles.half}><Text style={styles.shippingValue}>Esewa</Text></View>
-                </View>
-                <View style={styles.row}>
-                <View style={styles.half}> <Text style={styles.shippingTitle}>Delivery method:</Text></View>
-                <View style={styles.half}><Text style={styles.shippingValue}>Express, 2 days, Rs. 200</Text></View>
-                </View>
-                <View style={styles.row}>
-                    <View>
-                    <View style={styles.half}><Text style={styles.shippingTitle}>Discount:</Text></View>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingTitle}>Shipping Address</Text>
                     </View>
-                    <View>
-                    <View style={styles.half}><Text style={styles.shippingValue}>0%</Text></View>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingValue}>Hetauda-1, Hetauda, Makwanpur, 44107, Nepal</Text>
+                    </View>
+                </View>
+
+
+                <View style={styles.row}>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingTitle}>Payment method:</Text>
+                    </View>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingValue}>Esewa</Text>
                     </View>
                 </View>
 
                 <View style={styles.row}>
-                <View style={styles.half}><Text style={styles.shippingTitle}>Total Amount</Text></View>
-                <View style={styles.half}><Text style={styles.shippingValue}>Rs. 500</Text></View>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingTitle}>Delivery method:</Text>
+                    </View>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingValue}>Express, 2 days, Rs. 200</Text>
+                    </View>
+                </View>
+                <View style={styles.row}>
+                    <View>
+                        <View style={styles.half}>
+                            <Text style={styles.shippingTitle}>Discount:</Text>
+                        </View>
+                    </View>
+                    <View>
+                        <View style={styles.half}>
+                            <Text style={styles.shippingValue}>0%</Text>
+                        </View>
+                    </View>
+                </View>
+
+                <View style={styles.row}>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingTitle}>Total Amount</Text>
+                    </View>
+                    <View style={styles.half}>
+                        <Text style={styles.shippingValue}>Rs. 500</Text>
+                    </View>
                 </View>
             </View>
         </View>
@@ -119,6 +139,7 @@ padding:20
 },
 row:{
 flexDirection:'row',
+alignItems:'center'
 
 },
 orderDetail:{
@@ -171,7 +192,8 @@ image:{
 height:140,
 width:120,
 resizeMode:'cover',
-borderRadius:10
+borderRadius:10,
+marginRight:10
 },
 productDetail:{
 padding:10,
@@ -201,7 +223,7 @@ marginHorizontal:5
 spaceBtwn:{
 flexDirection:'row',
 justifyContent:'space-between',
-alignItems:'center'
+
 },
 shippingTitle:{
     fontSize:14,

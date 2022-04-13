@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput} from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity } from 'react-native'
 import React from 'react'
 import {Ionicons} from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
 
-export default function Messages() {
+export default function Messages({navigation}) {
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
     <ScrollView>
@@ -16,7 +16,7 @@ export default function Messages() {
                 ></TextInput>
             </View>
 
-            <View style={[styles.dFlex, styles.marginTop]}>
+            <TouchableOpacity style={[styles.dFlex, styles.marginTop]} onPress={()=>navigation.navigate('Pallavi')}>
                 <View style={styles.userWrapper}>
                     <View style={styles.ImageWrapper}>
                         <Image source={require('../../assets/user.png')} style={styles.image}></Image>
@@ -30,7 +30,7 @@ export default function Messages() {
                     <Text style={styles.activeIndicator}></Text>
                     <Text style={styles.activeStatus}>now</Text>
                 </View>
-            </View>
+            </TouchableOpacity>
 
             <View style={[styles.dFlex, styles.marginTop]}>
                 <View style={styles.userWrapper}>
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
         fontFamily:'Raleway_400Regular',
         marginLeft:8,
         height:25,
+        flexGrow:1
     },
     dFlex:{
         flexDirection:'row',
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     },
     userMessage:{
         fontSize:12,
-        fontWeight:400,
+        fontWeight:'400',
         fontFamily:"Raleway_400Regular"
     },
     activeStatus:{

@@ -1,17 +1,17 @@
-import { StyleSheet, Text, View,SafeAreaView, ScrollView,Image ,Dimensions} from 'react-native'
+import { StyleSheet, Text, View,SafeAreaView, ScrollView,Image ,Dimensions,TouchableOpacity} from 'react-native'
 import React from 'react'
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 
-export default function CategoryPage() {
+export default function CategoryPage({navigation}) {
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
     <View style={styles.row}>
-    <View style={styles.sortContainer}>
+    <TouchableOpacity style={styles.sortContainer} onPress={()=>navigation.navigate('Filters')}>
       <Ionicons name='filter' size={20}></Ionicons>
       <Text style={styles.filter}>Filters</Text>
-    </View>
+    </TouchableOpacity>
     <View style={styles.sortContainer}>
     <MaterialCommunityIcons name='swap-vertical' size={20}></MaterialCommunityIcons>
         <Text style={styles.filter}>Price: lowest to high</Text>
@@ -24,12 +24,12 @@ export default function CategoryPage() {
             <View style={styles.detailWrapper}>
             <Text style={styles.productName} >Puma Shirt</Text>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px', marginRight:5}}>Brands</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
                 <Text>Puma</Text>
             </View>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px',marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px'}}>Rs.500.00</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
             </View>
             </View>
         </View>
@@ -39,12 +39,12 @@ export default function CategoryPage() {
             <View style={styles.detailWrapper}>
             <Text style={styles.productName} >Puma Shirt</Text>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px', marginRight:5}}>Brands</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
                 <Text>Puma</Text>
             </View>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px',marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px'}}>Rs.500.00</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
             </View>
             </View>
         </View>
@@ -53,12 +53,12 @@ export default function CategoryPage() {
             <View style={styles.detailWrapper}>
             <Text style={styles.productName} >Puma Shirt</Text>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px', marginRight:5}}>Brands</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
                 <Text>Puma</Text>
             </View>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px',marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px'}}>Rs.500.00</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
             </View>
             </View>
         </View>
@@ -67,12 +67,12 @@ export default function CategoryPage() {
             <View style={styles.detailWrapper}>
             <Text style={styles.productName} >Puma Shirt</Text>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px', marginRight:5}}>Brands</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
                 <Text>Puma</Text>
             </View>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px',marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:'5px'}}>Rs.500.00</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
             </View>
             </View>
         </View>
@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
     container:{
         flexDirection:'row',
         flexWrap:'wrap',
-        justifyContent:'center'
+        justifyContent:'space-between',
+        
      
     },
     productImage:{
@@ -116,9 +117,10 @@ const styles = StyleSheet.create({
     },
     productWrapper:{
       
-        width:(Dimensions.get('window').width-20)/2,
+        width:(Dimensions.get('window').width-30)/2,
         marginRight:10,
         marginBottom:10,
+
         
     },
     productName:{
@@ -129,15 +131,14 @@ const styles = StyleSheet.create({
     },
     detailWrapper:{
         padding:10,
-        shadowColor: "#000",
-shadowOffset: {
-	width: 0,
-	height: 3,
-},
-shadowOpacity: 0.29,
-shadowRadius: 4.65,
+        shadowColor: "#ddd",
+        shadowOffset: {
+            width: 0,
+            height: 5,
+        },
+        shadowRadius: 5,
 
-elevation: 7,
+        elevation: 7,
     }
 
 })

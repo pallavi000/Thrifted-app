@@ -1,4 +1,4 @@
-import { StyleSheet,Image, SafeAreaView, ScrollView, Text, View } from 'react-native'
+import { StyleSheet,Image, SafeAreaView, ScrollView, Text, View ,Dimensions} from 'react-native'
 import React from 'react'
 import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
@@ -11,7 +11,7 @@ export default function Profile() {
         <Text style={styles.MainHeader}>My Profile</Text>
             <View style={styles.card}>
             <Image style={styles.userImg} source={require('../../assets/Saly-10.png')}></Image>
-            <Text style={styles.userName}>John Sudo</Text>
+            <Text style={[styles.userName,{marginTop:30,marginBottom:10}]}>John Sudo</Text>
                 <View style={styles.emailContainer}>
                 <Feather name="mail" size={20}></Feather>
                 <Text style={styles.mail}>bgattaraipallavi4@gmail.com</Text>
@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
         fontSize:37,
         fontWeight:'700',
         fontFamily:'Raleway_700Bold',
-        marginBottom:20
+        marginBottom:20,
+        marginBottom:60
     },
     cardWrapper:{
         padding:20,
@@ -82,9 +83,10 @@ const styles = StyleSheet.create({
     
     card:{
         backgroundColor:'#f5f5ff',
-        padding:20,
+        padding:15,
         borderRadius:10,
         marginBottom:30,
+        width: Dimensions.get('window').width-60,
         shadowColor: "rgba(0, 0, 0, 0.3)",
             shadowOffset: {
                 width: 0,
@@ -112,16 +114,22 @@ const styles = StyleSheet.create({
     userName:{
         fontSize:18,
         fontWeight:'600',
-        fontFamily:'Raleway_600SemiBold'
+        fontFamily:'Raleway_600SemiBold',
+        textAlign:'center',
+
     },
     userImg:{
         height:76,
         width:76,
         resizeMode:'cover',
         position:'absolute',
-        top:0,
+        top:-38,
         left:0,
-        borderRadius:40
+        borderRadius:38,
+        transform: [{translateX:(Dimensions.get('window').width-128)/2}],
+        borderWidth:0.4,
+        borderColor:'#c4c4c4',
+        
     },
     titleWrapper:{
         flexDirection:'row',

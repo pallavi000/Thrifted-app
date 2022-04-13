@@ -1,14 +1,13 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,Image, Dimensions} from 'react-native'
+import { StyleSheet, Text, View ,SafeAreaView,ScrollView,Image, Dimensions, TextInput} from 'react-native'
 import React from 'react'
 import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
 import {Feather, Octicons, Ionicons ,Fontisto} from '@expo/vector-icons'
-import { TextInput } from 'react-native-gesture-handler'
 
 export default function Chat() {
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
         <View style={styles.container}>
-        <ScrollView style={{flex:1}}> 
+        <ScrollView> 
             <View style={styles.messageContainer}>
                 <View style={styles.dFlex}>
                     <Image source={require('../../assets/user.png')} style={styles.image}></Image>
@@ -32,7 +31,8 @@ export default function Chat() {
                     ></TextInput>
                 </View>
                 <View style={styles.messageSend}>
-                <Fontisto name='at' size={20} color="#3D3D3D" style={styles.hash}></Fontisto>
+               
+                <Ionicons name='at-sharp' size={20} color="#3D3D3D" style={styles.hash}/>
                    <Ionicons name='send-outline' size={20} color="#3D3D3D"></Ionicons>
                 </View>
             </View>
@@ -43,8 +43,9 @@ export default function Chat() {
 
 const styles = StyleSheet.create({
     messageContainer:{
-        margin:20,
-        height:Dimensions.get('window').height-220
+        paddingHorizontal:10,
+        paddingVertical:10,
+        height:Dimensions.get('window').height-200,
     },
     dFlex:{
         flexDirection:'row',
@@ -107,7 +108,6 @@ const styles = StyleSheet.create({
         marginRight:10
     },
     messageInput:{
-        outline:0,
         height:40,
         color:'#666668',
         fontFamily:"Raleway_400Regular"

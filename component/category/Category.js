@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View,ScrollView,SafeAreaView,Dimensions,Image } from 'react-native'
+import { StyleSheet, Text, View,ScrollView,SafeAreaView,Dimensions,Image ,TouchableOpacity} from 'react-native'
 import React from 'react'
 import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
-export default function Category() {
+import { NavigationContainer } from '@react-navigation/native'
+export default function Category({navigation}) {
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
@@ -26,10 +27,10 @@ export default function Category() {
             <Text style={styles.summerSubtitle}>Up to 50% off</Text>
         </View>
 
-        <View style={styles.categories}>
+        <TouchableOpacity style={styles.categories} onPress={()=>navigation.navigate('Child Category')}>
             <View style={styles.categoriesName}><Text style={styles.cateTitle}>New</Text></View>
             <Image source={require('../../assets/cate1.png')} style={styles.categoriesImage}></Image>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.categories}>
             <View style={styles.categoriesName}><Text style={styles.cateTitle}>Clothes</Text></View>

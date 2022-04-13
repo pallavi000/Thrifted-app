@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View,ScrollView,Dimensions,Image} from 'react-native'
 import React from 'react'
 import { Feather } from '@expo/vector-icons'
+import { Raleway_400Regular } from '@expo-google-fonts/raleway'
 
 export default function OrderTrack() {
   return (
@@ -24,7 +25,7 @@ export default function OrderTrack() {
             <View style={styles.imageView}>
             <Image source={require('../../assets/prepared.png')} style={styles.logo}></Image>
             </View>
-                <Text style={styles.logoTitle}>Order Taken</Text>
+                <Text style={styles.logoTitle}>Order Is Being Prepared</Text>
             </View>
             <View>
                 <Text style={styles.orderTick}><Feather name='check' size={15} color="white"></Feather></Text>
@@ -35,10 +36,15 @@ export default function OrderTrack() {
             <View style={styles.imageView}>
             <Image source={require('../../assets/deliver.png')} style={styles.logo}></Image>
             </View>
-                <Text style={styles.logoTitle}>Order Taken</Text>
-            </View>
             <View>
-                <Text style={styles.orderTick}><Feather name='check' size={15} color="white"></Feather></Text>
+            <Text style={styles.logoTitle}>Order Is Being Delivered</Text>
+                <Text style={styles.subtitle}>Your delivery agent is coming</Text>
+            </View>
+              
+            </View>
+            <View style={{ justifyContent:'center',
+        alignItems:'center',display:'flex'}}>
+                <Text style={styles.phoneTick}><Feather name='phone-call' size={15} color="white"></Feather></Text>
             </View>
       </View>
 
@@ -64,7 +70,7 @@ const styles = StyleSheet.create({
         color:'white',
         fontFamily:'Raleway_800ExtraBold', 
         padding:20 ,
-        paddingTop:50  
+        paddingVertical:50
     },
     loginForm:{
         backgroundColor:'white',
@@ -118,6 +124,15 @@ const styles = StyleSheet.create({
           borderRadius:10,
           lineHeight:20
       },
+      phoneTick:{
+        backgroundColor:'#663399',
+        height:40,
+        width:40,
+        textAlign:'center',
+        borderRadius:20,
+        lineHeight: 42
+       
+      },
       mapContainer:{
           paddingVertical:50,
           paddingHorizontal:20,
@@ -132,5 +147,11 @@ const styles = StyleSheet.create({
           height:135,
           width:Dimensions.get('window').width-70,
           resizeMode:'cover',
+      },
+      subtitle:{
+          fontSize:14,
+          fontWeight:'400',
+          fontFamily:"Raleway_400Regular",
+          marginLeft:5
       }
 })

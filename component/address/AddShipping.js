@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TextInput,TouchableOpacity} from 'react-native'
 import React from 'react'
-import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
+import { Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 
 export default function AddShipping({navigation}) {
   return (
@@ -75,26 +75,23 @@ const styles = StyleSheet.create({
     },
     input:{
        fontSize:17,
-       fontWeight:'600',
-       fontFamily:'Raleway_600SemiBold',
+       fontWeight:'500',
+       fontFamily:"Raleway_500Medium",
        borderWidth:0,
-       
-    
     },
     loginBtn:{
-
-        paddingVertical:20,
-        paddingHorizontal:70,
+        paddingVertical:15,
+        paddingHorizontal:10,
         backgroundColor:'#663399',
         borderRadius:10,
         marginTop:50,
-        marginHorizontal:30,
+        marginHorizontal:20,
        },
        login:{
         textAlign:'center',
         fontFamily:'Raleway_700Bold',
         fontWeight:'700',
-        fontSize:20,
+        fontSize:18,
         color:'white',
        },
 })

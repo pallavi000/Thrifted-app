@@ -2,7 +2,6 @@ import { View } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React,{useEffect} from 'react'
-import nil from 'uuid/dist/nil'
 import Address from './Address'
 import CartItem from './Cart/CartItem'
 import Category from './category/Category'
@@ -30,11 +29,11 @@ import Shipping from './address/Shipping'
 import AddShipping from './address/AddShipping'
 import MyOrder from './Order/MyOrder'
 import OrderDetail from './Order/OrderDetail'
-import Filter from './Product/Filters/Filter'
+import Filter from './Product/filters/Filter'
 import BrandFilter from './Product/filters/BrandFilter'
-import Redeem from './Redeem/Redeem'
+import Redeem from './redeem/Redeem'
 import RedeemHistory from './redeem/RedeemHistory'
-import Messages from './Message/Messages'
+import Messages from './message/Messages'
 import Chat from './message/Chat'
 
 const Stack = createNativeStackNavigator()
@@ -45,7 +44,111 @@ function homeNavigation() {
           headerShown:true,
         }}
         >
+
+<Stack.Screen options={{
+            headerShown: false,
+          }} name="Order Success" component={OrderSuccess}/>
+
+<Stack.Screen options={{
+            headerShown: false,
+          }} name="Track Order" component={OrderTrack}/>
+
+       
+
+<Stack.Screen name="Shipping Address" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={Shipping}/> 
+       
         
+
+        <Stack.Screen name="Add Shipping Address" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={AddShipping}/>
+
+ 
+
+          
+          
+
+
+    
+
+          
+<Stack.Screen name="My Orders" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={MyOrder}/>  
+
+        <Stack.Screen name="Order Details" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={OrderDetail}/>   
+        
+               
+          
+
+
+        <Stack.Screen name="Redeem" options={{
+           headerShown: false,
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={Redeem}/> 
+
+        <Stack.Screen name="Redeemption History" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            } 
+          }} component={RedeemHistory}/>  
+          
 
         <Stack.Screen name="Messages" options={{
             headerStyle:{
@@ -71,48 +174,9 @@ function homeNavigation() {
               fontSize:18,
               fontWeight:'700',
             } 
-          }} component={Chat}/>
-
-        <Stack.Screen name="Redeemtion History" options={{
-            headerStyle:{
-              backgroundColor:'#fff',
-              borderWidth:0,
-            },
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-            } 
-          }} component={RedeemHistory}/>
-
-        <Stack.Screen name="Redeem" options={{
-           headerShown: false,
-            headerStyle:{
-              backgroundColor:'#fff',
-              borderWidth:0,
-            },
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-            } 
-          }} component={Redeem}/> 
+          }} component={Chat}/>   
           
-         <Stack.Screen name="Brand Filters" options={{
-            headerStyle:{
-              backgroundColor:'#fff',
-              borderWidth:0,
-            },
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-            } 
-          }} component={BrandFilter}/>  
-        <Stack.Screen name="Filters" options={{
+<Stack.Screen name="Filters" options={{
             headerStyle:{
               backgroundColor:'#fff',
               borderWidth:0,
@@ -125,7 +189,7 @@ function homeNavigation() {
             } 
           }} component={Filter}/>  
 
-        <Stack.Screen name="Order Details" options={{
+    <Stack.Screen name="Brand Filters" options={{
             headerStyle:{
               backgroundColor:'#fff',
               borderWidth:0,
@@ -136,45 +200,12 @@ function homeNavigation() {
               fontSize:18,
               fontWeight:'700',
             } 
-          }} component={OrderDetail}/>   
+          }} component={BrandFilter}/>  
+       
         
-        <Stack.Screen name="My Orders" options={{
-            headerStyle:{
-              backgroundColor:'#fff',
-              borderWidth:0,
-            },
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-            } 
-          }} component={MyOrder}/>    
-
-        <Stack.Screen name="Add Shipping Address" options={{
-            headerStyle:{
-              backgroundColor:'#fff',
-              borderWidth:0,
-            },
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-            } 
-          }} component={AddShipping}/>
-      <Stack.Screen name="Shipping Address" options={{
-            headerStyle:{
-              backgroundColor:'#fff',
-              borderWidth:0,
-            },
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-            } 
-          }} component={Shipping}/>
+        <Stack.Screen options={{
+            headerShown: false,
+          }} name="landing" component={Home}/>
 
           <Stack.Screen name="Child Category" options={{
             headerStyle:{
@@ -226,17 +257,28 @@ function homeNavigation() {
           }} component={Category}/>
 
 
-         <Stack.Screen options={{
-            headerShown: false,
-          }} name="Track Order" component={OrderTrack}/>
+       
 
-        <Stack.Screen options={{
-            headerShown: false,
-          }} name="Order Success" component={OrderSuccess}/>
+          
 
-          <Stack.Screen options={{
-            headerShown: false,
-          }} name="landing" component={Home}/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           
           <Stack.Screen options={{
             headerStyle:{

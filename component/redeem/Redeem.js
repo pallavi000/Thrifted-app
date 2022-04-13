@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View,SafeAreaView, ScrollView, TextInput,Dimensions, TouchableOpacity} from 'react-native'
 import React from 'react'
 import {Ionicons} from '@expo/vector-icons'
+import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 
 export default function Redeem({navigation}) {
   return (
@@ -30,7 +31,7 @@ export default function Redeem({navigation}) {
           <TextInput keyboardType='Number' style={styles.inputField}></TextInput>
         </View>
 
-        <TouchableOpacity >
+        <TouchableOpacity onPress={()=>navigation.navigate('Redeemption History')} >
           <View><Text style={styles.loginBtn}>Redeem</Text></View>
         </TouchableOpacity>
 
@@ -85,13 +86,13 @@ const styles = StyleSheet.create({
       label:{
         fontSize:15,
         fontWeight:'600',
-        fontFamily:'Raleway_700Bold',
+        fontFamily:"Raleway_600SemiBold",
         color:'#868686',
         marginLeft:5,
        
       },
       inputField:{
-        paddingVertical:7,
+        paddingVertical:2,
         paddingHorizontal:10
         
       },
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
        fontWeight:'700',
        fontSize:20,
        color:'white',
-       paddingVertical:20,
+       paddingVertical:15,
        paddingHorizontal:50,
        backgroundColor:'#663399',
        borderRadius:10,

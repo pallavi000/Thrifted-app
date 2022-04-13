@@ -151,7 +151,7 @@ value:{
 },
 loginBtn:{
 
-    paddingVertical:20,
+    paddingVertical:10,
     paddingHorizontal:50,
     backgroundColor:'#663399',
     borderRadius:10,

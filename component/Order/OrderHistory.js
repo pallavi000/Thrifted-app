@@ -11,7 +11,6 @@ export default function OrderHistory({navigation}) {
           });
       }, [navigation]);
 
-
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView style={{position:'relative'}} >

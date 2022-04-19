@@ -18,8 +18,9 @@ const bbstyles = StyleSheet.create({
         fontWeight: 'bold'
     },
       error:{
-        color:'red',
-        marginTop:5
+        color:'#FF2424',
+        marginTop:5,
+        textTransform:'capitalize'
     },  
     link: {
         color: 'rebeccapurple'

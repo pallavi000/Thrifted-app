@@ -59,7 +59,7 @@ useEffect(() => {
             <View style={styles.wrapper} >
           {categories.map(category=>{
               return(
-                <TouchableOpacity onPress={()=>navigation.navigate('Category',category)} style={styles.cateWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Category Nav',{screen:'Category Title'})} style={styles.cateWrapper}>
                 <Image style={styles.category} source={{uri:imageLink+category.image}}/>
                 <Text style={styles.cateText}>{category.name}</Text>
              </TouchableOpacity>

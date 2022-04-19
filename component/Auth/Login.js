@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput } from 'react-native'
+import { ScrollView,SafeAreaView, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput } from 'react-native'
 import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
@@ -6,6 +6,14 @@ import { AuthContext } from '../Context';
 import axios from 'axios';
 import bbstyles from '../Styles'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+
+const validationSchema = Yup.object().shape({
+  email:Yup.string().required().email(),
+  password:Yup.string().required(),
+
+})
 
 export default function Login({navigation}) {
   const [email,setEmail] = useState('')
@@ -13,22 +21,9 @@ export default function Login({navigation}) {
   const[error,setError] = useState('')
   const {setIsLoggedIn} = useContext(AuthContext)
 
-  function loginForm(){
-    //validation
-    if(email.trim().length==0) {
-      setError('Email is required.')
-      return false
-    }
-    if(password.trim().length==0) {
-      setError('Password is required')
-      return false
-    }
+  function loginForm(data){
+   
 
-    //data
-    const data = {
-      email,
-      password,
-    }
     axios.post('/user',data).then(async response=>{
         console.log(response.data)
         try {
@@ -44,7 +39,8 @@ export default function Login({navigation}) {
   }
 
   return (
-  <ScrollView style={{height:Dimensions.get('window').height}}>
+  <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+  <ScrollView >
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
       <View style={styles.loginForm}>
@@ -52,34 +48,59 @@ export default function Login({navigation}) {
         {error?(
           <Text style={bbstyles.alertDanger}>{error}</Text>
         ):(null)}
+        <Formik initialValues={{email:'',password:''}}
+        onSubmit={(values)=>loginForm(values)}
+        validationSchema={validationSchema}>
+
+      {({handleChange,handleSubmit,errors,touched, handleBlur})=>(
+        <>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="mail-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label} >Email</Text>
           </View>
-          <TextInput keyboardType='email-address' style={styles.inputField} onChangeText={(text)=>setEmail(text)} ></TextInput>
+          <TextInput keyboardType='email-address' 
+           style={styles.inputField}
+           onChangeText={handleChange('email')} 
+           onBlur={handleBlur('email')}
+           ></TextInput>
+           {touched.email && errors.email?(
+            <Text style={bbstyles.error}>{errors.email}</Text>
+           ):(null)}
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label}>Password</Text>
           </View>
-          <TextInput keyboardType='default' onFocus={()=>{}} style={styles.inputField} secureTextEntry={true} onChangeText={(text)=>setPassword(text)}></TextInput>
-
+          <TextInput keyboardType='default'
+           onFocus={()=>{}}
+            style={styles.inputField} 
+            secureTextEntry={true} 
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
+            ></TextInput>
+          {touched.password && errors.password?(
+            <Text style={bbstyles.error}>{errors.password}</Text>
+           ):(null)}
+     
         </View>
         <TouchableOpacity onPress={()=>navigation.navigate('forgotpassword')}>
           <Text style={styles.forgot}>Forgot Password ?</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>loginForm()}>
+        <TouchableOpacity onPress={handleSubmit}>
           <View><Text style={styles.loginBtn}>Login </Text></View>
         </TouchableOpacity>
         <TouchableOpacity onPress={()=>navigation.navigate('register')} >
           <Text style={styles.create}>Create Account</Text>
         </TouchableOpacity>
+        </>
+      )}
+        </Formik>
       </View>
     </View>
-
   </ScrollView>
+  </SafeAreaView>
   )
 }
 
@@ -113,8 +134,7 @@ padding:30
  },
  formgroup:{
    marginBottom:20,
-   borderBottomColor:'#c4c4c4',
-  borderBottomWidth:1,
+
  
 
  },
@@ -134,7 +154,9 @@ padding:30
  },
  inputField:{
    paddingVertical:7,
-   paddingHorizontal:10
+   paddingHorizontal:10,
+   borderBottomColor:'#c4c4c4',
+   borderBottomWidth:1,
    
  },
  forgot:{

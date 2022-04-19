@@ -34,7 +34,7 @@ import ForgotPassword from './component/Auth/ForgotPassword'
 import ResetPassword from './component/Auth/ResetPassword';
 import ChangePassword from './component/ChangePassword'
 import Setting from './component/Setting';
-import { accountNavigation, CartNavigation, homeNavigation, profileNavigation } from './component/StackNavigator';
+import { accountNavigation, CartNavigation, categoryNavigation, homeNavigation, profileNavigation } from './component/StackNavigator';
 
 axios.defaults.baseURL="http://167.86.77.80:5000/api"
 
@@ -152,19 +152,23 @@ export default function App(props) {
             <Feather name="home" size={25}  color={'white'}/>
             )
           }}/> 
-        <Tab.Screen name="Profile" component={accountNavigation}
+          
+
+
+        <Tab.Screen name="Category Nav" component={categoryNavigation}
         options= {{
-          tabBarStyle: {
-            display:'none'
-          },
+         
           tabBarIcon:()=>(<Feather name="grid" size={25}  color={'white'} />)
         }}/>
+
          <Tab.Screen  name="Create Post" component={CreatePost} options={{
           tabBarIcon:()=>(<Feather name="camera" size={25}  color={'white'}/>)
         }}/>
+
         <Tab.Screen name="addtocart" component={CartNavigation} options={{
           tabBarIcon:()=>(<><Feather name="shopping-bag" size={25}  color={'white'}/><Text style={styles.cartcount}>{cartCount}</Text></>)
         }}/>
+        
         <Tab.Screen name="account" component={profileNavigation} options={{
           tabBarIcon:()=>(<Feather name="user" size={25}  color={'white'}/>)
         }}/>

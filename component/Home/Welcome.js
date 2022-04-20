@@ -54,11 +54,10 @@ const styles = StyleSheet.create({
         fontWeight:'700',
         fontSize:20,
         color:'#663399',
-        paddingVertical:20,
-        paddingHorizontal:50,
+        paddingVertical:10,
         backgroundColor:'white',
         borderRadius:10,
-        marginTop:120,
+        marginTop:90,
         textAlign:'center',
         fontFamily:'Raleway_700Bold'
     }

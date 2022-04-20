@@ -46,6 +46,39 @@ function homeNavigation() {
           headerShown:true,
         }}
         >
+{/* <Stack.Screen name="Shipping Address" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={Shipping}/> 
+
+            <Stack.Screen name="Add Shipping Address" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={AddShipping}/> */}
+
+
+          <Stack.Screen options={{
+            headerShown:false,
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+          }}
+           name="Change Password" component={ChangePassword}/>
           <Stack.Screen options={{
                   headerShown: false,
                 }} name="landing" component={Home}/>
@@ -102,12 +135,7 @@ function homeNavigation() {
                 } 
               }} component={EditShipping}/>
 
-          <Stack.Screen options={{
-            headerShown:false,
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-          }}
-           name="Change Password" component={ChangePassword}/>
+        
 
         <Stack.Screen name="Pallavi" options={{
                 headerStyle:{

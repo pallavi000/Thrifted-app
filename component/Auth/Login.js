@@ -1,4 +1,4 @@
-import { ScrollView,SafeAreaView, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput } from 'react-native'
+import { ScrollView,SafeAreaView, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput,Alert } from 'react-native'
 import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
@@ -10,8 +10,8 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 
 const validationSchema = Yup.object().shape({
-  email:Yup.string().required().email(),
-  password:Yup.string().required(),
+  email:Yup.string().required('Email is required').email('Email must be a valid email'),
+  password:Yup.string().required('Password is required'),
 
 })
 
@@ -21,21 +21,17 @@ export default function Login({navigation}) {
   const[error,setError] = useState('')
   const {setIsLoggedIn} = useContext(AuthContext)
 
-  function loginForm(data){
+  async function loginForm(data){
    
+    try {
+      const response = await axios.post('/user',data)
+      await AsyncStorage.setItem('token',response.data.token)
+      setIsLoggedIn(true)
+    } catch (error) {
+      Alert.alert('Error',error.request.response)
+      console.log(error.request.response)
+    }
 
-    axios.post('/user',data).then(async response=>{
-        console.log(response.data)
-        try {
-          await AsyncStorage.setItem('token',response.data.token)
-        setIsLoggedIn(true)
-        } catch (error) {
-            setError(error.message)
-        }
-    }).catch(err=>{
-        console.log(err.request.response)
-        setError(err.request.response)
-    })
   }
 
   return (
@@ -45,9 +41,6 @@ export default function Login({navigation}) {
       <Text style={styles.title}>Welcome Back</Text>
       <View style={styles.loginForm}>
         <Text style={styles.login}>Login</Text>
-        {error?(
-          <Text style={bbstyles.alertDanger}>{error}</Text>
-        ):(null)}
         <Formik initialValues={{email:'',password:''}}
         onSubmit={(values)=>loginForm(values)}
         validationSchema={validationSchema}>
@@ -129,7 +122,7 @@ padding:30
    fontWeight:'700',
    fontSize:18,
    fontFamily:'Raleway_700Bold',
-   marginBottom:30
+   marginBottom:40
  
  },
  formgroup:{
@@ -142,7 +135,7 @@ padding:30
    display:'flex',
    flexDirection:'row',
    alignItems:'center',
-   marginBottom:5
+   
  },
  label:{
    fontSize:15,
@@ -153,7 +146,7 @@ padding:30
   
  },
  inputField:{
-   paddingVertical:7,
+   paddingVertical:5,
    paddingHorizontal:10,
    borderBottomColor:'#c4c4c4',
    borderBottomWidth:1,
@@ -164,14 +157,12 @@ padding:30
    fontWeight:'600',
    fontFamily:'Raleway_600SemiBold',
    color:'#663399',
-   marginTop:10
-
  },
  loginBtn:{
   fontWeight:'700',
   fontSize:20,
   color:'white',
-  paddingVertical:20,
+  paddingVertical:10,
   paddingHorizontal:50,
   backgroundColor:'#663399',
   borderRadius:10,

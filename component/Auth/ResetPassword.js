@@ -5,6 +5,17 @@ import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } fr
 import { AuthContext } from '../Context';
 import axios from 'axios';
 import bbstyles from '../Styles'
+import * as Yup from 'yup'
+import { Formik } from 'formik';
+import { Alert } from 'react-native-web';
+
+
+const validationSchema = Yup.object().shape({
+  newPassword: Yup.string().required(),
+  confirmPassword:Yup.string().required(),
+  verifyKey:Yup.string().required()
+})
+
 
 export default function ResetPassword() {
     const [newPassword,setNewPassword] = useState('')
@@ -13,55 +24,43 @@ export default function ResetPassword() {
     const[error,setError] =useState('')
     const[success,setSuccess] = useState('')
 
-function resetPassword(){
-    if(newPassword.trim().length==0) {
-        setError('New Password is required.')
-        return false
-      }
-      if(confirmPassword.trim().length==0) {
-        setError('Confirm Password is required.')
-        return false
-      }
-      if(verifyKey.trim().length==0) {
-        setError('Verify Key is required.')
-        return false
-      }
-
-
-
-    const data={
-        newPassword,
-        confirmPassword,
-        verifykey:verifyKey
+async function resetPassword(data){
+    try {
+      var response =await axios.post('/user/reset/password',data)
+      Alert.alert('your password has been successfully updated')
+    } catch (error) {
+      Alert.alert('Error',error.request.response)
     }
-    axios.post('/user/reset/password',data).then(response=>{
-              console.log(response.data)
-              setSuccess('your password has been successfully updated')
-  
-          }).catch(err=>{
-              setError(err.request.response)
-          })
   }
 
 
   return (
-<ScrollView style={{height:Dimensions.get('window').height}}>
+    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    <ScrollView >
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
       <View style={styles.loginForm}>
         <Text style={styles.login}>Reset Password</Text>
-        {error?(
-          <Text style={bbstyles.alertDanger}>{error}</Text>
-        ):(null)}
-        {success?(
-          <Text style={bbstyles.alertSuccess}>{success}</Text>
-        ):(null)}
-        <View style={styles.formgroup}>
+       <Formik initialValues={{newPassword:'',confirmPassword:'',verifyKey:''}}
+       onSubmit={(values)=>resetPassword(values)}
+       validationSchema= {validationSchema}>
+
+        {({handleSubmit,handleChange,errors,handleBlur,touched})=>(
+          <>
+          <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label} >New Password</Text>
           </View>
-          <TextInput keyboardType='default' secureTextEntry={true} style={styles.inputField} onChange={(e)=>setNewPassword(e.target.value)} ></TextInput>
+          <TextInput keyboardType='default'
+           secureTextEntry={true} 
+           style={styles.inputField}
+            onChangeText={handleChange('newPassword')}
+            onBlur={handleBlur('newPassword')}>
+            </TextInput>
+            {touched.newPassword && errors.newPassword?(
+              <Text style={bbstyles.error}>{errors.newPassword}</Text>
+            ):(null)}
         </View>
 
         <View style={styles.formgroup}>
@@ -69,7 +68,15 @@ function resetPassword(){
             <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label} >Confirm Password</Text>
           </View>
-          <TextInput keyboardType='default' secureTextEntry={true} style={styles.inputField} onChange={(e)=>setConfirmPassword(e.target.value)} ></TextInput>
+          <TextInput keyboardType='default'
+           secureTextEntry={true} 
+           style={styles.inputField}
+            onChangeText={handleChange('confirmPassword')}
+            onBlur={handleBlur('confirmPassword')}>
+            </TextInput>
+            {touched.confirmPassword && errors.confirmPassword?(
+              <Text style={bbstyles.error}>{errors.confirmPassword}</Text>
+            ):(null)}
         </View>
 
         <View style={styles.formgroup}>
@@ -77,17 +84,30 @@ function resetPassword(){
             <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label} >Verify Key</Text>
           </View>
-          <TextInput keyboardType='default'  style={styles.inputField} onChange={(e)=>setVerifyKey(e.target.value)} ></TextInput>
+          <TextInput keyboardType='default'
+           style={styles.inputField}
+            onChangeText={handleChange('verifykey')}
+            onBlur={handleBlur('verifykey')}>
+            </TextInput>
+            {touched.verifykey && errors.verifykey?(
+              <Text style={bbstyles.error}>{errors.verifykey}</Text>
+            ):(null)}
         </View>
         
        
-        <TouchableOpacity onPress={()=>resetPassword()}>
+        <TouchableOpacity onPress={handleSubmit}>
           <View><Text style={styles.loginBtn}>Submit</Text></View>
         </TouchableOpacity>
+          </>
+        )}
+
+       </Formik>
+        
       </View>
     </View>
 
   </ScrollView>
+  </SafeAreaView>
   )
 }
 
@@ -107,7 +127,8 @@ const styles = StyleSheet.create({
     loginForm:{
       backgroundColor:'white',
       color:'black',
-      borderRadius:18,
+      borderTopRightRadius:18,
+      borderTopLeftRadius:18,
    flex:1,
    padding:30
     },
@@ -120,10 +141,6 @@ const styles = StyleSheet.create({
     },
     formgroup:{
       marginBottom:20,
-      borderBottomColor:'#c4c4c4',
-     borderBottomWidth:1,
-    
-   
     },
     labelWrapper:{
       display:'flex',
@@ -141,7 +158,9 @@ const styles = StyleSheet.create({
     },
     inputField:{
       paddingVertical:7,
-      paddingHorizontal:10
+      paddingHorizontal:10,
+      borderBottomColor:'#c4c4c4',
+      borderBottomWidth:1,
       
     },
     forgot:{
@@ -156,7 +175,7 @@ const styles = StyleSheet.create({
      fontWeight:'700',
      fontSize:20,
      color:'white',
-     paddingVertical:20,
+     paddingVertical:10,
      paddingHorizontal:50,
      backgroundColor:'#663399',
      borderRadius:10,

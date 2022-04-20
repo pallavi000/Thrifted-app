@@ -1,71 +1,101 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TouchableOpacity} from 'react-native'
-import React,{useState} from 'react'
+import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TouchableOpacity,Alert} from 'react-native'
+import React,{useState,useEffect,useContext} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import {Ionicons} from '@expo/vector-icons'
 import CheckBox from 'expo-checkbox'
+import axios from 'axios'
+import { AuthContext } from '../Context'
+import {useFocusEffect, useIsFocused} from '@react-navigation/native'
+import CustomCheckBox from '../ui/CustomCheckBox'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export default function Shipping({navigation}) {
-    const [isSelected, setSelection] = useState(false);
+
+export default function Shipping(props) {
+
+    const[addresses,setAddresses] = useState([])
+    const {navigation} = props
+    const IsFocused = useIsFocused()
+    const [isSelected, setSelection] = useState(0);
+
+    async function loadSelectedCheckBox() {
+        var addressId = await AsyncStorage.getItem('shippingId')
+        setSelection(addressId)
+    }
+    
+
+    useEffect(()=>{
+        loadSelectedCheckBox()
+    },[])
+
+   
+
+    const data = useContext(AuthContext)
+        const {token} = data
+        const config = {
+            headers:{
+                'access-token': token
+            }
+        }
+
+    useEffect(() => {
+        getaddress()
+    }, [IsFocused])
+    
+async function getaddress(){
+    try {
+        var response = await axios.get('/address',config)
+        setAddresses(response.data) 
+    } catch (error) {
+       Alert.alert('Error', error.request.response)
+    }
+
+}
+
+async function removeAddress(id){
+    try {
+        var response =await axios.delete('/address/'+id,config)
+        var deleted= addresses.filter(address=>address._id!= id)
+        setAddresses(deleted)
+        Alert.alert('Success','Address Deleted!')
+    } catch (error) {
+        Alert.alert('Error',error.request.response)
+    }
+}
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
-    <View style={styles.addressCard}>
-        <View style={styles.address}>
-            <Text style={styles.userName}>Jone Doe</Text>
-            <Text style={styles.street}> 3 Newbridge Court </Text>
-            <Text style={styles.street}>Chino Hills, CA 91709, United States</Text>
+    {addresses.map(address=>{
+        return(
+            <View style={styles.addressCard}>
+            <View style={styles.address}>
+            <Text style={styles.userName}>{address.name}</Text>
+            <Text style={styles.street}> {address.street} </Text>
+            <Text style={styles.street}>{address.city}, {address.district}, {address.zipcode}, Nepal</Text>
             <View style={styles.addressCheck}>
-            <CheckBox
-          value={isSelected}
-          onValueChange={setSelection}
-          style={styles.checkbox}
-        />
-        <Text style={styles.street}>Use as the shipping address</Text>
+           
+            <CustomCheckBox
+                id={address._id}
+                loadSelectedCheckBox={loadSelectedCheckBox}
+                isSelected={isSelected}
+                setSelection={setSelection}
+            />
+             
+            <Text style={styles.street}>Use as the shipping address</Text>
             </View>
         </View>
         <View style={styles.action}>
+        <TouchableOpacity onPress={()=>navigation.navigate('Edit Shipping Address',address)}>
             <Text style={styles.edit}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>removeAddress(address._id)}>
+                <Text style={[styles.edit,{color:'red',marginBottom:10}]}>Delete</Text>
+                </TouchableOpacity>
         </View>
     </View>
-
-    <View style={styles.addressCard}>
-        <View style={styles.address}>
-            <Text style={styles.userName}>Jone Doe</Text>
-            <Text style={styles.street}> 3 Newbridge Court </Text>
-            <Text style={styles.street}>Chino Hills, CA 91709, United States</Text>
-            <View style={styles.addressCheck}>
-            <CheckBox
-          value={isSelected}
-          onValueChange={setSelection}
-          style={styles.checkbox}
-        />
-        <Text style={styles.street}>Use as the shipping address</Text>
-            </View>
-        </View>
-        <View style={styles.action}>
-            <Text style={styles.edit}>Edit</Text>
-        </View>
-    </View>
-
-    <View style={styles.addressCard}>
-        <View style={styles.address}>
-            <Text style={styles.userName}>Jone Doe</Text>
-            <Text style={styles.street}> 3 Newbridge Court </Text>
-            <Text style={styles.street}>Chino Hills, CA 91709, United States</Text>
-            <View style={styles.addressCheck}>
-                <CheckBox
-                value={isSelected}
-                onValueChange={setSelection}
-                style={styles.checkbox}
-                />
-             <Text style={styles.street}>Use as the shipping address</Text>
-        </View>
-        </View>
-        <View style={styles.action}>
-            <Text style={styles.edit}>Edit</Text>
-        </View>
-    </View>
-
+        )
+    })}
+ 
     <TouchableOpacity onPress={()=>navigation.navigate('Add Shipping Address')} style={styles.add}>
         <Ionicons name="add" size={20} style={styles.addIcon}></Ionicons>
     </TouchableOpacity>
@@ -77,6 +107,9 @@ export default function Shipping({navigation}) {
 }
 
 const styles = StyleSheet.create({
+    action:{
+            justifyContent:'space-between'
+    },
     addressCard:{
         backgroundColor:'#f5f5ff',
         padding:20,
@@ -141,9 +174,9 @@ add:{
             backgroundColor:'#f5f5ff',
            
 
-},
-addIcon:{
-    textAlign:'center'
-}
+            },
+            addIcon:{
+                textAlign:'center'
+            }
   
 })

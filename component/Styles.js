@@ -1,6 +1,8 @@
 import ImageTile from 'expo-image-picker-multiple/src/ImageTile'
 import {StyleSheet,Dimensions} from 'react-native'
 import { SpringUtils } from 'react-native-reanimated'
+import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold, Raleway_400Regular  } from '@expo-google-fonts/raleway';
+
 
 
 
@@ -19,8 +21,10 @@ const bbstyles = StyleSheet.create({
     },
       error:{
         color:'#FF2424',
-        marginTop:5,
-        textTransform:'capitalize'
+        fontSize:12,
+        fontWeight:'300',
+        fontFamily:"Raleway_400Regular"
+        
     },  
     link: {
         color: 'rebeccapurple'

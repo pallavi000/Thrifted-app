@@ -1,85 +1,101 @@
-import { ScrollView, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput } from 'react-native'
+import { ScrollView, StyleSheet,Dimensions, Text,SafeAreaView,Alert, View,TouchableOpacity,TextInput } from 'react-native'
 import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
 import { AuthContext } from '../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+import bbstyles from '../Styles';
+
+const validationSchema= Yup.object().shape({
+  email:Yup.string().required().email(),
+  password:Yup.string().required(),
+  name:Yup.string().required()
+})
 
 export default function Register({navigation}) {
-    const [email,setEmail] = useState('')
-    const [password,setPassword] = useState('')
-    const [ fullName,setFullName] = useState('')
+   
     const {setIsLoggedIn} = useContext(AuthContext)
-    const[error,setError] = useState('')
-
-    function registerForm(){
-           //validation
-
-    if(fullName.trim().length==0) {
-    setError('User name is required.')
-    return false
-    }
-
-    if(email.trim().length==0) {
-        setError('Email is required.')
-        return false
+    async function registerForm(data){
+    try {
+      var response= await axios.post('/user/all',data)
+      if(response.data){
+        await AsyncStorage.setItem('token',response.data.token)
+        setIsLoggedIn(true)
       }
-      if(password.trim().length==0) {
-        setError('Password is required')
-        return false
-      }
-    
-    const data = {
-        name:fullName,
-        email,
-        password
+      
+    } catch (error) {
+        Alert.alert('Error',error.request.response)
     }
-    axios.post('/user/all',data).then(async response=>{ 
-        console.log(response.data)     
-        await AsyncStorage.setItem('token',response.data)
-      setIsLoggedIn(true)
-     
-     }).catch(err=>{
-         console.log(err)
-     })
-    }
+  }
+   
 
   return (
-    <ScrollView style={{height:Dimensions.get('window').height}}>
+    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    <ScrollView >
     <View style={styles.container}>
       <Text style={styles.title}>Create an Account</Text>
       <View style={styles.loginForm}>
         <Text style={styles.login}>Register</Text>
-        {error?(
-          <Text style={bbstyles.alertDanger}>{error}</Text>
-        ):(null)}
-        <View style={styles.formgroup}>
+       <Formik initialValues={{email:'',password:'',name:''}}
+            onSubmit={(values)=>registerForm(values)}
+            validationSchema={validationSchema}>
+
+              {({handleSubmit,handleChange,handleBlur,touched,errors})=>(
+                <>
+                <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="person" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label} >Full Name</Text>
           </View>
-          <TextInput keyboardType='default' style={styles.inputField} onChange={(e)=>setFullName(e.target.value)}></TextInput>
+          <TextInput keyboardType='default'
+           style={styles.inputField} 
+           onChangeText={handleChange('name')}
+           onBlur={handleBlur('name')}
+           ></TextInput>
+           {touched.name && errors.name?(
+             <Text style={bbstyles.error}>{errors.name}</Text>
+           ):(null)}
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="mail-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label}>Email</Text>
           </View>
-          <TextInput keyboardType='email' style={styles.inputField} onChange={(e)=>setEmail(e.target.value)}></TextInput>
+          <TextInput keyboardType='email-address'
+           style={styles.inputField} 
+           onChangeText={handleChange('email')}
+           onBlur={handleBlur('email')}
+           ></TextInput>
+           {touched.email && errors.email?(
+             <Text style={bbstyles.error}>{errors.email}</Text>
+           ):(null)}
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
             <Text style={styles.label}>Password</Text>
           </View>
-          <TextInput keyboardType='default' onFocus={()=>{}} style={styles.inputField} secureTextEntry={true} onChange={(e)=>setPassword(e.target.value)}></TextInput>
-
+          <TextInput keyboardType='default'
+          secureTextEntry={true}
+           style={styles.inputField} 
+           onChangeText={handleChange('password')}
+           onBlur={handleBlur('password')}
+           ></TextInput>
+            {touched.password && errors.password?(
+             <Text style={bbstyles.error}>{errors.password}</Text>
+           ):(null)}
         </View>
         
-        <TouchableOpacity onPress={()=>registerForm()}>
+        <TouchableOpacity onPress={handleSubmit}>
           <View><Text style={styles.loginBtn}>Register</Text></View>
         </TouchableOpacity>
+                </>
+              )}
+            </Formik>
+        
         <Text style={styles.already}>Already have an account?</Text>
         <TouchableOpacity onPress={()=>navigation.navigate('login')} >
           <Text style={styles.create}>Login</Text>
@@ -88,6 +104,7 @@ export default function Register({navigation}) {
     </View>
 
   </ScrollView>
+  </SafeAreaView>
   )
 }
 
@@ -109,9 +126,10 @@ const styles = StyleSheet.create({
     loginForm:{
       backgroundColor:'white',
       color:'black',
-      borderRadius:18,
-   flex:1,
-   padding:30
+      borderTopRightRadius:18,
+      borderTopLeftRadius:18,
+      flex:1,
+      padding:30
     },
     login:{
       fontWeight:'700',
@@ -122,8 +140,7 @@ const styles = StyleSheet.create({
     },
     formgroup:{
       marginBottom:20,
-      borderBottomColor:'#c4c4c4',
-     borderBottomWidth:1,
+
     
    
     },
@@ -139,12 +156,12 @@ const styles = StyleSheet.create({
       fontFamily:'Raleway_700Bold',
       color:'#868686',
       marginLeft:5,
-     
     },
     inputField:{
-      paddingVertical:7,
-      paddingHorizontal:10
-      
+      paddingVertical:5,
+      paddingHorizontal:10,
+      borderBottomColor:'#c4c4c4',
+      borderBottomWidth:1,
     },
     forgot:{
       fontSize:15,
@@ -152,13 +169,12 @@ const styles = StyleSheet.create({
       fontFamily:'Raleway_600SemiBold',
       color:'#663399',
       marginTop:10
-   
     },
     loginBtn:{
      fontWeight:'700',
      fontSize:20,
      color:'white',
-     paddingVertical:20,
+     paddingVertical:10,
      paddingHorizontal:50,
      backgroundColor:'#663399',
      borderRadius:10,

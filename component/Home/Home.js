@@ -30,8 +30,7 @@ useEffect(() => {
 
 
   return (
-<SafeAreaView>
-
+    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
 <View  style={styles.homeNav}>
         <View style={styles.navlogo}>
                     <Ionicons name='aperture' size={30}></Ionicons>

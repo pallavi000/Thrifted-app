@@ -170,7 +170,7 @@ elevation: 1,
     pageName:{
         fontSize:13,
         fontFamily:'Raleway_700Bold',
-        fontWeight:700,
+        fontWeight:'700',
         marginLeft:5
     },
     border:{

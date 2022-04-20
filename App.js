@@ -26,7 +26,7 @@ import Payment from './component/Payment';
 import OrderReceived from './component/OrderReceived';
 import OrderHistory from './component/Order/OrderHistory';
 import EditAddress from './component/EditAddress';
-import CreatePost from './component/CreatePost'
+import CreatePost from './component/post/CreatePost'
 import SaleHistory from './component/SaleHistory';
 import Payouts from './component/Payouts';
 import Category from './component/Category'
@@ -36,7 +36,7 @@ import ChangePassword from './component/ChangePassword'
 import Setting from './component/Setting';
 import { accountNavigation, CartNavigation, categoryNavigation, homeNavigation, profileNavigation } from './component/StackNavigator';
 
-axios.defaults.baseURL="http://167.86.77.80:5000/api"
+axios.defaults.baseURL="http://167.86.77.80/api"
 
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator()

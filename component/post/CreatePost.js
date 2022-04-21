@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, SafeAreaView,ScrollView,Image,TextInput } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView,ScrollView,Image,TextInput,TouchableOpacity,TouchableWithoutFeedback } from 'react-native'
 import React,{useEffect,useState,useContext} from 'react'
 import {Feather} from '@expo/vector-icons'
-import { Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
+import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
 import bbstyles from '../Styles'
@@ -24,13 +24,12 @@ const validationSchema = Yup.object().shape({
     image1:Yup.string().required()
 })
 
-export default function CreatePost() {
+export default function CreatePost({navigation}) {
     const[colors,setColors] = useState([])
     const[sizes,setSizes] = useState([])
     const[brands,setBrands] = useState([])
     const[categories,setCategories] = useState([])
     const[showBrand,setShowBrand] = useState(false)
-   
 
     const data = useContext(AuthContext)
     const {token} = data
@@ -41,6 +40,17 @@ export default function CreatePost() {
         }
     }
 
+
+    navigation.setOptions({
+       headerShown:true,
+       headerRight:()=>(
+          <TouchableOpacity >
+              <Text>Post</Text>
+          </TouchableOpacity>
+       )
+    })
+       
+    
 
     useEffect(() => {
         axios.get('/frontend/createpost',config).then(response=>{
@@ -107,7 +117,6 @@ export default function CreatePost() {
            initialValues={{name:'',detail:'',category:'',stock:'',size:'',brand:'',color:'',original:'',price:'',earning_price:'',type:'',image1:'',custombrand:'',image2:'',image3:'',image4:''}}
            onSubmit={(values)=>createPost(values)}
            validationSchema={validationSchema}
-           
            >
            {({handleChange,handleSubmit,errors,values,setFieldValue,touched,handleBlur})=>(
                <>
@@ -141,26 +150,25 @@ export default function CreatePost() {
                          ):(null)}
                     </View>
 
-                    <View style={styles.formGroup}>
+            <View style={styles.formGroup}>
                 <Text style={styles.label}>Tell buyers about your selling (Required)</Text>
                 <TextInput
-                        style={styles.input}
-                        keyboardType='default'
-                        onChangeText={handleChange("detail")}
-                        onBlur={handleBlur('detail')}
-                         />
-                         {errors.detail && touched.detail?(
-                            <Text style={styles.error}>{errors.detail}</Text>
-                         ):(null)}
+                    style={styles.input}
+                    keyboardType='default'
+                    onChangeText={handleChange("detail")}
+                    onBlur={handleBlur('detail')}
+                />
+                {errors.detail && touched.detail?(
+                <Text style={styles.error}>{errors.detail}</Text>
+                ):(null)}
             </View>
 
-            <View style={styles.formGroup}>
+            <View style={styles.selectForm}>
                 <Text style={styles.label}>Category (Required)</Text>
                 <Picker
                     style={styles.input}
                      selectedValue={values.category}
                         onValueChange={itemValue =>
-                        
                         setFieldValue('category',itemValue)
                     }>
                   <Picker.Item  label="Selelct Product Category" value="" />
@@ -189,7 +197,7 @@ export default function CreatePost() {
                             <Text style={styles.error}>{errors.stock}</Text>
                          ):(null)}
             </View>
-            <View style={styles.formGroup}>
+            <View style={styles.selectForm}>
                 <Text style={styles.label}>Color (Required)</Text>
                 <Picker
                     style={styles.input}
@@ -211,7 +219,7 @@ export default function CreatePost() {
                 <Text style={styles.error}>{errors.color}</Text>
                 ):(null)}
             </View>
-            <View style={styles.formGroup}>
+            <View style={styles.selectForm}>
                 <Text style={styles.label}>Brand (Optional)</Text>
                 <Picker
                     style={styles.formcontrol}
@@ -246,7 +254,7 @@ export default function CreatePost() {
                     
                 <Text style={styles.error}>{errors.brand}</Text>
             </View>
-            <View style={styles.formGroup}>
+            <View style={styles.selectForm}>
                 <Text style={styles.label}>Size (Required)</Text>
                 <Picker
                     style={styles.formcontrol}
@@ -303,10 +311,10 @@ export default function CreatePost() {
                  ></TextInput>
             </View>
 
-            <View style={styles.formGroup}>
+            <View style={styles.selectForm}>
                 <Text style={styles.label}>Product Type (Required)</Text>
                 <Picker
-                    style={styles.formcontrol}
+                    style={styles.input}
                      selectedValue={values.type}
                         onValueChange={itemValue =>
                         setFieldValue('type',itemValue)
@@ -319,7 +327,9 @@ export default function CreatePost() {
                     <Text style={styles.error}>{errors.type}</Text>
                 ):(null)}
             </View>
-
+            <TouchableWithoutFeedback onPress={handleSubmit}>
+                <Text style={bbstyles.btnPrimary}>Submit</Text>
+                </TouchableWithoutFeedback>
 
                </>
            )}
@@ -333,6 +343,18 @@ export default function CreatePost() {
 const styles = StyleSheet.create({
     container:{
         padding:20
+    },
+    formcontrol: {
+        fontSize: 14,
+        fontWeight: '400',
+        fontFamily:"Raleway_400Regular",
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: 'red',
+        width: '100%',
+        paddingHorizontal: 12,
+        paddingVertical: 5,
+        // marginTop: 10,
     },
     row:{
         flexDirection:'row',
@@ -370,10 +392,15 @@ const styles = StyleSheet.create({
 
     },
     formGroup:{
-        paddingBottom:10,
+      
         marginBottom:20,
-        borderBottomColor:'#C9C9C9',
-        borderBottomWidth:1
+        
+    },
+    selectForm:{
+        padding:10,
+        borderBottomColor:'#C4C4C4BF',
+        borderBottomWidth:1,
+        marginBottom:20
     },
     label:{
         color:'#868686',
@@ -386,5 +413,7 @@ const styles = StyleSheet.create({
        fontWeight:'500',
        fontFamily:"Raleway_500Medium",
        borderWidth:0,
+       borderBottomColor:'#C9C9C9',
+        borderBottomWidth:1
     },
 })

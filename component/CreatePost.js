@@ -116,7 +116,7 @@ const CreatePost = () => {
                <MainImage/>
                <Text style={styles.title}>Product Name</Text>
                 <TextInput
-                style={styles.formcontrol}
+                style={styles.input}
                     keyboardType='default'
                     placeholder="Enter product name"
                     onChangeText={handleChange("name")}

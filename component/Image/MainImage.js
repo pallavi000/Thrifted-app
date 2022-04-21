@@ -15,14 +15,20 @@ const MainImage = () => {
 async function getRequestPermission(){
     const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
     if(!granted){
-        alert("Permission denied")
+        const result = await imagePicker.requestMediaLibraryPermissionsAsync()
+        if(!result.granted) {
+          alert("Permission denied")
+        }
     }
 }
 
 async function getCameraPermission(){
     const {granted} = await imagePicker.getCameraPermissionsAsync()
     if(!granted){
+      const result = await imagePicker.requestCameraPermissionsAsync()
+      if(!result.granted) {
         alert("Permission denied")
+      }
     }
 }
 
@@ -81,6 +87,7 @@ function multiImage(){
           <View style={styles.modalView}>
           <View  style={styles.iconwrap}>
           <TouchableOpacity   onPress={() => setModalVisible(!modalVisible)}>
+          <Text>close</Text>
              
               <FontAwesome style={styles.modalIcon} name="times-circle-o" size={20} color={'red'}></FontAwesome>
 
@@ -239,6 +246,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         alignItems: 'center',
         shadowColor: '#000',
+        width:'50%',
         shadowOffset: {
           width: 0,
           height: 2,

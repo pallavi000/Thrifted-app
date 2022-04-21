@@ -88,7 +88,6 @@ const CreatePost = () => {
              const arr=[]
              categories.map(category=>{
                arr.push(<Picker.Item  label={increment(n)+ category.name} value={category._id} />,renderChildren(category.childrens,inc))
-               
              })
              return arr
          }
@@ -98,7 +97,6 @@ const CreatePost = () => {
        var  price= e.target.value
        var profit = price- price*20/100
        console.log(profit)
-       
        setFieldValue('earning_price',profit)
    
      }

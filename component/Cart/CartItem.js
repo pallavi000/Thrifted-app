@@ -191,7 +191,7 @@ loginBtn:{
        flexDirection:'row',
        justifyContent:'space-between',
        alignItems:'center',
-       marginTop:200
+       marginTop:100
    },
    total:{
     fontSize:17,

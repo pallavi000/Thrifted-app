@@ -22,6 +22,8 @@ useEffect(() => {
         setSellProducts(response.data.saleProduct)
         setCategories(response.data.categories)
         console.log(response.data.product)
+
+
         
     })
 }, [])
@@ -69,13 +71,12 @@ useEffect(() => {
 
           {products.map(product=>{
                return(
-         
           <TouchableWithoutFeedback  onPress={()=>navigation.navigate('Product Detail',product)}>
           <View style={styles.productWrapper} key={product._id}>
-            <View style={styles.userWrapper}>
-               <Image style={styles.userimage} source={{uri:'http://167.86.77.80:3000/images/1642749540268.jpg'}}></Image> 
-               <Text style={styles.username}>username</Text>   
-            </View>
+            <TouchableOpacity onPress={()=>navigation.navigate('account',{screen:'My Closet',params:product.seller_id})} style={styles.userWrapper}>
+               <Image style={styles.userimage} source={{uri:imageLink+product.seller_id?.image}}></Image> 
+               <Text style={styles.username}>{product.seller_id?.name}</Text>   
+            </TouchableOpacity>
             <View style={styles.product}>
                 <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image>
                 <View style={styles.productreview}>

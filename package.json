@@ -33,6 +33,7 @@
     "expo-status-bar": "~1.1.0",
     "formik": "^2.2.9",
     "jwt-decode": "^3.1.2",
+    "prop-types": "^15.8.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.2",
@@ -47,7 +48,9 @@
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.8.0",
     "react-native-web": "0.17.1",
+    "react-native-webview": "^11.18.1",
     "react-navigation-stack": "^2.10.4",
+    "rn-all-nepal-payment": "^1.0.2",
     "unimodules-permissions-interface": "^6.1.0",
     "uuid": "^8.3.2",
     "yup": "^0.32.11"

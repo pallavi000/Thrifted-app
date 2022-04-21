@@ -20,6 +20,7 @@ export default function Shipping(props) {
     async function loadSelectedCheckBox() {
         var addressId = await AsyncStorage.getItem('shippingId')
         setSelection(addressId)
+
     }
     
 
@@ -45,6 +46,11 @@ async function getaddress(){
     try {
         var response = await axios.get('/address',config)
         setAddresses(response.data) 
+        console.log(isSelected)
+        if(!isSelected && response.data && response.data.length>0) {
+            setSelection(response.data[0]._id)
+            await AsyncStorage.setItem('shippingId',response.data[0]._id)
+        }
     } catch (error) {
        Alert.alert('Error', error.request.response)
     }
@@ -53,9 +59,19 @@ async function getaddress(){
 
 async function removeAddress(id){
     try {
+
         var response =await axios.delete('/address/'+id,config)
         var deleted= addresses.filter(address=>address._id!= id)
         setAddresses(deleted)
+        if(isSelected==id) {
+            await AsyncStorage.removeItem('shippingId')
+            if(deleted && deleted.length>0) {
+                setSelection(deleted[0]._id)
+                await AsyncStorage.setItem('shippingId',deleted[0]._id)
+            } else {
+                setSelection(0)
+            }
+        }
         Alert.alert('Success','Address Deleted!')
     } catch (error) {
         Alert.alert('Error',error.request.response)
@@ -65,7 +81,8 @@ async function removeAddress(id){
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
-    {addresses.map(address=>{
+    {addresses && addresses.length !=0?(
+        addresses.map(address=>{
         return(
             <View style={styles.addressCard}>
             <View style={styles.address}>
@@ -94,7 +111,9 @@ async function removeAddress(id){
         </View>
     </View>
         )
-    })}
+    })
+    ):(null)}
+    
  
     <TouchableOpacity onPress={()=>navigation.navigate('Add Shipping Address')} style={styles.add}>
         <Ionicons name="add" size={20} style={styles.addIcon}></Ionicons>

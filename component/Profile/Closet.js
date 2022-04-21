@@ -15,7 +15,7 @@ import {Picker} from '@react-native-picker/picker';
 export default function Closet(props) {
 
     const[products,setProducts] = useState([])
-    const[users,setUsers] = useState([])
+    const[user,setUser] = useState([])
     const navigation = props.navigation
     const data = useContext(AuthContext)
     const {decode} = data
@@ -28,11 +28,14 @@ export default function Closet(props) {
             'access-token': token
         }
     }
+    
+
+
     useEffect(() => {
-        axios.post('/frontend/closet/'+decode._id).then(response=>{
+        axios.post('/frontend/closet/'+props.route.params._id).then(response=>{
             console.log(response.data)
             setProducts(response.data.product)
-            setUsers(response.data.user)
+            setUser(response.data.user)
             console.log('closet')
         }).catch(err=>{
             console.log(err.request.response)
@@ -68,7 +71,7 @@ export default function Closet(props) {
 </View>
 
             </View>
-            <Text style={styles.userName}>Username</Text>
+            <Text style={styles.userName}>{user.name}</Text>
 <Text style={styles.desc}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt #hashtag</Text>
 
 <TouchableOpacity style={styles.loginBtn}>

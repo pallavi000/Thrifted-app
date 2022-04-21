@@ -1,23 +1,27 @@
-import { StyleSheet, Text, View,SafeAreaView,ScrollView } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View,SafeAreaView,ScrollView, TouchableOpacity } from 'react-native'
+import React,{useContext} from 'react'
 import {MaterialCommunityIcons,MaterialIcons,Feather,Ionicons,FontAwesome} from '@expo/vector-icons'
 import { Raleway_700Bold } from '@expo-google-fonts/raleway'
+import { AuthContext } from '../Context'
 
-export default function Setting() {
+export default function Setting({navigation}) {
+const data = useContext(AuthContext)
+const {decode} = data
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
         <View style={styles.container}>
             <View style={styles.card}>
-                <View style={styles.pagesWrapper}>
-                <View style={{flexDirection:'row',alignItems:'center'}}>
-                <MaterialCommunityIcons name='hanger' size={20}></MaterialCommunityIcons>
-                    <Text style={styles.pageName}>My Closet</Text>
-                </View>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                    <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
-                </View>  
-                </View>
+                <TouchableOpacity onPress={()=>navigation.navigate('My Closet',decode)}  style={styles.pagesWrapper}>
+                    <View style={{flexDirection:'row',alignItems:'center'}}>
+                    <MaterialCommunityIcons name='hanger' size={20}></MaterialCommunityIcons>
+                        <Text style={styles.pageName}>My Closet</Text>
+                    </View>
+                    <View style={{flexDirection:'row', alignItems:'center'}}>
+                        <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
+                    </View>  
+                </TouchableOpacity>
 
                 <View style={styles.border}></View>
 
@@ -45,7 +49,7 @@ export default function Setting() {
 
                 <View style={styles.border}></View>
 
-                <View style={styles.pagesWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Shipping Address')} style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <Ionicons name='location-outline' size={20}></Ionicons>
                         <Text style={styles.pageName}>My Addresses</Text>
@@ -53,7 +57,7 @@ export default function Setting() {
                         <View style={{flexDirection:'row'}}>
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>
-                </View>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.card}>

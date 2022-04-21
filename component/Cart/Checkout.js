@@ -1,41 +1,147 @@
-import { View ,Text,SafeAreaView, Image,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent, TouchableOpacity} from 'react-native'
+import { View ,Text,SafeAreaView, Image,Dimensions,TouchableOpacity, StyleSheet,Alert, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent} from 'react-native'
 
-import React,{useState} from 'react'
+import React,{useState,useEffect,useContext} from 'react'
 import { Raleway_400Regular, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
-import { Feather } from '@expo/vector-icons'
+import { Feather, Ionicons } from '@expo/vector-icons'
 import { RadioButton } from 'react-native-paper';
+import { AuthContext } from '../Context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios'
+import { useIsFocused } from '@react-navigation/native';
+import Checkbox from 'expo-checkbox';
+import {Picker} from '@react-native-picker/picker';
+import Esewa from '../payment_gateway/Esewa';
+import Khalti from '../payment_gateway/Khalti';
 
 export default function Checkout({navigation}) {
 const[paymentMethod,setPaymentMethod] = useState('')
+const[addresses,setAddresses] = useState([])
+const[selectedId,setSelectedId] = useState(0)
+const[shippingAddress,setShippingAddresses] = useState()
+const[sameBilling,setSameBilling] = useState(true)
+const[billingAddress,setBillingAddress] = useState({})
 
 
+const IsFocused = useIsFocused()
+
+async function loadSelectedCheckBox() {
+    var addressId = await AsyncStorage.getItem('shippingId')
+    setSelectedId(addressId)
+}
+
+useEffect(()=>{
+
+if(addresses && addresses.length>0 && selectedId){
+    console.log('address find')
+    var shippingAddress = addresses.find(address=>address._id==selectedId)
+    if(shippingAddress){
+        setShippingAddresses(shippingAddress)
+
+    }
+}
+
+},[addresses,selectedId])
+
+
+const data = useContext(AuthContext)
+        const {token,subtotal} = data
+        const config = {
+            headers:{
+                'access-token': token
+            }
+        }
+
+    useEffect(() => {
+        getaddress()
+        loadSelectedCheckBox()
+    }, [IsFocused])
+    
+async function getaddress(){
+    try {
+        var response = await axios.get('/address',config)
+        setAddresses(response.data)
+    } catch (error) {
+
+       //Alert.alert('Error', error.request.response)
+    }
+}
+
+function changeBillingAddress(id){
+    var billing = addresses.find(address=>address._id == id)
+    if(billing){
+        setBillingAddress(billing)
+    }
+}
+
+ 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
+    <Esewa/>
+    <Khalti/>
        <View style={styles.cardWrapper}>
        <View style={styles.headerWrapper}>
             <Text style={styles.header}>Shipping Information</Text>
+            <TouchableOpacity onPress={()=>navigation.navigate('account',{screen:'Shipping Address'})}>
             <Text style={styles.change}>Change</Text>
+            </TouchableOpacity>
        </View>
-           <View style={styles.card}>
+       {shippingAddress?(
+           <>
+        <View style={styles.card}>
                 <View style={styles.userWrapper}>
                     <Feather name="user" size={20} color={'#200E32'}></Feather>
-                    <Text style={styles.userName}>User Name</Text>
+                    <Text style={styles.userName}>{shippingAddress.name}</Text>
                 </View>
                 <View style={styles.userWrapper}>
                     <Feather name='map-pin' size={20} color={'#200E32'}></Feather>
-                    <Text style={styles.userName}>Kawasoti-8 Nawalpur,Nepal</Text>
+                    <Text style={styles.userName}>{shippingAddress.street}, {shippingAddress.city}, {shippingAddress.district}, {shippingAddress.zipcode}, Nepal</Text>
                 </View>
                 <View style={styles.userWrapper}>
                     <Feather name='phone' size={20} color={'#200E32'}></Feather>
-                    <Text style={styles.userName}>+977-98765321</Text>
+                    <Text style={styles.userName}>{shippingAddress.phone}</Text>
                 </View>
-
            </View>
+
+           <View style={{flexDirection:'row',alignItems:'center',marginBottom:15}}>
+               <Checkbox value={sameBilling} style={styles.checkbox} onValueChange={setSameBilling}></Checkbox>
+                <Text>Same as Shipping Address</Text>
+           </View>
+           {!sameBilling?(
+
+            <Picker
+                    style={styles.formcontrol}
+                     selectedValue={billingAddress._id}
+                        onValueChange={itemValue =>
+                        changeBillingAddress(itemValue)
+                    }>
+                  <Picker.Item  label="Selelct Billing Address" value="" />
+                    {addresses.map(address=>{
+                        return(
+                           
+                            <Picker.Item  label={`${address.street}, ${address.city}, ${address.district}, ${address.zipcode}, Nepal`} value={address._id} />
+                            
+                        )
+                    })}
+                </Picker>
+           ):(null)}
+           </>
+       ):(
+        <TouchableOpacity onPress={()=>navigation.navigate('account',{screen:'Add Shipping Address'})} style={[styles.card,{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingVertical:10}]}>
+        <Text>Add Shipping Address</Text>
+        <View  style={styles.add}>
+        <Ionicons name="add" size={20} style={styles.addIcon}></Ionicons>
+         </View>
+        </TouchableOpacity>
+       )}
+           
+
+           
+
+
 
            <View style={styles.headerWrapper}>
             <Text style={styles.header}> Payement Method</Text>
-           
        </View>
            <View style={styles.card}>
                 <View style={styles.userWrapper}>
@@ -47,9 +153,8 @@ const[paymentMethod,setPaymentMethod] = useState('')
                 />
                 <View style={styles.creaditCard}>
                 <View style={styles.cardImageWrapper}>
-                <Image style={styles.cardImage} source={require('../../assets/Bitmap.png')}></Image>
+                <Image style={styles.cardImage} source={require('../../assets/esewa_logo.png')}></Image>
                 </View>
-                    <Text style={styles.userName}>**** **** **** 1234</Text>
                 </View>
                 </View>
                 <View style={styles.userWrapper}>
@@ -61,16 +166,15 @@ const[paymentMethod,setPaymentMethod] = useState('')
                 />
                 <View style={styles.creaditCard}>
                 <View style={styles.cardImageWrapper}>
-                <Image style={styles.cardImage} source={require('../../assets/Bitmap.png')}></Image>
+                <Image style={styles.cardImage} source={require('../../assets/khalti-logo.svg')}></Image>
                 </View>
-                    <Text style={styles.userName}>**** **** **** 1234</Text>
                 </View>
                 </View>
            </View>
 
            <View style={styles.cartTotal}>
             <Text style={styles.total}>Total</Text>
-            <Text style={styles.totalValue}>Rs. 400</Text>
+            <Text style={styles.totalValue}>Rs. {subtotal}</Text>
             </View>
 
             <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Checkout')} >
@@ -88,6 +192,17 @@ const styles = StyleSheet.create({
         paddingHorizontal:30
     
     },
+    formcontrol: {
+        fontSize: 16,
+        fontWeight: '400',
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: '#e5e5e5',
+        width: '100%',
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        marginTop: 10,
+    },
     
     card:{
         backgroundColor:'#f5f5ff',
@@ -95,7 +210,7 @@ const styles = StyleSheet.create({
         padding:20,
       
         borderRadius:10,
-        marginBottom:30,
+        marginBottom:20,
         shadowColor: "rgba(0, 0, 0, 0.3)",
             shadowOffset: {
                 width: 0,
@@ -189,4 +304,32 @@ const styles = StyleSheet.create({
         fontSize:20,
         color:'white',
        },
+       checkbox:{
+        color:'white',
+        marginRight:8
+    },
+
+    add:{
+        shadowColor: "rgba(0, 0, 0, 0.3)",
+                shadowOffset: {
+                    width: 0,
+                    height: 5,
+                },
+                shadowOpacity: 0.6,
+                shadowRadius: 20,
+                elevation: 14,
+                margin:10,  
+                height:40,
+                width:40,
+                borderRadius:20 ,
+              
+                justifyContent:'center',
+                alignItems:'center',
+                backgroundColor:'#f5f5ff',
+               
+    
+                },
+                addIcon:{
+                    textAlign:'center'
+                }
 })

@@ -85,7 +85,7 @@ const {decode} = data
             </View>
 
             <View style={styles.card}>
-                <View style={styles.pagesWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Redeem')} style={styles.pagesWrapper}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                 <MaterialCommunityIcons name='briefcase' size={20}></MaterialCommunityIcons>
                     <Text style={styles.pageName}>Redeem</Text>
@@ -93,11 +93,11 @@ const {decode} = data
                 <View style={{flexDirection:'row', alignItems:'center'}}>
                     <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                 </View>  
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.border}></View>
 
-                <View style={styles.pagesWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Redeemption History')} style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <MaterialCommunityIcons name='history' size={20}></MaterialCommunityIcons>
                         <Text style={styles.pageName}>Redeem History</Text>
@@ -105,7 +105,7 @@ const {decode} = data
                         <View style={{flexDirection:'row'}}>
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>
-                </View>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.card}>

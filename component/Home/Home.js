@@ -55,7 +55,6 @@ useEffect(() => {
     
    
         <View>
-    
             <ScrollView   horizontal={true} showsHorizontalScrollIndicator={false} >
             <View style={styles.wrapper} >
           {categories.map(category=>{

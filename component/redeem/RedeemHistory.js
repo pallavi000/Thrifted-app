@@ -1,19 +1,62 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
-import React from 'react'
+import React,{useState,useEffect, useContext} from 'react'
 import {Feather, MaterialCommunityIcons, Ionicons} from '@expo/vector-icons'
 import { Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
+import axios from 'axios'
+import { AuthContext } from '../Context'
 
 export default function RedeemHistory() {
+    const[payments,setPayments] = useState([]) 
+
+    const data = useContext(AuthContext)
+    const {token} = data
+
+    const config = {
+        headers:{
+            'access-token':token
+        }
+    }
+
+useEffect(()=>{
+getHistory()
+},[])
+
+
+function dateConvert(requestTime){
+var arr = requestTime.split('T')
+return arr[0]
+}
+
+function timeConvert(requestTime){
+    var arr = requestTime.split('T')
+    var time = arr[1].split('.')
+    return time[0]
+}
+
+
+async function getHistory(){
+    try {
+        var response = await axios.get('/user/withdraw/all',config)
+        console.log(response.data)
+        setPayments(response.data)
+    } catch (error) {
+        console.log(error.request.response)
+    }
+}
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
     <ScrollView>
         <View style={styles.container}>
-            <View style={styles.pendingCard}>
+        {payments.map(payment=>{
+            return(
+                payment.status== 'pending'?(
+                    <View style={styles.pendingCard}>
                 <View>
-                    <Text styles={styles.title}>Esewa . 9845534234</Text>
+                    <Text styles={styles.title}>{payment.payment_method} . {payment.account_detail}</Text>
                             <View style={styles.row}>
-                                <Text style={styles.subtitle}>02/03/2022</Text>
-                                <Text style={styles.subtitle}>05:30:21</Text>
+                                <Text style={styles.subtitle}>{dateConvert(payment.createdAt)}</Text>
+                                <Text style={styles.subtitle}>{timeConvert(payment.createdAt)}</Text>
                             </View>
                         </View>
 
@@ -21,22 +64,8 @@ export default function RedeemHistory() {
                 <MaterialCommunityIcons style={styles.icon} name='timer-sand-empty' size={20}></MaterialCommunityIcons>
                 </View>
            </View>
-
-            <View style={styles.cancelledCard}>
-                <View>
-                    <Text styles={styles.title}>Esewa . 9845534234</Text>
-                            <View style={styles.row}>
-                                <Text style={styles.subtitle}>02/03/2022</Text>
-                                <Text style={styles.subtitle}>05:30:21</Text>
-                            </View>
-                        </View>
-
-                <View style={styles.cancelledAction}>
-                <Ionicons name='close' style={styles.icon} size={20}></Ionicons>
-                </View>
-            </View>
-
-         <View style={styles.successCard}>
+                ):payment.status=='completed'?(
+                    <View style={styles.successCard}>
                 <View>
                     <Text styles={styles.title}>Esewa . 9845534234</Text>
                             <View style={styles.row}>
@@ -49,6 +78,28 @@ export default function RedeemHistory() {
                 <Feather name='check' style={styles.icon} size={20}></Feather>
                 </View>
          </View>
+                ):(
+                    <View style={styles.cancelledCard}>
+                <View>
+                    <Text styles={styles.title}>Esewa . 9845534234</Text>
+                            <View style={styles.row}>
+                                <Text style={styles.subtitle}>02/03/2022</Text>
+                                <Text style={styles.subtitle}>05:30:21</Text>
+                            </View>
+                        </View>
+
+                <View style={styles.cancelledAction}>
+                <Ionicons name='close' style={styles.icon} size={20}></Ionicons>
+                </View>
+            </View>
+                )
+            )
+        })}
+            
+
+            
+
+         
 
 
             </View>

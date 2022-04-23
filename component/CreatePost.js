@@ -10,8 +10,6 @@ import MainImage from './Image/MainImage'
 import { tan } from 'react-native-reanimated'
 import { saveToLibraryAsync } from 'expo-media-library'
 
-
-
 const validationSchema = Yup.object().shape({
    name:Yup.string().required(),
     category:Yup.string().required(),
@@ -23,10 +21,8 @@ const validationSchema = Yup.object().shape({
     price:Yup.string().required(),
     type:Yup.string().required(),
     detail:Yup.string().required(),
-    image1:Yup.string().required()
-    
+    image1:Yup.string().required() 
 })
-
 
 const CreatePost = () => {
     const[colors,setColors] = useState([])
@@ -34,8 +30,6 @@ const CreatePost = () => {
     const[brands,setBrands] = useState([])
     const[categories,setCategories] = useState([])
     const[showBrand,setShowBrand] = useState(false)
-   
-
     const data = useContext(AuthContext)
     const {token} = data
 
@@ -44,10 +38,6 @@ const CreatePost = () => {
             'access-token': token
         }
     }
-
-
-
-
 
     useEffect(() => {
         axios.get('/frontend/createpost',config).then(response=>{
@@ -60,8 +50,7 @@ const CreatePost = () => {
      }, [])
 
      function createPost(values){
-         console.log(values)
-         return false
+        
         axios.post('/product/create/post',values,config).then(response=>{
             console.log(response.data)
        }).catch(err=>{
@@ -75,7 +64,6 @@ const CreatePost = () => {
             setShowBrand(true)
         }else setShowBrand(false)
      }
-
 
      function renderChildren(categories,n){
          var inc = n;
@@ -98,18 +86,14 @@ const CreatePost = () => {
        var profit = price- price*20/100
        console.log(profit)
        setFieldValue('earning_price',profit)
-   
      }
-     
-     
+
     return (
         <ScrollView style={[bbstyles.container, bbstyles.bgWhite]}>
-        
             <Formik 
            initialValues={{name:'',detail:'',category:'',stock:'',size:'',brand:'',color:'',original:'',price:'',earning_price:'',type:'',image1:'',custombrand:'',image2:'',image3:'',image4:''}}
            onSubmit={(values)=>createPost(values)}
            validationSchema={validationSchema}
-           
            >
            {({handleChange,handleSubmit,errors,setFieldValue,values})=>(
                <>
@@ -122,7 +106,6 @@ const CreatePost = () => {
                     onChangeText={handleChange("name")}
                 />
                   <Text style={styles.error}>{errors.name}</Text>
-
                 <Text style={styles.title}>Description</Text>
                 <TextInput
                 style={styles.formcontrol}
@@ -131,27 +114,22 @@ const CreatePost = () => {
                     onChangeText={handleChange("detail")}
                 />
                 <Text style={styles.error}>{errors.detail}</Text>
-
                 <Text style={styles.title}>Category</Text>
                 <Picker
                     style={styles.formcontrol}
                      selectedValue={values.category}
                         onValueChange={itemValue =>
-                        
                         setFieldValue('category',itemValue)
                     }>
                   <Picker.Item  label="Selelct Product Category" value="" />
                     {categories.map(category=>{
                         return(
-                           
                             [<Picker.Item  label={category.name} value={category._id} />,
                             renderChildren(category.childrens,1)]
-                            
                         )
                     })}
                 </Picker>
                 <Text style={styles.error}>{errors.category}</Text>
-
                 <Text style={styles.title}>Product Quantity</Text>
                 <TextInput
                 style={styles.formcontrol}
@@ -160,7 +138,6 @@ const CreatePost = () => {
                     onChangeText={handleChange("stock")}
                 />
                 <Text style={styles.error}>{errors.stock}</Text>
-
                 <Text style={styles.title}>Product Size</Text>
                 <Picker
                     style={styles.formcontrol}
@@ -176,25 +153,21 @@ const CreatePost = () => {
                     })}
                 </Picker>
                 <Text style={styles.error}>{errors.size}</Text>
-
                 <Text style={styles.title}>Brand</Text>
                 <Picker
                     style={styles.formcontrol}
                     selectedValue={values.brand}
                         onValueChange={itemValue =>
-                        brandValue(itemValue,setFieldValue)
-                        
+                        brandValue(itemValue,setFieldValue)  
                     }>
                      <Picker.Item  label="Selelct Brand" value="" />
                     {brands.map(brand=>{
                         return(
                             <Picker.Item  label={brand.name} value={brand._id} />
-                           
                         )
                     })}
                     <Picker.Item  label="Others.." value="others"  />
                 </Picker>
-                    
                     {showBrand?(
                         <View>
                         <Text style={styles.title}>Your brand name</Text>
@@ -207,9 +180,7 @@ const CreatePost = () => {
                         <Text style={styles.error}>{errors.custombrand}</Text>
                     </View>
                     ):(null)}
-                    
                 <Text style={styles.error}>{errors.brand}</Text>
-
                 <Text style={styles.title}>Color</Text>
                 <Picker
                     style={styles.formcontrol}
@@ -219,17 +190,12 @@ const CreatePost = () => {
                     }>
                <Picker.Item  label="Selelct Product Color" value="" />
                     {colors.map(color=>{
-                        return(
-                            
+                        return(    
                             <Picker.Item  label={color.name} value={color._id} />
                         )
                     })}
                 </Picker>
                 <Text style={styles.error}>{errors.color}</Text>
-
-
-
-
                 <Text style={styles.title}>Original Price</Text>
                 <TextInput
                 style={styles.formcontrol}
@@ -244,20 +210,16 @@ const CreatePost = () => {
                     keyboardType='default'
                     placeholder="Product listing price"
                     onChangeText={
-                        handleChange('price')
-                        
+                        handleChange('price')  
                     }
-
                     onChange={(e)=>calcEarning(e,setFieldValue)}
                 />
                 <Text style={styles.error}>{errors.price}</Text>
-
                 <Text style={styles.title}>Your Earning(when sold)</Text>
                 <TextInput
                 style={styles.formcontrol}
                     keyboardType='default'
                     value={values.earning_price}
-
                 />
                 <Text style={styles.error}>{errors.earning_price}</Text>
                 <Text style={styles.title}>Product Type</Text>
@@ -272,7 +234,6 @@ const CreatePost = () => {
                             <Picker.Item  label="Sale" value="sale" />
                 </Picker>
                 <Text style={styles.error}>{errors.type}</Text>
-
                 <TouchableWithoutFeedback onPress={handleSubmit}>
                 <Text style={bbstyles.btnPrimary}>Submit</Text>
                 </TouchableWithoutFeedback>

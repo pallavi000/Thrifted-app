@@ -13,12 +13,12 @@ import MainImage from '../Image/MainImage'
 const validationSchema = Yup.object().shape({
     name:Yup.string().required(),
     category:Yup.string().required(),
-    stock:Yup.string().required(),
+    stock:Yup.number().required(),
     size:Yup.string().required(),
     brand:Yup.string().required(),
     color:Yup.string().required(),
-    original:Yup.string().required(),
-    price:Yup.string().required(),
+    original:Yup.number().required(),
+    price:Yup.number().required(),
     type:Yup.string().required(),
     detail:Yup.string().required(),
     image1:Yup.string().required()
@@ -63,8 +63,8 @@ export default function CreatePost({navigation}) {
      }, [])
 
      function createPost(values){
-         console.log(values)
-         return false
+       
+        
         axios.post('/product/create/post',values,config).then(response=>{
             console.log(response.data)
        }).catch(err=>{
@@ -188,7 +188,7 @@ export default function CreatePost({navigation}) {
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Quantity (Required)</Text>
                 <TextInput
-                 keyboardType='default'
+                 keyboardType='numeric'
                  style={styles.input}
                  onChangeText={handleChange("stock")}
                  onBlur={handleBlur('stock')}
@@ -279,7 +279,7 @@ export default function CreatePost({navigation}) {
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Original Price(Required)</Text>
                 <TextInput
-                 keyboardType='default'
+                 keyboardType='numeric'
                  style={styles.input}
                  onChangeText={handleChange("original")}
                 onBlur={handleBlur('original')}
@@ -291,7 +291,7 @@ export default function CreatePost({navigation}) {
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Listing Price (Required)</Text>
                 <TextInput
-                 keyboardType='default'
+                 keyboardType='numeric'
                  style={styles.input}
                  onChangeText={handleChange("price")}
                 onBlur={handleBlur('price')}
@@ -305,7 +305,7 @@ export default function CreatePost({navigation}) {
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Your Earning (When Sold)</Text>
                 <TextInput
-                 keyboardType='default'
+                 keyboardType='numeric'
                  style={styles.input}
                  value={values.earning_price}
                  ></TextInput>

@@ -10,9 +10,6 @@ import { useEffect, useRef } from 'react/cjs/react.production.min'
 
 
 export default function ProductDetail({navigation,route}) {
-
-  
-
     React.useEffect(() => {
         console.log(navigation.getParent()?.getParent())
         if(titleShown){
@@ -21,14 +18,11 @@ export default function ProductDetail({navigation,route}) {
           return () => {
             setTitleShown({...titleShown,display:'flex'})
           }
-
       }, [navigation]);
 
-   
-     
 
     const product = route.params
-
+    console.log('product',product)
 
     const data = useContext(AuthContext)
     const {cartCount,setCartCount,token,titleShown,setTitleShown} = data
@@ -38,7 +32,8 @@ export default function ProductDetail({navigation,route}) {
         const data={
             pid,
             quantity:1
-        }      
+        }  
+
         const config = {
             headers: {
               'access-token':token
@@ -47,6 +42,7 @@ export default function ProductDetail({navigation,route}) {
           console.log(data)
         axios.post('/addtocart/cart',data,config).then(response=>{
             console.log('success')
+            console.log(response.data)
             getToken()
             setCartCount(cartCount+1)
         }).catch(err=>{
@@ -55,12 +51,10 @@ export default function ProductDetail({navigation,route}) {
         })
     }
 
-
-
-
     function buyNow(){
         
     }
+
 
   return (
    <SafeAreaView>
@@ -76,7 +70,7 @@ export default function ProductDetail({navigation,route}) {
                     <View style={styles.sizeWrapper}>
                         <Text style={styles.featureName}>Size</Text>
                         <View style={styles.productFeatureWrapper}>
-                            <Text style={styles.featureValue}>Small</Text>
+                            <Text style={styles.featureValue}>{product.size_id?.name}</Text>
                         </View>
                     </View>
                     <View style={styles.sizeWrapper}>
@@ -86,7 +80,7 @@ export default function ProductDetail({navigation,route}) {
                     <View style={styles.sizeWrapper}>
                         <Text style={styles.featureName}>Brand</Text>
                         <View style={styles.productFeatureWrapper}>
-                        <Text style={styles.featureValue}>Nike</Text>
+                        <Text style={styles.featureValue}>{product.brand_id?.name}</Text>
                         </View>
                     </View>
                 </View>
@@ -102,15 +96,11 @@ export default function ProductDetail({navigation,route}) {
                     <Text style={styles.priceTitle}>Total</Text>
                     <Text style={styles.priceValue}>Rs. {product.price}</Text>
                 </View>
-                <TouchableOpacity style={styles.loginBtn}>
+                <TouchableOpacity style={styles.loginBtn} onPress={()=>addtocart(product._id)}>
             <Text style={styles.login}>Add to cart</Text>
             </TouchableOpacity>
-            
             </View>
-          
        </ScrollView>
-         
-     
    </SafeAreaView>
   )
 }

@@ -1,41 +1,119 @@
-import { StyleSheet, Text, View,SafeAreaView, ScrollView, TextInput,Dimensions, TouchableOpacity} from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View,SafeAreaView, ScrollView,Alert, TextInput,Dimensions, TouchableOpacity} from 'react-native'
+import React,{useContext,useState} from 'react'
 import {Ionicons} from '@expo/vector-icons'
 import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
+import * as Yup from 'yup'
+import { Formik } from 'formik'
+import bbstyles from '../Styles'
+import { AuthContext } from '../Context'
+import { Picker } from '@react-native-picker/picker'
+import axios from 'axios'
+
+const validationSchema = Yup.object().shape({
+  balance:Yup.number().required().min(100, 'Withdraw amount should be greater than 100'),
+  account_detail:Yup.string().required(),
+  payment_method:Yup.string().required()
+})
 
 export default function Redeem({navigation}) {
+const data = useContext(AuthContext)
+const {token} = data
+
+const config = {
+  headers:{
+    'access-token':token
+  }
+}
+
+async function RedeemForm(data){
+  try {
+    var response = await axios.post('/user/withdraw',data,config)
+    console.log(response.data)
+    Alert.alert('Success','Your transaction request has been submitted')
+    navigation.navigate('Redeemption History')
+  } catch (error) {
+   
+    console.log(error.request.response)
+    Alert.alert('Error',error.request.response)
+  }
+}
+
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-    <ScrollView >
+    <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Redeem</Text>
-      <View style={styles.loginForm}>
+      <Formik initialValues={{balance:'',account_detail:'',payment_method:''}}
+      onSubmit={(values)=>RedeemForm(values)}
+      validationSchema={validationSchema}
+      >
+     {({handleChange,handleSubmit,errors,touched,setFieldValue,values,handleBlur})=>(
+       <>
+       <View style={styles.loginForm}>
         <Text style={styles.login}>Redeem</Text>
         
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Text style={styles.label} >Payment Method</Text>
           </View>
-          <TextInput keyboardType='default' style={styles.inputField}></TextInput>
+         
+          <Picker
+                    style={styles.formControl}
+                    onBlur={handleBlur('payment_method')}
+                     selectedValue={values.payment_method}
+                        onValueChange={itemValue =>
+                        setFieldValue('payment_method',itemValue)
+                    }>
+                             <Picker.Item  label="Selelct Payment Method" value="" />
+                            <Picker.Item  label="FonePay" value="fonepay" />
+                            <Picker.Item  label="Esewa" value="esewa" />
+                </Picker>
+                {touched.payment_method & errors.payment_method ?(
+                <Text style={{color:'red'}}>{errors.payment_method}</Text>
+
+                ):(null)}
+
         </View>
+
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
             <Text style={styles.label}>Account No./ID</Text>
           </View>
-          <TextInput keyboardType='default' style={styles.inputField}></TextInput>
+          <TextInput keyboardType='default'
+           style={styles.inputField}
+           onChangeText={handleChange('account_detail')}
+           onBlur={handleBlur('account_detail')}
+           ></TextInput>
+           {errors.account_detail && touched.account_detail?(
+            <Text style={bbstyles.error}>{errors.account_detail}</Text>
+           ):(null)}
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
-            <Text style={styles.label}>Ammount</Text>
+            <Text style={styles.label}>Amount</Text>
           </View>
-          <TextInput keyboardType='Number' style={styles.inputField}></TextInput>
+          <TextInput 
+          keyboardType='numeric'
+           style={styles.inputField}
+           onChangeText={handleChange('balance')}
+           onBlur={handleBlur('balance')}
+           ></TextInput>
+           {errors.balance && touched.balance?(
+            <Text style={bbstyles.error}>{errors.balance}</Text>
+           ):(null)}
         </View>
 
-        <TouchableOpacity onPress={()=>navigation.navigate('Redeemption History')} >
+        <TouchableOpacity onPress={handleSubmit} >
           <View><Text style={styles.loginBtn}>Redeem</Text></View>
         </TouchableOpacity>
 
       </View>
+       </>
+     )}
+        
+      </Formik>
+      
     </View>
 
   </ScrollView>

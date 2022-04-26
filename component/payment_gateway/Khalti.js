@@ -1,45 +1,56 @@
-import React from 'react';
-import { Button, SafeAreaView } from 'react-native';
+import axios  from 'axios';
+import React, { useEffect } from 'react';
+import { Button, SafeAreaView ,Alert} from 'react-native';
 
 import { KhatiSdk } from 'rn-all-nepal-payment';
 
-const Khalti = () => {
+const Khalti = (props) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
-  const _onPaymentComplete = (data) => {
-    setIsVisible(false);
+  useEffect(()=>{
+    setIsVisible(props.visible)
+    console.log(props.pid)
+  },[props])
+
+  const _onPaymentComplete = async(data) => {
+    props.setVisible(false);
     const str = data.nativeEvent.data;
     const resp = JSON.parse(str);
-    // console.log({ resp })
     if (resp.event === 'CLOSED') {
       // handle closed action
     } else if (resp.event === 'SUCCESS') {
-      // console.log({ data: resp.data })
+      try {
+        const data= {
+          token:resp.data.token,
+          amount:resp.data.amount
+        }
+        var response = await axios.post('/order/khalti/verify',data)
+        Alert.alert('Success','Payment Success')
+        props.orderSuccess()
+      } catch (error) {
+
+        Alert.alert('Error','Payment Failed')
+      }
     } else if (resp.event === 'ERROR') {
-      // console.log({ error: resp.data })
+      Alert.alert('Error','Payment Failed')
     }
     return;
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Button title={'Start Khalti'} onPress={() => setIsVisible(true)} />
       <KhatiSdk
-        amount={100} // Number in paisa
+        amount={props.total*100} // Number in paisa
         isVisible={isVisible} // Bool to show model
         paymentPreference={[
           // Array of services needed from Khalti
           'KHALTI',
-          'EBANKING',
-          'MOBILE_BANKING',
-          'CONNECT_IPS',
-          'SCT',
         ]}
-        productName={'Dragon'} // Name of product
-        productIdentity={'1234567890'} // Unique product identifier at merchant
+        productName={props.pid} // Name of product
+        productIdentity={props.pid} // Unique product identifier at merchant
         onPaymentComplete={_onPaymentComplete} // Callback from Khalti Web Sdk
-        productUrl={'http://gameofthrones.wikia.com/wiki/Dragons'} // Url of product
-        publicKey={'test_public_key_dc74e0fd57cb46cd93832aee0a390234'} // Test or live public key which identifies the merchant
+        productUrl='https://google.com'// Url of product
+        publicKey={'test_public_key_28a78100166644c99e6692c7b0a4e7dd'} // Test or live public key which identifies the merchant
       />
     </SafeAreaView>
   );

@@ -1,51 +1,89 @@
-import { StyleSheet, Text, View,ScrollView,SafeAreaView,Dimensions,Image ,TouchableOpacity} from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View,ScrollView,SafeAreaView,Dimensions,Image ,TouchableWithoutFeedback ,TouchableOpacity} from 'react-native'
+import React,{useEffect,useState, useContext} from 'react'
 import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import { NavigationContainer } from '@react-navigation/native'
+import axios from 'axios'
+import {imageLink} from '../ImageLink'
+
+
 export default function Category({navigation}) {
+    const[categories,setCategories] = useState([])
+    const[active,setActive] = useState(false)
+    const[activeCategory,setActiveCategory] = useState()
+
+useEffect(()=>{
+getCategory()
+},[])
+
+async function getCategory(){
+try {
+    var response = await axios.get('/category')
+    setCategories(response.data)
+    setActiveCategory(response.data[0])
+    setActive(response.data[0]._id)
+    navigation.setOptions({
+        headerTitle: response.data[0].name
+    })
+} catch (error) {
+    console.log(error.request.response)
+}
+}
+
+function currentCategory(category){
+setActive(category._id)
+setActiveCategory(category)
+navigation.setOptions({
+    headerTitle:category.name
+})
+}
+
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
        
         <View style={styles.categoryContainer}>
-            <View>
-            <Text style={styles.categoryName}>Women</Text>
-                <View style={styles.borderBottom}></View>
-            </View>
-            <View>
-            <Text style={styles.categoryName}>Men</Text>
-            <View ></View>
-            </View>
-            <View>
-            <Text style={styles.categoryName}>Kids</Text>
-            <View ></View>
-            </View>
+        {categories.map(category=>{
+            return(
+            
+                <TouchableWithoutFeedback key={category._id} onPress={()=>currentCategory(category)}>
+                    <View>
+                    <Text style={styles.categoryName}>
+                        {category.name}
+                    </Text>
+
+                    {active==category._id?(
+                        <View style={styles.borderBottom}></View>
+                    ):(
+                        <View></View>
+                    )}
+</View>
+                </TouchableWithoutFeedback>
+            )
+        })}
+            
+
+            
         </View>
        <View style={styles.cardWrapper}>
         <View style={styles.summerCat}>
             <Text style={styles.summerTitle}>SUMMER SALES</Text>
             <Text style={styles.summerSubtitle}>Up to 50% off</Text>
         </View>
-
-        <TouchableOpacity style={styles.categories} onPress={()=>navigation.navigate('Child Category')}>
-            <View style={styles.categoriesName}><Text style={styles.cateTitle}>New</Text></View>
-            <Image source={require('../../assets/cate1.png')} style={styles.categoriesImage}></Image>
+    {activeCategory?(
+        activeCategory.childrens.map(category=>{
+            return(
+                <TouchableOpacity style={styles.categories} key={category._id} onPress={()=>navigation.navigate('Child Category',category)}>
+            <View style={styles.categoriesName}><Text style={styles.cateTitle}>{category.name}</Text></View>
+            <Image source={{uri: imageLink+category.image}} style={styles.categoriesImage}></Image>
         </TouchableOpacity>
+            )
+        })
+    ):(null)}
+        
+        
 
-        <View style={styles.categories}>
-            <View style={styles.categoriesName}><Text style={styles.cateTitle}>Clothes</Text></View>
-            <Image source={require('../../assets/cate2.png')} style={styles.categoriesImage}></Image>
-        </View>
-
-        <View style={styles.categories}>
-            <View style={styles.categoriesName}><Text style={styles.cateTitle}>Shoes</Text></View>
-            <Image source={require('../../assets/cate3.png')} style={styles.categoriesImage}></Image>
-        </View>
-
-        <View style={styles.categories}>
-            <View style={styles.categoriesName}><Text style={styles.cateTitle}>Accesories</Text></View>
-            <Image source={require('../../assets/cate4.png')} style={styles.categoriesImage}></Image>
-        </View>
+        
 
        </View>
        </ScrollView>
@@ -70,7 +108,8 @@ const styles = StyleSheet.create({
         fontSize:16,
         fontWeight:'600',
         paddingBottom:10,
-        paddingHorizontal:30,   
+        paddingHorizontal:30,  
+        textAlign:'left' 
     },
     borderBottom:{
         borderBottomColor:'#663399',

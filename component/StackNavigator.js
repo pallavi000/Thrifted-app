@@ -46,6 +46,7 @@ function homeNavigation() {
           headerShown:true,
         }}
         >
+        
           <Stack.Screen options={{
                   headerShown: false,
                 }} name="landing" component={Home}/>

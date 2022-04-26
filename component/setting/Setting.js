@@ -37,7 +37,7 @@ const {decode} = data
             </View>
 
             <View style={styles.card}>
-                <View style={styles.pagesWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('My Orders')} style={styles.pagesWrapper}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                 <Feather name='shopping-bag' size={20}></Feather>
                     <Text style={styles.pageName}>My Purchases</Text>
@@ -45,7 +45,7 @@ const {decode} = data
                 <View style={{flexDirection:'row', alignItems:'center'}}>
                     <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                 </View>  
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.border}></View>
 

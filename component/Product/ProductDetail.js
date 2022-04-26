@@ -7,6 +7,7 @@ import { imageLink } from '../ImageLink'
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold, Raleway_700Bold_Italic } from '@expo-google-fonts/raleway'
 import { Feather } from '@expo/vector-icons'
 import { useEffect, useRef } from 'react/cjs/react.production.min'
+// import { SliderBox } from "react-native-image-slider-box";
 
 
 export default function ProductDetail({navigation,route}) {
@@ -55,12 +56,28 @@ export default function ProductDetail({navigation,route}) {
         
     }
 
+    function parseImages(image, images){
+        var arr=[imageLink+image]
+        images.forEach(image => {
+            arr.push(imageLink+image)
+        });
+        return arr
+    }
+
+    
 
   return (
    <SafeAreaView>
        <ScrollView style={[bbstyles.scrollHeight,{backgroundColor:'#f5f5ff',paddingBottom:0}]}>
             <View style={styles.detailImage}>
-                <Image source={{uri:imageLink+product.image}} style={styles.productImage}></Image>
+            
+            {/* <SliderBox
+            images={parseImages(product.image, product.feature_image)}
+            ImageComponentStyle	= {styles.productImage}
+            dotColor="#663399"
+            imageLoadingColor="#663399"
+            /> */}
+
             </View>
             <View style={styles.detailContainer}>
                 <View style={styles.productName}>

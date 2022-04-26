@@ -5,6 +5,9 @@ import {Ionicons,Feather } from '@expo/vector-icons'
 import bbstyles from '../Styles'
 import { imageLink } from '../ImageLink'
 import { SafeAreaView } from 'react-native-safe-area-context'
+// import { SliderBox } from "react-native-image-slider-box";
+
+
 
 export default function Home({navigation}) {
 
@@ -21,13 +24,18 @@ useEffect(() => {
         setRentProducts(response.data.rentProduct)
         setSellProducts(response.data.saleProduct)
         setCategories(response.data.categories)
-        console.log(response.data.product)
-
-
-        
+        console.log(response.data.product) 
     })
 }, [])
 
+
+function parseImages(image, images){
+    var arr=[imageLink+image]
+    images.forEach(image => {
+        arr.push(imageLink+image)
+    });
+    return arr
+}
 
 
 
@@ -68,6 +76,8 @@ useEffect(() => {
                 </View>
           </ScrollView>
 
+         
+
           {products.map(product=>{
                return(
           <TouchableWithoutFeedback  onPress={()=>navigation.navigate('Product Detail',product)}>
@@ -77,7 +87,14 @@ useEffect(() => {
                <Text style={styles.username}>{product.seller_id?.name}</Text>   
             </TouchableOpacity>
             <View style={styles.product}>
-                <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image>
+                {/* <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image> */}
+
+                {/* <SliderBox
+            images={parseImages(product.image, product.feature_image)}
+            ImageComponentStyle	= {styles.productImage}
+            dotColor="#663399"
+            imageLoadingColor="#663399"
+            /> */}
                 <View style={styles.productreview}>
                 <View>
                 <Feather name="heart" style={styles.reviewicon} size={25}></Feather>
@@ -189,7 +206,7 @@ const styles = StyleSheet.create({
     },
     productImage:{
         height:400,
-        width:'auto',
+        width:'100%',
         resizeMode:'cover'
         
     },

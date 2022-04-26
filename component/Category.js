@@ -22,10 +22,12 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 const Category = (props) => {
     const [modalVisible, setModalVisible] = useState(false)
     const[filterModalVisible,setFilterModalVisible] = useState(false)
+    
     const[products,setProducts] = useState([])
     const[categories,setCategories] = useState([])
     const[brands,setBrands] = useState([])
     const[colors,setColors] = useState([])
+    
     const[brand_id,setBrand_id] = useState([])
     const[color_id,setColor_id]= useState([])
     const[minprice,setMinprice] = useState([])
@@ -163,7 +165,7 @@ const Category = (props) => {
             
 
 
-             var currentPageNo = response.data.total/itemsPerPage
+            var currentPageNo = response.data.total/itemsPerPage
             currentPageNo=  Math.ceil(currentPageNo)
             if(currentPageNo<pageno){
                 setPageno(currentPageNo)
@@ -174,6 +176,10 @@ const Category = (props) => {
         })
     }
 
+
+
+
+    
     function brand_filter(id){
         setSelectedBrand(id)
         if(id){
@@ -184,7 +190,6 @@ setBrand_id([id])
         }
             
     }
-
 
 
     function color_filter(id){

@@ -1,33 +1,96 @@
 import { StyleSheet, Text, View,SafeAreaView,ScrollView ,TouchableOpacity} from 'react-native'
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import {Fontisto} from '@expo/vector-icons'
+import BrandFilter from './BrandFilter'
+// import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
-export default function Filter({navigation}) {
+export default function Filter(props) {
+    const[showBrand,setShowBrand] = useState(false)
+    const[color_id,setColor_id] = useState([])
+    const[brand_id,setBrand_id] = useState([])
+    const[minprice,setMinprice] = useState([])
+    const[maxprice,setMaxprice]= useState([])
+
+    const {navigation} = props
+
+    useEffect(()=>{
+        setColor_id(props.color_id)
+        setBrand_id(props.brand_id)
+        setMaxprice(props.maxprice)
+        setMinprice(props.minprice)
+    },[])
+    
+    function color_filter(id){
+        if(color_id.includes(id)){
+            var y = color_id.filter(c=>c!=id)
+            setColor_id(y)
+        }else{
+            var z = [...color_id,id]
+            setColor_id(z)
+        }
+    }
+
+    function apply() {
+        props.setColor_id(color_id)
+        props.setBrand_id(brand_id)
+        props.setMinprice(minprice)
+        props.setMaxprice(maxprice)
+        props.setFilter(false)
+    }
+
+    function priceFilter(data){
+        setMaxprice([data[1]])
+        setMinprice([data[0]])
+    }
+
+  
+
   return (
+      showBrand?(
+          <BrandFilter 
+              setShowBrand = {setShowBrand}
+              brands = {props.brands}
+              brand_id = {brand_id}
+              setBrand_id = {setBrand_id}
+          />
+      ):(
+
+      
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
     <ScrollView>
         <View style={styles.container}>
             <View style={styles.filterSection}>
                 <Text style={styles.title}>Price Range</Text>
+                {/* <MultiSlider
+        values={[0,100]}
+        min={0}
+        max={20000}
+        snapped={true}
+        smoothSnapped={true}
+        markerStyle={{backgroundColor:'#663399',height: 20,width:20}}
+        selectedStyle={{backgroundColor:'#663399'}}
+        trackStyle={{height:4}}
+        onValuesChangeFinish={(values)=>priceFilter(values)}
+      /> */}
             </View>
             <View style={styles.filterSection}>
                 <Text style={styles.title}>Colors</Text>
                 <View style={styles.filterContainer}>
-                    <View style={styles.colorFilter}>
-                        <View style={[styles.colorActive,{backgroundColor:'#020202'}]}></View>
-                    </View>
-                        <View style={[styles.color,{backgroundColor:'rgb(246, 246, 246)'}]} ></View>
-                        <View style={[styles.color,{backgroundColor:'rgb(190, 169, 169)'}]}></View>
-                        <View style={[styles.color,{backgroundColor:'rgb(244, 129, 23)'}]}></View>
-                        <View style={[styles.color,{backgroundColor:'rgb(44, 177, 177)'}]}></View>
-                        <View ></View>
-                        <View ></View>
-                        <View ></View>
+                    {props.colors.map(color=>{
+                        return(
+                        color_id.includes(color._id) ?(
+                            <TouchableOpacity onPress={()=>color_filter(color._id)} style={styles.colorFilter} key={color._id}>
+                             <View style={[styles.colorActive,{backgroundColor:color.name}]}></View>
+                         </TouchableOpacity>
+                        ):(
+                            <TouchableOpacity onPress={()=>color_filter(color._id)} style={[styles.color,{backgroundColor:color.name}]} ></TouchableOpacity>
+                        ))                       
+                    })}
                 </View>
                 </View>
 
-                <View style={styles.filterSection}>
+                {/* <View style={styles.filterSection}>
                     <Text style={styles.title}>Size</Text>
                         <View style={styles.filterContainer}>
                         <View ><Text style={styles.size}>XS</Text></View>
@@ -38,19 +101,19 @@ export default function Filter({navigation}) {
                         <View ></View>
                         <View ></View>
                     </View>
-                </View>
-                <View style={styles.filterSection}>
-                <Text style={styles.title}>Category</Text>
-                        <View style={styles.filterContainer}>
-                            <Text style={styles.activeCategory}>All</Text>
-                            <Text style={styles.category}>Women</Text>
-                            <Text style={styles.category}>Men</Text>
-                            <Text style={styles.category}>Boys</Text>
-                            <Text style={styles.category}>Girls</Text>
-                        </View>
-                    </View>
+                </View> */}
+                        {/* <View style={styles.filterSection}>
+                        <Text style={styles.title}>Category</Text>
+                                <View style={styles.filterContainer}>
+                                    <Text style={styles.activeCategory}>All</Text>
+                                    <Text style={styles.category}>Women</Text>
+                                    <Text style={styles.category}>Men</Text>
+                                    <Text style={styles.category}>Boys</Text>
+                                    <Text style={styles.category}>Girls</Text>
+                                </View>
+                            </View> */}
 
-                    <TouchableOpacity style={styles.filterSection} onPress={()=>navigation.navigate('Brand Filters')}>
+                    <TouchableOpacity style={styles.filterSection} onPress={()=>setShowBrand(true)}>
                         <Text style={styles.title}>Brand</Text>
                         <View style={styles.BrandFilter}>
                             <Text style={styles.subtitle}>adidas Originals, Jack & Jones, s.Oliver</Text>
@@ -60,8 +123,12 @@ export default function Filter({navigation}) {
                     </TouchableOpacity>
 
                 <View style={styles.filterApplySection}>
-                    <Text style={styles.discard}>Discard</Text>
+                <TouchableOpacity onPress={()=>props.setFilter(false)}>
+                <Text style={styles.discard}>Discard</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>apply()}>
                     <Text style={styles.apply}>Apply</Text>
+                    </TouchableOpacity>
                 </View>
 
 
@@ -69,6 +136,7 @@ export default function Filter({navigation}) {
                 </View>
         </ScrollView>
         </SafeAreaView>
+      )
   )
 }
 const styles = StyleSheet.create({

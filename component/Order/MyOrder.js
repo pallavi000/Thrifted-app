@@ -1,8 +1,51 @@
 import { StyleSheet, Text, View ,SafeAreaView,ScrollView, TouchableOpacity} from 'react-native'
-import React from 'react'
+import React,{useContext,useState,useEffect} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
+import { AuthContext } from '../Context'
+import axios from 'axios'
 
 export default function MyOrder({navigation}) {
+
+    const[items,setItems] = useState([])
+    const data = useContext(AuthContext)
+    const {token} = data
+
+    const config = {
+        headers: {
+          'access-token':token
+        }
+      } 
+
+    useEffect(() => {
+        getOrder()
+    },[])
+
+    async function getOrder(){
+    try {
+        var response = await axios.get('/order/transaction',config)
+        console.log(response.data)
+        setItems(response.data)
+    } catch (error) {
+        console.log(error.request.response)
+    }
+    }
+
+    function changeDate(createdAt){
+        var arr = createdAt.split('T')
+        return arr[0]
+    }
+
+    function orderQuantity(orders){
+       var total = orders.reduce((total,order)=>{
+            return total += order.quantity
+       },0)
+       return total
+    }
+
+
+    
+
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
@@ -19,88 +62,42 @@ export default function MyOrder({navigation}) {
             <Text  style={styles.process}>Cancelled</Text>
         </View>
     </View>
-    <View style={styles.addressCard}>
-        <View style={styles.row}>
-            <Text style={styles.orderNo}>Order No : 1947034</Text>
-            <Text style={styles.orderDate}>05-12-2022</Text>
-        </View>
+    {items.map(item=>{
+        return(
+            <>
+            <View style={styles.addressCard} key={item._id}>
+            <View style={styles.row}>
+                <Text style={styles.orderNo}>Order No : {item._id}</Text>
+                <Text style={styles.orderDate}>{changeDate(item.createdAt)}</Text>
+            </View>
         <View style={styles.itemDetail}>
             <View>
                 <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Tracking number:</Text><Text style={styles.itemValue}> IW3475453455</Text>
-                </View>
-                
+                <Text style={styles.orderDate}>Tracking number:</Text><Text style={styles.itemValue}>{item.transaction_id}</Text>
+                </View>  
             </View>
             <View style={styles.row}>
             <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Quantity:</Text><Text style={styles.itemValue}> 5</Text>
+                <Text style={styles.orderDate}>Quantity:</Text><Text style={styles.itemValue}> {orderQuantity(item.orders)}</Text>
                 </View>
             <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Total Amount:</Text><Text style={styles.itemValue}> Rs.50</Text>
+                <Text style={styles.orderDate}>Total Amount:</Text><Text style={styles.itemValue}> Rs.{item.total}</Text>
                 </View>
             </View>
         </View>
         <View style={styles.row}>
-            <TouchableOpacity onPress={()=>navigation.navigate('Order Details')}>
+            <TouchableOpacity onPress={()=>navigation.navigate('Order Details',item)}>
             <Text style={styles.details}>Details</Text>
             </TouchableOpacity>
             <Text style={styles.delivered}>Delivered</Text>
         </View>
     </View>
+            </>
+        )
+    })}
+    
 
-    <View style={styles.addressCard}>
-        <View style={styles.row}>
-            <Text style={styles.orderNo}>Order No : 1947034</Text>
-            <Text style={styles.orderDate}>05-12-2022</Text>
-        </View>
-        <View style={styles.itemDetail}>
-            <View>
-                <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Tracking number:</Text><Text style={styles.itemValue}> IW3475453455</Text>
-                </View>
-                
-            </View>
-            <View style={styles.row}>
-            <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Quantity:</Text><Text style={styles.itemValue}> 5</Text>
-                </View>
-            <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Total Amount:</Text><Text style={styles.itemValue}> Rs.50</Text>
-                </View>
-            </View>
-        </View>
-        <View style={styles.row}>
-            <Text style={styles.details}>Details</Text>
-            <Text style={styles.delivered}>Delivered</Text>
-        </View>
-    </View>
-
-    <View style={styles.addressCard}>
-        <View style={styles.row}>
-            <Text style={styles.orderNo}>Order No : 1947034</Text>
-            <Text style={styles.orderDate}>05-12-2022</Text>
-        </View>
-        <View style={styles.itemDetail}>
-            <View>
-                <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Tracking number:</Text><Text style={styles.itemValue}> IW3475453455</Text>
-                </View>
-                
-            </View>
-            <View style={styles.row}>
-            <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Quantity:</Text><Text style={styles.itemValue}> 5</Text>
-                </View>
-            <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Total Amount:</Text><Text style={styles.itemValue}> Rs.50</Text>
-                </View>
-            </View>
-        </View>
-        <View style={styles.row}>
-            <Text style={styles.details}>Details</Text>
-            <Text style={styles.delivered}>Delivered</Text>
-        </View>
-    </View>
+    
     </View>
     </ScrollView>
     </SafeAreaView>

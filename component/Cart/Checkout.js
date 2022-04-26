@@ -12,6 +12,9 @@ import Checkbox from 'expo-checkbox';
 import {Picker} from '@react-native-picker/picker';
 import Esewa from '../payment_gateway/Esewa';
 import Khalti from '../payment_gateway/Khalti';
+import { v4 as uuidv4 } from 'uuid';
+import parseErrorStack from 'react-native/Libraries/Core/Devtools/parseErrorStack';
+
 
 export default function Checkout({navigation}) {
 const[paymentMethod,setPaymentMethod] = useState('')
@@ -20,6 +23,10 @@ const[selectedId,setSelectedId] = useState(0)
 const[shippingAddress,setShippingAddresses] = useState()
 const[sameBilling,setSameBilling] = useState(true)
 const[billingAddress,setBillingAddress] = useState({})
+const[pid,setPid] = useState(uuidv4())
+const[shippingFee,setShippingFee] = useState(0)
+const[esewaVisible,setEsewaVisible] = useState(false)
+const[khaltiVisible,setKhaltiVisible] = useState(false)
 
 
 const IsFocused = useIsFocused()
@@ -30,16 +37,13 @@ async function loadSelectedCheckBox() {
 }
 
 useEffect(()=>{
-
 if(addresses && addresses.length>0 && selectedId){
     console.log('address find')
     var shippingAddress = addresses.find(address=>address._id==selectedId)
     if(shippingAddress){
         setShippingAddresses(shippingAddress)
-
     }
 }
-
 },[addresses,selectedId])
 
 
@@ -50,7 +54,7 @@ const data = useContext(AuthContext)
                 'access-token': token
             }
         }
-
+        
     useEffect(() => {
         getaddress()
         loadSelectedCheckBox()
@@ -61,10 +65,10 @@ async function getaddress(){
         var response = await axios.get('/address',config)
         setAddresses(response.data)
     } catch (error) {
-
        //Alert.alert('Error', error.request.response)
     }
 }
+
 
 function changeBillingAddress(id){
     var billing = addresses.find(address=>address._id == id)
@@ -73,12 +77,53 @@ function changeBillingAddress(id){
     }
 }
 
- 
+function orderSuccess() {
+    navigation.navigate('Order Success')
+
+}
+
+
+function payment(){
+    if(!paymentMethod){
+        Alert.alert('Please Select Payment Method')
+        return
+    }
+    const data={
+        total:subtotal+shippingFee,
+        shipping:shippingFee,
+        note: '',
+        transaction_id:pid,
+        payment_method:paymentMethod
+      }
+    axios.post('/order',data,config).then(res=>{
+        if(paymentMethod=='khalti'){
+            setKhaltiVisible(true)
+        }else{
+            setEsewaVisible(true)
+        }
+
+    }).catch(err=>{
+        Alert.alert('Error',err.request.response)
+    })
+}
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
-    <Esewa/>
-    <Khalti/>
+    <Esewa
+        orderSuccess={orderSuccess}
+        total={subtotal}
+        pid={pid}
+        visible={esewaVisible}
+        setVisible={setEsewaVisible}
+    />
+    <Khalti
+        orderSuccess={orderSuccess}
+        total={subtotal}
+        pid={pid}
+        visible={khaltiVisible}
+        setVisible = {setKhaltiVisible}
+    />
        <View style={styles.cardWrapper}>
        <View style={styles.headerWrapper}>
             <Text style={styles.header}>Shipping Information</Text>
@@ -166,7 +211,7 @@ function changeBillingAddress(id){
                 />
                 <View style={styles.creaditCard}>
                 <View style={styles.cardImageWrapper}>
-                <Image style={styles.cardImage} source={require('../../assets/khalti-logo.svg')}></Image>
+                <Image style={styles.cardImage} source={require('../../assets/khalti-logo.png')}></Image>
                 </View>
                 </View>
                 </View>
@@ -177,7 +222,8 @@ function changeBillingAddress(id){
             <Text style={styles.totalValue}>Rs. {subtotal}</Text>
             </View>
 
-            <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Checkout')} >
+            <TouchableOpacity style={styles.loginBtn} onPress={()=>payment()} >
+
             <Text style={styles.login}>Confirm to Pay</Text>
             </TouchableOpacity>
         </View>

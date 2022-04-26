@@ -1,14 +1,122 @@
 import { StyleSheet, Text, View,SafeAreaView, ScrollView,Image ,Dimensions,TouchableOpacity} from 'react-native'
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
+import Filter from '../Product/filters/Filter'
+import axios from 'axios'
+import { imageLink } from '../ImageLink'
 
-export default function CategoryPage({navigation}) {
+export default function CategoryPage({navigation,route}) {
+   const[filter,setFilter] = useState(false)
+   const[pageNo,setPageNo] = useState(1)
+   const[sorting,setSorting] = useState('-_id')
+   const[products,setProducts] = useState([])
+   const[brands,setBrands] = useState([])
+   const[colors,setColors] = useState([])
+   const[totalProduct,setTotalProduct] = useState(24)
+
+   const[brand_id,setBrand_id] = useState([])
+   const[color_id,setColor_id]= useState([])
+   const[minprice,setMinprice] = useState([])
+   const[maxprice,setMaxprice] = useState([])
+
+   const[category_id,setCategory_id] = useState([])
+   const[currentcatId,setCurrentcatId] = useState(null)
+   const[itemsPerPage,setItemsPerPage] = useState(24)
+
+ 
+
+   const category = route.params
+
+   useEffect(() => {
+    if(brand_id && brand_id.length!=0|| color_id &&color_id.length!=0 || minprice &&minprice.length!=0 || category_id && category_id.length!=0) {
+        filterProducts()
+    }else{
+        getProducts()
+    }
+   }, [pageNo,sorting,brand_id,color_id,category_id,minprice])
+   
+   async function getProducts(){
+      
+       try {
+        const data = {
+            category_slug:category.slug,
+            pageNo,
+            sorting
+        }
+        var response = await axios.post('/category/filter',data)
+        console.log(response.data)
+        setProducts(response.data.products)
+        setBrands(response.data.brands)
+        setColors(response.data.colors)
+        setCurrentcatId(response.data.category._id)
+        setTotalProduct(response.data.count)
+       } catch (error) {
+           console.log(error.message)
+       }
+   }
+
+
+   async function filterProducts(){
+        var data={
+            brand_id,
+            color_id,
+            minprice,
+            maxprice,
+            category_id,
+            pageNo,
+            sorting
+        }
+
+        if(category_id && category_id.length>0){
+        } else {
+            data={
+                brand_id,
+                color_id,
+                minprice,
+                maxprice,
+                category_id:[currentcatId],
+                pageNo,
+                sorting
+            }
+        }
+
+        try {
+            var response= await axios.post('/category/checkfilter',data)
+            var x = response.data.products.filter((v,i,a)=>a.findIndex(t=>(t._id === v._id))===i)
+                setProducts(x)
+                setTotalProduct(response.data.total)
+
+                var currentPageNo = response.data.total/itemsPerPage
+                currentPageNo=  Math.ceil(currentPageNo)
+                if(currentPageNo<pageNo){
+                    setPageNo(currentPageNo)
+                }
+        } catch (error) {
+            
+        }
+   }
+
   return (
+      filter?(
+          <Filter 
+              setFilter= {setFilter}
+              brand_id = {brand_id}
+              color_id = {color_id}
+              minprice = {minprice}
+              maxprice = {maxprice}
+              setBrand_id = {setBrand_id}
+              setColor_id = {setColor_id}
+              setMaxprice = {setMaxprice}
+              setMinprice = {setMinprice}
+              colors= {colors}
+              brands = {brands}
+          />
+      ):(
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
     <View style={styles.row}>
-    <TouchableOpacity style={styles.sortContainer} onPress={()=>navigation.navigate('Filters')}>
+    <TouchableOpacity style={styles.sortContainer} onPress={()=>setFilter(true)}>
       <Ionicons name='filter' size={20}></Ionicons>
       <Text style={styles.filter}>Filters</Text>
     </TouchableOpacity>
@@ -19,66 +127,28 @@ export default function CategoryPage({navigation}) {
     </View>
     
     <View style={styles.container}>
-        <View style={styles.productWrapper}>
-            <Image source={require('../../assets/product1.png')} style={styles.productImage}></Image>
+        {products.map(product=>{
+        return(
+            <View style={styles.productWrapper}>
+            <Image source={{uri:imageLink+product.image}} style={styles.productImage}></Image>
             <View style={styles.detailWrapper}>
-            <Text style={styles.productName} >Puma Shirt</Text>
+            <Text style={styles.productName} numberOfLines={2} >{product.name}</Text>
             <View style={{flexDirection:'row',alignItems:'center'}}>
                 <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
-                <Text>Puma</Text>
+                <Text>{product.brand_id?.name}</Text>
             </View>
             <View style={{flexDirection:'row',alignItems:'center'}}>
                 <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.{product.price}</Text>
             </View>
             </View>
         </View>
-
-        <View style={styles.productWrapper}>
-            <Image source={require('../../assets/product1.png')} style={styles.productImage}></Image>
-            <View style={styles.detailWrapper}>
-            <Text style={styles.productName} >Puma Shirt</Text>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
-                <Text>Puma</Text>
-            </View>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
-            </View>
-            </View>
-        </View>
-        <View style={styles.productWrapper}>
-            <Image source={require('../../assets/product1.png')} style={styles.productImage}></Image>
-            <View style={styles.detailWrapper}>
-            <Text style={styles.productName} >Puma Shirt</Text>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
-                <Text>Puma</Text>
-            </View>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
-            </View>
-            </View>
-        </View>
-        <View style={styles.productWrapper}>
-            <Image source={require('../../assets/product1.png')} style={styles.productImage}></Image>
-            <View style={styles.detailWrapper}>
-            <Text style={styles.productName} >Puma Shirt</Text>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
-                <Text>Puma</Text>
-            </View>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.500.00</Text>
-            </View>
-            </View>
-        </View>
+        )
+    })}
     </View>
     </ScrollView>
     </SafeAreaView>
+      )
   )
 }
 

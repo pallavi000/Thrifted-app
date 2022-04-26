@@ -1,230 +1,49 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView,TouchableOpacity } from 'react-native'
 import React,{useState} from 'react'
 import Checkbox from 'expo-checkbox';
 import { Raleway_500Medium } from '@expo-google-fonts/raleway';
+import BrandCheck from '../../ui/BrandCheck';
 
-export default function BrandFilter() {
-    const [isChecked, setChecked] = useState(false);
+export default function BrandFilter(props) {
+
+  function brand_filter(id){
+    if(props.brand_id.includes(id)){
+        var x = props.brand_id.filter(br=>br !=id)
+        props.setBrand_id(x)
+    }else{
+        var b = [...props.brand_id, id];
+        props.setBrand_id(b)
+    }
+}
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
     <ScrollView>
         <View style={styles.container}>
-          
-          <View style={styles.brandFilter}>
+          {props.brands.map(brand=>{
+            return(
+              <View style={styles.brandFilter}>
               <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
+                <Text style={styles.brandName}>{brand.name}</Text>
               </View>
               <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
+                <BrandCheck
+                  brand = {brand}
+                  brand_ids = {props.brand_id}
+                  brand_filter = {brand_filter}
                 />
               </View>
           </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={styles.brandName}>Adidas Originals</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isChecked}
-                  onValueChange={setChecked}
-                  color={isChecked ? '#663399' : undefined}
-                />
-              </View>
-          </View>
-
-          <View style={styles.brandFilter}>
-              <View>
-                <Text style={[styles.brandName,styles.activeBrand]}>Boutique Moschino</Text>
-              </View>
-              <View style={styles.brandCheck}>
-                <Checkbox
-                  style={styles.checkbox}
-                  value={   true}
-                  onValueChange={setChecked}
-                  color='#663399'
-                />
-              </View>
-          </View> 
-
+            )
+          })}
           </View>
           <View style={styles.filterApplySection}>
+          <TouchableOpacity onPress={()=>props.setShowBrand(false)}>
               <Text style={styles.discard}>Discard</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={()=>props.setShowBrand(false)}>
               <Text style={styles.apply}>Apply</Text>
+              </TouchableOpacity>
           </View>
         </ScrollView>
         </SafeAreaView>

@@ -1,80 +1,78 @@
 import { StyleSheet, Text, View,SafeAreaView,ScrollView,Image,Dimensions } from 'react-native'
 import React from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
+import { imageLink } from '../ImageLink'
 
-export default function OrderDetail() {
+export default function OrderDetail({route}) {
+    const item = route.params
+  
+
+    function changeDate(createdAt){
+        var arr = createdAt.split('T')
+        return arr[0]
+    }
+    function orderQuantity(orders){
+       var total = orders.reduce((total,order)=>{
+            return total += order.quantity
+       },0)
+       return total
+    }
+
+
 return (
 <SafeAreaView style={{backgroundColor:'white',flex:1}}>
     <ScrollView>
         <View style={styles.container}>
             <View style={styles.orderDetail}>
-                <Text style={styles.orderNo}>Order No 1947034</Text>
-                <Text style={styles.orderDate}>05-12-2022</Text>
+                <Text style={styles.orderNo}>Order No {item._id}</Text>
+                <Text style={styles.orderDate}>{changeDate(item.createdAt)}</Text>
             </View>
 
             <View style={styles.orderDetail}>
                 <View style={styles.row}>
                     <Text style={styles.orderDate}>Tracking number</Text>
-                    <Text style={styles.orderValue}> IW3475453455</Text>
+                    <Text style={styles.orderValue}>{item.transaction_id}</Text>
                 </View>
                 <Text style={styles.delivered}>Delivered</Text>
             </View>
-            <Text style={styles.orderValue}>3 items</Text>
-            <View style={styles.addressCard}>
+            <Text style={styles.orderValue}>{item.orders.length} items</Text>
+
+            {item.orders.map(order=>{
+                return(
+                    <View style={styles.addressCard}>
                 <View style={styles.row}>
-                    <Image source={require('../../assets/order1.png')} style={styles.image}></Image>
+                
+                    <Image source={{uri:imageLink+ order.product_id?.image}} style={styles.image}></Image>
                     <View>
-                        <Text style={styles.name}>Pullover</Text>
+                    <View style={{flexDirection:'row'}}> 
+                        <Text style={styles.name} ellipsizeMode='tail'>{order.product_id?.name}</Text>
+                        </View>
                         <Text style={styles.brand}>Nike</Text>
                         <View style={styles.row}>
                             <View style={[styles.row,{marginRight:5}]}>
                                 <Text style={styles.brand}>Color: </Text>
-                                <Text style={styles.value}>Gray</Text>
+                                <Text style={styles.value}>{order.color}</Text>
                             </View>
                             <View style={styles.row}>
                                 <Text style={styles.brand}>Size: </Text>
-                                <Text style={styles.value}>L</Text>
+                                <Text style={styles.value}>{order.size}</Text>
                             </View>
                         </View>
                         <View style={styles.spaceBtwn}>
                             <View style={styles.row}>
                                 <Text style={styles.brand}>Quantity: </Text>
-                                <Text style={styles.value}>1</Text>
+                                <Text style={styles.value}>{order.quantity}</Text>
                             </View>
-                            <Text style={styles.orderValue}>Rs.2</Text>
+                            <Text style={styles.orderValue}>Rs.{order.price}</Text>
                         </View>
                     </View>
                 </View>
             </View>
+                )
+            })}
+            
 
-            <View style={styles.addressCard}>
-               
-                    <View style={styles.row}>
-                        <Image source={require('../../assets/order1.png')} style={styles.image}></Image>
-                        <View >
-                            <Text style={styles.name}>Pullover</Text>
-                            <Text style={styles.brand}>Nike</Text>
-                            <View style={styles.row}>
-                                <View style={[styles.row,{marginRight:5}]}>
-                                    <Text style={styles.brand}>Color: </Text>
-                                    <Text style={styles.value}>Gray</Text>
-                                </View>
-                                <View style={styles.row}>
-                                    <Text style={styles.brand}>Size: </Text>
-                                    <Text style={styles.value}>L</Text>
-                                </View>
-                            </View>
-                            <View style={styles.spaceBtwn}>
-                                <View style={styles.row}>
-                                    <Text style={styles.brand}>Quantity: </Text>
-                                    <Text style={styles.value}>1</Text>
-                                </View>
-                                <Text style={styles.orderValue}>Rs.2</Text>
-                            </View>
-
-                        </View>
-                    </View>
-            </View>
+            
 
             <View style={styles.shipping} >
                 <Text style={styles.orderTitle}>Order Information</Text>
@@ -117,7 +115,6 @@ return (
                         </View>
                     </View>
                 </View>
-
                 <View style={styles.row}>
                     <View style={styles.half}>
                         <Text style={styles.shippingTitle}>Total Amount</Text>
@@ -206,6 +203,8 @@ fontSize:16,
 fontWeight:'700',
 fontFamily:'Raleway_600SemiBold',
 marginBottom:8,
+flex: 1, 
+flexWrap: 'wrap'
 },
 brand:{
 fontSize:14,

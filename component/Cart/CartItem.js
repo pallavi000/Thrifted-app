@@ -14,15 +14,14 @@ export default function CartItem({navigation}) {
     const data = useContext(AuthContext)
     const {cartItems,setCartItems,token,subtotal,retotal} = data
     
-
     console.log(cartItems)
-
     const config = {
         headers:{
             'access-token': token
         }
     }
 
+    
     async function removeCart(item){
         try {
             var res = await axios.delete('/addtocart/cartremove/'+item._id,config)
@@ -32,8 +31,6 @@ export default function CartItem({navigation}) {
         } catch (error) {
             Alert.alert('Error', error.request.response)
         }
-       
-  
     }
    
 

@@ -134,6 +134,64 @@ function homeNavigation() {
           }} 
           name="Product Detail"  component={ProductDetail}/>
 
+<Stack.Screen name="Category" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+//               shadowColor: "#000000",
+// shadowOffset: {
+// 	width: 0,
+// 	height: 10,
+// },
+// shadowOpacity: 0.6,
+// shadowRadius: 16.00,
+
+// elevation: 24,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            }
+            
+          }} component={Category}/>
+
+<Stack.Screen name="My Closet" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+          }} component={Closet}/>
+      <Stack.Screen name="Category Title" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            },
+           
+
+          }} component={CategoryPage}/>
+      <Stack.Screen name="Child Category" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            }
+          }} component={ChildCat}/>
+
   
           {/* <Stack.Screen name="payment" component={Payment}/>
           <Stack.Screen name="orderReceived" component={OrderReceived}/>
@@ -225,19 +283,9 @@ function homeNavigation() {
               fontSize:18,
               fontWeight:'700',
             },
-            headerLeft: () => (
-      <Button title="back"
-      
-        onPress={() => {
-          console.log(props)
-       props.navigation.goBack()
-      
-        }}
-      />
-    ),
-            
+           
+
           }} component={CategoryPage}/>
-       
       <Stack.Screen name="Child Category" options={{
             headerStyle:{
               backgroundColor:'#fff',
@@ -344,9 +392,16 @@ function profileNavigation({navigation}){
             },
             headerTitleAlign: 'center',
             headerShadowVisible: false,
+            headerShown:true,
+            headerStyle:{
+              backgroundColor:'#663399',
+              color:'white'
+            },
+            headerTintColor:'white',
             headerTitleStyle:{
               fontSize:18,
               fontWeight:'700',
+              color:'white'
             } 
           }} component={Redeem}/> 
 

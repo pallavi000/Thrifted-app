@@ -1,12 +1,54 @@
-import { StyleSheet, Text, View,SafeAreaView,ScrollView, TouchableOpacity } from 'react-native'
-import React,{useContext} from 'react'
+import { StyleSheet, Text, View,SafeAreaView,ScrollView, TouchableOpacity, Switch } from 'react-native'
+import React,{useContext,useState,useLayoutEffect} from 'react'
 import {MaterialCommunityIcons,MaterialIcons,Feather,Ionicons,FontAwesome} from '@expo/vector-icons'
 import { Raleway_700Bold } from '@expo-google-fonts/raleway'
 import { AuthContext } from '../Context'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Setting({navigation}) {
 const data = useContext(AuthContext)
 const {decode} = data
+const[sales,setSales] = useState(false)
+const[newArrival,setNewArrival] = useState(false)
+const[dsc,setDsc] = useState(false)
+
+
+async function setSwitch(){
+    var notifications = await AsyncStorage.getItem('notifications')
+    if(notifications){
+       notifications =  JSON.parse(notifications)
+       console.log(notifications)
+       setSales(notifications.sales)
+       setNewArrival(notifications.newArrival)
+       setDsc(notifications.dsc)
+    }
+
+}
+
+useLayoutEffect(()=>{
+setSwitch()
+},[])
+
+async function toggleSwitch(value){
+    const notification={
+        sales:sales,
+        newArrival:newArrival,
+        dsc:dsc
+    }
+    if(value=='sales'){
+        setSales(!sales)
+        notification.sales = !sales
+    }else if(value=='newarrival'){
+        setNewArrival(!newArrival)
+        notification.newArrival = !newArrival
+    }else{
+        setDsc(!dsc)
+        notification.dsc = !dsc
+    }
+    
+await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
+
+}
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
@@ -25,7 +67,7 @@ const {decode} = data
 
                 <View style={styles.border}></View>
 
-                <View style={styles.pagesWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Profile')} style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <MaterialIcons name='person-outline' size={20}></MaterialIcons>
                         <Text style={styles.pageName}>My Profile</Text>
@@ -33,7 +75,7 @@ const {decode} = data
                         <View style={{flexDirection:'row'}}>
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>
-                </View>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.card}>
@@ -114,8 +156,14 @@ const {decode} = data
                 <MaterialIcons name='notifications-none' size={20}></MaterialIcons>
                     <Text style={styles.pageName}>Sales</Text>
                 </View>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                    <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
+                <View style={{flexDirection:'row', alignItems:'center' ,height:10}}>
+                <Switch
+                    trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
+                    thumbColor={sales ? "#4CD964" : "#868686"}
+                    ios_backgroundColor="#EBEDF3"
+                    onValueChange={()=>toggleSwitch('sales')}
+                    value={sales}
+                />
                 </View>  
                 </View>
 
@@ -126,7 +174,13 @@ const {decode} = data
                         <Text style={styles.pageName}>New Arrivals</Text>
                         </View>
                         <View style={{flexDirection:'row'}}>
-                        <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
+                        <Switch
+                            trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
+                            thumbColor={newArrival ? "#4CD964" : "#868686"}
+                            ios_backgroundColor="#EBEDF3"
+                            onValueChange={()=>toggleSwitch('newarrival')}
+                            value={newArrival}
+                        />
                     </View>
                 </View>
                 <View style={styles.border}></View>
@@ -136,7 +190,13 @@ const {decode} = data
                         <Text style={styles.pageName}>Delivery Status Changes</Text>
                         </View>
                         <View style={{flexDirection:'row'}}>
-                        <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
+                        <Switch
+                            trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
+                            thumbColor={dsc ? "#4CD964" : "#868686"}
+                            ios_backgroundColor="#EBEDF3"
+                            onValueChange={()=>toggleSwitch('dsc')}
+                            value={dsc}
+                        />
                     </View>
                 </View>
             </View>

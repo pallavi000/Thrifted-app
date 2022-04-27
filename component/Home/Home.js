@@ -52,9 +52,9 @@ function parseImages(image, images){
                     <View style={styles.icons}>
                     <Ionicons name="heart-outline" size={30}></Ionicons>
                     </View>
-                    <View style={styles.icons}>
+                    <TouchableOpacity onPress={()=>navigation.navigate('Messages')} style={styles.icons}>
                     <Ionicons name="mail-outline" size={30}></Ionicons> 
-                    </View>
+                    </TouchableOpacity>
                 </View>
       </View>
 
@@ -67,7 +67,7 @@ function parseImages(image, images){
             <View style={styles.wrapper} >
           {categories.map(category=>{
               return(
-                <TouchableOpacity onPress={()=>navigation.navigate('Category Nav',{screen:'Category Title'})} style={styles.cateWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Category Title')} style={styles.cateWrapper}>
                 <Image style={styles.category} source={{uri:imageLink+category.image}}/>
                 <Text style={styles.cateText}>{category.name}</Text>
              </TouchableOpacity>
@@ -82,7 +82,7 @@ function parseImages(image, images){
                return(
           <TouchableWithoutFeedback  onPress={()=>navigation.navigate('Product Detail',product)}>
           <View style={styles.productWrapper} key={product._id}>
-            <TouchableOpacity onPress={()=>navigation.navigate('account',{screen:'My Closet',params:product.seller_id})} style={styles.userWrapper}>
+            <TouchableOpacity onPress={()=>navigation.navigate('My Closet',product.seller_id)} style={styles.userWrapper}>
                <Image style={styles.userimage} source={{uri:imageLink+product.seller_id?.image}}></Image> 
                <Text style={styles.username}>{product.seller_id?.name}</Text>   
             </TouchableOpacity>

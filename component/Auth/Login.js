@@ -1,4 +1,4 @@
-import { ScrollView,SafeAreaView, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput,Alert } from 'react-native'
+import { ScrollView,SafeAreaView,StatusBar,ActivityIndicator, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput,Alert } from 'react-native'
 import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
@@ -20,22 +20,28 @@ export default function Login({navigation}) {
   const [password,setPassword] = useState('')
   const[error,setError] = useState('')
   const {setIsLoggedIn} = useContext(AuthContext)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function loginForm(data){
-   
+    setIsSubmitting(true)
     try {
       const response = await axios.post('/user',data)
       await AsyncStorage.setItem('token',response.data.token)
+      setIsSubmitting(false)
       setIsLoggedIn(true)
     } catch (error) {
+      setIsSubmitting(false)
       Alert.alert('Error',error.request.response)
-      console.log(error.request.response)
     }
 
   }
 
   return (
   <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+  <StatusBar
+        backgroundColor="#663399"
+        barStyle="light-content"
+    />
   <ScrollView >
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
@@ -49,7 +55,7 @@ export default function Login({navigation}) {
         <>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
-            <Ionicons name="mail-outline" size={20} color={'#868686'}></Ionicons>
+            <Ionicons name="mail-outline" size={14} color={'#868686'}></Ionicons>
             <Text style={styles.label} >Email</Text>
           </View>
           <TextInput keyboardType='email-address' 
@@ -63,7 +69,7 @@ export default function Login({navigation}) {
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
-            <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
+            <Ionicons name="lock-closed-outline" size={14} color={'#868686'}></Ionicons>
             <Text style={styles.label}>Password</Text>
           </View>
           <TextInput keyboardType='default'
@@ -81,9 +87,18 @@ export default function Login({navigation}) {
         <TouchableOpacity onPress={()=>navigation.navigate('forgotpassword')}>
           <Text style={styles.forgot}>Forgot Password ?</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleSubmit}>
-          <View><Text style={styles.loginBtn}>Login </Text></View>
+        
+
+      {isSubmitting ?(
+        <TouchableOpacity style={styles.loginBtn}>
+          <ActivityIndicator size={24} color='#fff'/>
         </TouchableOpacity>
+      ):(
+        <TouchableOpacity onPress={handleSubmit} style={styles.loginBtn}>
+          <View><Text style={styles.loginText}>Login</Text></View>
+        </TouchableOpacity>
+      )}
+        
         <TouchableOpacity onPress={()=>navigation.navigate('register')} >
           <Text style={styles.create}>Create Account</Text>
         </TouchableOpacity>
@@ -115,42 +130,35 @@ const styles = StyleSheet.create({
    color:'black',
   borderTopRightRadius:18,
   borderTopLeftRadius:18,
-flex:1,
-padding:30
+  flex:1,
+  padding:30
  },
  login:{
    fontWeight:'700',
    fontSize:18,
    fontFamily:'Raleway_700Bold',
    marginBottom:40
- 
  },
  formgroup:{
    marginBottom:20,
-
- 
-
  },
  labelWrapper:{
    display:'flex',
    flexDirection:'row',
-   alignItems:'center',
-   
+   alignItems:'center', 
  },
  label:{
-   fontSize:15,
+   fontSize:12,
    fontWeight:'600',
    fontFamily:'Raleway_700Bold',
    color:'#868686',
    marginLeft:5,
-  
  },
  inputField:{
    paddingVertical:5,
-   paddingHorizontal:10,
+   paddingHorizontal:5,
    borderBottomColor:'#c4c4c4',
    borderBottomWidth:1,
-   
  },
  forgot:{
    fontSize:15,
@@ -159,18 +167,21 @@ padding:30
    color:'#663399',
  },
  loginBtn:{
-  fontWeight:'700',
-  fontSize:20,
-  color:'white',
-  paddingVertical:10,
-  paddingHorizontal:50,
-  backgroundColor:'#663399',
-  borderRadius:10,
-  marginTop:70,
-  textAlign:'center',
-  fontFamily:'Raleway_700Bold',
-  
- },
+    paddingVertical:10,
+    paddingHorizontal:10,
+    width:Dimensions.get('window').width-60,
+    backgroundColor:'#663399',
+    borderRadius:10,
+    marginTop:50,
+    marginBottom:30
+    },
+    loginText:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
+    },
  create:{
   fontSize:15,
   fontWeight:'600',

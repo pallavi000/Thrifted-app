@@ -1,24 +1,26 @@
 import { StyleSheet, Text, View,SafeAreaView,ScrollView ,TouchableOpacity} from 'react-native'
-import React,{useState,useEffect} from 'react'
+import React,{useState,useEffect,useLayoutEffect} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import {Fontisto} from '@expo/vector-icons'
 import BrandFilter from './BrandFilter'
-// import MultiSlider from '@ptomasroos/react-native-multi-slider'
+import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 export default function Filter(props) {
     const[showBrand,setShowBrand] = useState(false)
     const[color_id,setColor_id] = useState([])
     const[brand_id,setBrand_id] = useState([])
-    const[minprice,setMinprice] = useState([])
-    const[maxprice,setMaxprice]= useState([])
+    const[minprice,setMinprice] = useState([0])
+    const[maxprice,setMaxprice]= useState([20000])
 
     const {navigation} = props
 
-    useEffect(()=>{
+    useLayoutEffect(()=>{
         setColor_id(props.color_id)
         setBrand_id(props.brand_id)
-        setMaxprice(props.maxprice)
-        setMinprice(props.minprice)
+        if(props.maxprice && props.maxprice.length>0) {
+            setMaxprice(props.maxprice)
+            setMinprice(props.minprice)
+        }
     },[])
     
     function color_filter(id){
@@ -44,6 +46,16 @@ export default function Filter(props) {
         setMinprice([data[0]])
     }
 
+    function getBrandNames() {
+        var brandNames = []
+        props.brands.forEach(brand=>{
+            if(brand_id.includes(brand._id)) {
+                brandNames.push(brand.name)
+            }
+        })
+        return brandNames.join(", ")
+    }
+
   
 
   return (
@@ -62,17 +74,22 @@ export default function Filter(props) {
         <View style={styles.container}>
             <View style={styles.filterSection}>
                 <Text style={styles.title}>Price Range</Text>
-                {/* <MultiSlider
-        values={[0,100]}
-        min={0}
-        max={20000}
-        snapped={true}
-        smoothSnapped={true}
-        markerStyle={{backgroundColor:'#663399',height: 20,width:20}}
-        selectedStyle={{backgroundColor:'#663399'}}
-        trackStyle={{height:4}}
-        onValuesChangeFinish={(values)=>priceFilter(values)}
-      /> */}
+                <MultiSlider
+                    values={[minprice[0],maxprice[0]]}
+                    min={0}
+                    max={20000}
+                    snapped={true}
+                    smoothSnapped={true}
+                    markerStyle={{backgroundColor:'#663399',height: 20,width:20}}
+                    selectedStyle={{backgroundColor:'#663399'}}
+                    trackStyle={{height:4}}
+                    onValuesChangeFinish={(values)=>priceFilter(values)}
+                    onValuesChange={(values)=>priceFilter(values)}
+                />
+                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                    <Text style={styles.priceShow}>Rs. {minprice[0]}</Text>
+                    <Text style={styles.priceShow}>Rs. {maxprice[0]}</Text>
+                </View>
             </View>
             <View style={styles.filterSection}>
                 <Text style={styles.title}>Colors</Text>
@@ -84,7 +101,7 @@ export default function Filter(props) {
                              <View style={[styles.colorActive,{backgroundColor:color.name}]}></View>
                          </TouchableOpacity>
                         ):(
-                            <TouchableOpacity onPress={()=>color_filter(color._id)} style={[styles.color,{backgroundColor:color.name}]} ></TouchableOpacity>
+                            <TouchableOpacity key={color._id} onPress={()=>color_filter(color._id)} style={[styles.color,{backgroundColor:color.name}]} ></TouchableOpacity>
                         ))                       
                     })}
                 </View>
@@ -116,13 +133,21 @@ export default function Filter(props) {
                     <TouchableOpacity style={styles.filterSection} onPress={()=>setShowBrand(true)}>
                         <Text style={styles.title}>Brand</Text>
                         <View style={styles.BrandFilter}>
-                            <Text style={styles.subtitle}>adidas Originals, Jack & Jones, s.Oliver</Text>
+                        {brand_id && brand_id.length>0 ? (
+                            <Text style={styles.subtitle}>{getBrandNames()}</Text>
+                        ):
+                        (
+                            <Text style={styles.subtitle}>Select brands from the list.</Text>
+                        )}
                             <Fontisto name='angle-right' size={20}></Fontisto>
                            
                         </View>
                     </TouchableOpacity>
 
-                <View style={styles.filterApplySection}>
+            
+                </View>
+        </ScrollView>
+        <View style={styles.filterApplySection}>
                 <TouchableOpacity onPress={()=>props.setFilter(false)}>
                 <Text style={styles.discard}>Discard</Text>
                 </TouchableOpacity>
@@ -130,16 +155,21 @@ export default function Filter(props) {
                     <Text style={styles.apply}>Apply</Text>
                     </TouchableOpacity>
                 </View>
-
-
-
-                </View>
-        </ScrollView>
         </SafeAreaView>
       )
   )
 }
 const styles = StyleSheet.create({
+    priceShow: {
+        paddingHorizontal: 20,
+        paddingVertical: 5,
+        backgroundColor: '#f5f5ff',
+        borderWidth: 1,
+        borderColor: '#663399',
+        borderRadius: 5,
+        color: '#663399',
+        fontSize: 12,
+    },
     filterSection:{
         padding:20,
         // borderBottomColor:'#C9C9C9',
@@ -273,15 +303,15 @@ const styles = StyleSheet.create({
     },
     filterApplySection:{
         backgroundColor:'#f5f5ff',
-        padding:10,
-        shadowColor: "rgba(0, 0, 0, 0.3)",
+        paddingVertical:5,
+        shadowColor: "rgba(0, 0, 0, 1)",
         shadowOffset: {
             width: 0,
-            height: -4,
+            height: 4,
             },
-        shadowOpacity: 0.3,
+        shadowOpacity: 1,
         shadowRadius: 3,
-        elevation: 1,
+        elevation: 4,
         flexDirection:'row',
         flexWrap:'wrap',
         justifyContent:'space-evenly',

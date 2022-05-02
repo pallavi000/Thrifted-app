@@ -52,6 +52,7 @@
     "react-native-web": "0.17.1",
     "react-native-webview": "^11.18.1",
     "react-navigation-stack": "^2.10.4",
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22",
     "rn-all-nepal-payment": "^1.0.2",
     "unimodules-permissions-interface": "^6.1.0",
     "uuid": "^8.3.2",

@@ -13,7 +13,6 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 
 

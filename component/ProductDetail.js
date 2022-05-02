@@ -3,7 +3,6 @@ import { BaseNavigationContainer, NavigationRouteContext } from '@react-navigati
 import axios from 'axios'
 import React, { useContext, useState } from 'react'
 import { View ,Text, Image, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent, TouchableOpacity} from 'react-native'
-import { tan } from 'react-native-reanimated'
 import { ScreenStackHeaderBackButtonImage } from 'react-native-screens'
 import { cartContext } from './CartContext'
 import { AuthContext } from './Context'

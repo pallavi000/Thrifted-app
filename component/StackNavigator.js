@@ -95,22 +95,7 @@ function homeNavigation() {
                   fontSize:18,
                   fontWeight:'700',
                 } 
-              }} component={Setting}/>
-
-            <Stack.Screen name="Edit Shipping Address" options={{
-                headerStyle:{
-                  backgroundColor:'#fff',
-                  borderWidth:0,
-                },
-                headerTitleAlign: 'center',
-                headerShadowVisible: false,
-                headerTitleStyle:{
-                  fontSize:18,
-                  fontWeight:'700',
-                } 
-              }} component={EditShipping}/>
-
-        
+              }} component={Setting}/>        
 
         <Stack.Screen name="Pallavi" options={{
                 headerStyle:{
@@ -230,6 +215,46 @@ function homeNavigation() {
             headerShadowVisible: false,
           }} name="Checkout" component={Checkout}/>
 
+          
+          <Stack.Screen name="Addresses" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={Shipping}/> 
+
+            <Stack.Screen name="Add Address" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={AddShipping}/>
+
+              <Stack.Screen name="Edit Address" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={EditShipping}/>
+
           <Stack.Screen options={{
                 headerShown: false,
               }} name="Order Success" component={OrderSuccess}/>
@@ -254,23 +279,21 @@ function homeNavigation() {
             headerStyle:{
               backgroundColor:'#fff',
               borderWidth:0,
-//               shadowColor: "#000000",
-// shadowOffset: {
-// 	width: 0,
-// 	height: 10,
-// },
-// shadowOpacity: 0.6,
-// shadowRadius: 16.00,
-
-// elevation: 24,
+              shadowColor: "#000",
+              shadowOffset:{
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
             },
             headerTitleAlign: 'center',
-            headerShadowVisible: false,
+            headerShadowVisible: true,
             headerTitleStyle:{
               fontSize:18,
               fontWeight:'700',
-            }
-            
+            },
           }} component={Category}/>
       <Stack.Screen name="Category Title" options={{
             headerStyle:{
@@ -332,7 +355,7 @@ function profileNavigation({navigation}){
             headerShadowVisible: false,
           }} component={OrderHistory}/>
 
-          <Stack.Screen name="Shipping Address" options={{
+          <Stack.Screen name="Addresses" options={{
                 headerStyle:{
                   backgroundColor:'#fff',
                   borderWidth:0,
@@ -345,7 +368,7 @@ function profileNavigation({navigation}){
                 } 
               }} component={Shipping}/> 
 
-            <Stack.Screen name="Add Shipping Address" options={{
+            <Stack.Screen name="Add Address" options={{
                 headerStyle:{
                   backgroundColor:'#fff',
                   borderWidth:0,
@@ -357,6 +380,19 @@ function profileNavigation({navigation}){
                   fontWeight:'700',
                 } 
               }} component={AddShipping}/>
+
+              <Stack.Screen name="Edit Address" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={EditShipping}/>
         
         <Stack.Screen name="My Orders" options={{
             headerStyle:{
@@ -386,10 +422,6 @@ function profileNavigation({navigation}){
         
         <Stack.Screen name="Redeem" options={{
            headerShown: false,
-            headerStyle:{
-              backgroundColor:'#fff',
-              borderWidth:0,
-            },
             headerTitleAlign: 'center',
             headerShadowVisible: false,
             headerShown:true,

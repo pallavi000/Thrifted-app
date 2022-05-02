@@ -46,7 +46,6 @@ async function getaddress(){
     try {
         var response = await axios.get('/address',config)
         setAddresses(response.data) 
-        console.log(isSelected)
         if(!isSelected && response.data && response.data.length>0) {
             setSelection(response.data[0]._id)
             await AsyncStorage.setItem('shippingId',response.data[0]._id)
@@ -84,7 +83,7 @@ async function removeAddress(id){
     {addresses && addresses.length !=0?(
         addresses.map(address=>{
         return(
-            <View style={styles.addressCard}>
+            <View key={address._id} style={styles.addressCard}>
             <View style={styles.address}>
             <Text style={styles.userName}>{address.name}</Text>
             <Text style={styles.street}> {address.street} </Text>
@@ -102,7 +101,7 @@ async function removeAddress(id){
             </View>
         </View>
         <View style={styles.action}>
-        <TouchableOpacity onPress={()=>navigation.navigate('Edit Shipping Address',address)}>
+        <TouchableOpacity onPress={()=>navigation.navigate('Edit Address',address)}>
             <Text style={styles.edit}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>removeAddress(address._id)}>
@@ -115,7 +114,7 @@ async function removeAddress(id){
     ):(null)}
     
  
-    <TouchableOpacity onPress={()=>navigation.navigate('Add Shipping Address')} style={styles.add}>
+    <TouchableOpacity onPress={()=>navigation.navigate('Add Address')} style={styles.add}>
         <Ionicons name="add" size={20} style={styles.addIcon}></Ionicons>
     </TouchableOpacity>
 

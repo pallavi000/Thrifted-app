@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, SafeAreaView,ScrollView,Image,TextInput,TouchableOpacity,TouchableWithoutFeedback } from 'react-native'
-import React,{useEffect,useState,useContext} from 'react'
-import {Feather} from '@expo/vector-icons'
-import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
+import { StyleSheet, Text, View, SafeAreaView,ScrollView,Image,TextInput,TouchableOpacity,TouchableWithoutFeedback, Dimensions, Alert } from 'react-native'
+import React,{useEffect,useState,useContext,useRef} from 'react'
+import {Feather, MaterialCommunityIcons} from '@expo/vector-icons'
+import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
 import bbstyles from '../Styles'
@@ -9,19 +9,21 @@ import axios from 'axios'
 import { AuthContext } from '../Context'
 import {Picker} from '@react-native-picker/picker';
 import MainImage from '../Image/MainImage'
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
 
 const validationSchema = Yup.object().shape({
-    name:Yup.string().required(),
-    category:Yup.string().required(),
-    stock:Yup.number().required(),
-    size:Yup.string().required(),
-    brand:Yup.string().required(),
-    color:Yup.string().required(),
-    original:Yup.number().required(),
-    price:Yup.number().required(),
-    type:Yup.string().required(),
-    detail:Yup.string().required(),
-    image1:Yup.string().required()
+    image1:Yup.string().required('Image is required'),
+    name:Yup.string().required('Product Name is required'),
+    detail:Yup.string().required('Product Detail is required'),
+    category:Yup.string().required('Category is required'),
+    stock:Yup.number().required('Quantity is required'),
+    size:Yup.string().required('Product Size is required'),
+    brand:Yup.string().required('Brand is required'),
+    color:Yup.string().required('Color is required'),
+    original:Yup.number().required('Original Price is required'),
+    price:Yup.number().required('Price is required'),
+    type:Yup.string().required('Product Type is required'),
 })
 
 export default function CreatePost({navigation}) {
@@ -30,6 +32,12 @@ export default function CreatePost({navigation}) {
     const[brands,setBrands] = useState([])
     const[categories,setCategories] = useState([])
     const[showBrand,setShowBrand] = useState(false)
+    const formRef = useRef();
+    const sheetRef = useRef(null)
+    const openCameraRef = useRef()
+    const selectImageRef = useRef()
+    const fill = new Animated.Value(1)
+    const[earningPrice, setEarningPrice] = useState()
 
     const data = useContext(AuthContext)
     const {token} = data
@@ -40,14 +48,23 @@ export default function CreatePost({navigation}) {
         }
     }
 
+    function addPost() {
+        var errors = Object.values(formRef.current.errors)
+        console.log(formRef.current)
+        if(errors && errors.length>0) {
+            Alert.alert('Error', errors[0])
+            return
+        }
+        formRef.current.handleSubmit()
+    }
 
     navigation.setOptions({
-       headerShown:true,
-       headerRight:()=>(
-          <TouchableOpacity >
-              <Text>Post</Text>
-          </TouchableOpacity>
-       )
+        headerShown:true,
+        headerRight:()=>(
+            <TouchableOpacity onPress={()=>addPost()}>
+                <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Post <MaterialCommunityIcons name='send-circle-outline' size={16} color='#663399'/></Text>
+            </TouchableOpacity>
+        )
     })
        
     
@@ -62,9 +79,7 @@ export default function CreatePost({navigation}) {
         })
      }, [])
 
-     function createPost(values){
-       
-        
+     function createPost(values){ 
         axios.post('/product/create/post',values,config).then(response=>{
             console.log(response.data)
        }).catch(err=>{
@@ -90,37 +105,97 @@ export default function CreatePost({navigation}) {
          if(categories&&categories.length!=0){
              const arr=[]
              categories.map(category=>{
-               arr.push(<Picker.Item  label={increment(n)+ category.name} value={category._id} />,renderChildren(category.childrens,inc))
+               arr.push(<Picker.Item key={category._id}  label={increment(n)+ category.name} value={category._id} />,renderChildren(category.childrens,inc))
              })
              return arr
          }
      }
 
-     function calcEarning(e,setFieldValue){
-       var  price= e.target.value
-       var profit = price- price*20/100
-       console.log(profit)
-       setFieldValue('earning_price',profit)
-   
+     function calcEarning(value){
+        formRef.current.setFieldValue('price',value)
+        var  price= value
+        var profit = price- price*20/100
+        formRef.current.setFieldValue('earning_price',profit)
+        setEarningPrice(profit.toString())
      }
-    
 
+     
+     const renderHeader = () =>(
+        <>
+        <View style={{
+            backgroundColor: '#fff',
+            padding: 10,
+            alignItems: 'center',
+            paddingTop: 20,
+            borderTopWidth: 1,
+            borderTopColor: '#ddd',
+        }}>
+            <Text
+            style={{
+                fontFamily: "Raleway_600SemiBold",
+                fontSize: 20,
+                color: 'black',
+                borderTopWidth: 5,
+                borderTopColor: '#663399',              
+                paddingTop: 5,
+                borderRadius: 3
+            }}
+            >Choose Image</Text>
+        </View>
+        </>
+    )
+    function renderContent() {
+        return(
+        <View
+        style={{
+            backgroundColor: '#fff',
+            height:300
+        }}
+        >
+        <TouchableOpacity onPress={()=>selectImageRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
+            <Image style={styles.cameraIcon} source={require('../../assets/gallery.png')}/><Text style={styles.loginText}>Select Image</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={()=>openCameraRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
+            <Image style={styles.cameraIcon} source={require('../../assets/camera.png')}/><Text style={styles.loginText}>Open Camera</Text>
+        </TouchableOpacity>
+        </View>
+        )
+    }
 
 
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+
+        <BottomSheet
+            ref={sheetRef}
+            snapPoints={[300, 0]}
+            borderRadius={10}
+            initialSnap={1}
+            enabledContentTapInteraction={false}
+            renderHeader={renderHeader}
+            renderContent={renderContent}
+            callbackNode={fill}
+      />
+
      <ScrollView style={{position:'relative'}} >
-        <View style={styles.container}>
+        <Animated.View style={[styles.container,{
+            opacity: Animated.add(0.3, Animated.multiply(fill, 1.0))
+        }]}>
         
-        <Formik 
+        <Formik
+            innerRef={formRef}
            initialValues={{name:'',detail:'',category:'',stock:'',size:'',brand:'',color:'',original:'',price:'',earning_price:'',type:'',image1:'',custombrand:'',image2:'',image3:'',image4:''}}
            onSubmit={(values)=>createPost(values)}
            validationSchema={validationSchema}
            >
            {({handleChange,handleSubmit,errors,values,setFieldValue,touched,handleBlur})=>(
                <>
-               <MainImage/>
+               <MainImage
+                   sheetRef={sheetRef}
+                   openCameraRef={openCameraRef}
+                   selectImageRef={selectImageRef}
+               />
                {/* <Image source={require('../../assets/post.png')} style={styles.userImage} ></Image>
 
                <View style={styles.row}>
@@ -146,7 +221,7 @@ export default function CreatePost({navigation}) {
                         onBlur={handleBlur('name')}
                          />
                          {errors.name && touched.name?(
-                            <Text style={styles.error}>{errors.name}</Text>
+                            <Text style={bbstyles.error}>{errors.name}</Text>
                          ):(null)}
                     </View>
 
@@ -159,29 +234,31 @@ export default function CreatePost({navigation}) {
                     onBlur={handleBlur('detail')}
                 />
                 {errors.detail && touched.detail?(
-                <Text style={styles.error}>{errors.detail}</Text>
+                <Text style={bbstyles.error}>{errors.detail}</Text>
                 ):(null)}
             </View>
 
-            <View style={styles.selectForm}>
+            <View style={styles.formGroup}>
                 <Text style={styles.label}>Category (Required)</Text>
+                <View style={styles.selectForm}>
                 <Picker
-                    style={styles.input}
+                style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.category}
                         onValueChange={itemValue =>
                         setFieldValue('category',itemValue)
                     }>
-                  <Picker.Item  label="Selelct Product Category" value="" />
+                  <Picker.Item  label="Select Product Category" value="" />
                     {categories.map(category=>{
                         return(
                            
-                            [<Picker.Item  label={category.name} value={category._id} />,
+                            [<Picker.Item key={category._id}  label={category.name} value={category._id} />,
                             renderChildren(category.childrens,1)] 
                         )
                     })}
                 </Picker>
+                </View>
                 {errors.category && touched.category?(
-                            <Text style={styles.error}>{errors.category}</Text>
+                            <Text style={bbstyles.error}>{errors.category}</Text>
                          ):(null)}
             </View>
 
@@ -194,13 +271,14 @@ export default function CreatePost({navigation}) {
                  onBlur={handleBlur('stock')}
                  ></TextInput>
                    {errors.stock && touched.stock?(
-                            <Text style={styles.error}>{errors.stock}</Text>
+                            <Text style={bbstyles.error}>{errors.stock}</Text>
                          ):(null)}
             </View>
-            <View style={styles.selectForm}>
+            <View style={styles.formGroup}>
                 <Text style={styles.label}>Color (Required)</Text>
+                <View style={styles.selectForm}>
                 <Picker
-                    style={styles.input}
+                style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.color}
                         onValueChange={itemValue =>
                         setFieldValue('color',itemValue)
@@ -211,32 +289,35 @@ export default function CreatePost({navigation}) {
                     {colors.map(color=>{
                         return(
                             
-                            <Picker.Item  label={color.name} value={color._id} />
+                            <Picker.Item key={color._id}  label={color.name} value={color._id} />
                         )
                     })}
                 </Picker>
+                </View>
                 {errors.color && touched.color?(
-                <Text style={styles.error}>{errors.color}</Text>
+                <Text style={bbstyles.error}>{errors.color}</Text>
                 ):(null)}
             </View>
-            <View style={styles.selectForm}>
+            <View style={styles.formGroup}>
                 <Text style={styles.label}>Brand (Optional)</Text>
+                <View style={styles.selectForm}>
                 <Picker
-                    style={styles.formcontrol}
+                style={{height:30,marginLeft:-8,marginRight: -8}}
                     selectedValue={values.brand}
                         onValueChange={itemValue =>
                         brandValue(itemValue,setFieldValue)}
                         onBlur={handleBlur('brand')}
                     >
-                     <Picker.Item  label="Selelct Brand" value="" />
+                     <Picker.Item label="Selelct Brand" value="" />
                     {brands.map(brand=>{
                         return(
-                            <Picker.Item  label={brand.name} value={brand._id} />
+                            <Picker.Item key={brand._id} label={brand.name} value={brand._id} />
                            
                         )
                     })}
                     <Picker.Item  label="Others.." value="others"  />
                 </Picker>
+                </View>
                     
                     {showBrand?(
                         <View>
@@ -248,16 +329,17 @@ export default function CreatePost({navigation}) {
                             onChangeText={handleChange("custombrand")}
                             onBlur={handleBlur.custombrand}
                         />
-                        <Text style={styles.error}>{errors.custombrand}</Text>
+                        <Text style={bbstyles.error}>{errors.custombrand}</Text>
                     </View>
                     ):(null)}
                     
-                <Text style={styles.error}>{errors.brand}</Text>
+                <Text style={bbstyles.error}>{errors.brand}</Text>
             </View>
-            <View style={styles.selectForm}>
+            <View style={styles.formGroup}>
                 <Text style={styles.label}>Size (Required)</Text>
+                <View style={styles.selectForm}>
                 <Picker
-                    style={styles.formcontrol}
+                style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.size}
                         onValueChange={itemValue =>
                         setFieldValue('size',itemValue)
@@ -267,12 +349,13 @@ export default function CreatePost({navigation}) {
                <Picker.Item  label="Selelct Product Size" value="" />
                     {sizes.map(size=>{
                         return(
-                            <Picker.Item  label={size.name} value={size._id} />
+                            <Picker.Item key={size._id} label={size.name} value={size._id} />
                         )
                     })}
                 </Picker>
+                </View>
                 {touched.size && errors.size?(
-                    <Text style={styles.error}>{errors.size}</Text>
+                    <Text style={bbstyles.error}>{errors.size}</Text>
                 ):(null)}
             </View>
 
@@ -285,7 +368,7 @@ export default function CreatePost({navigation}) {
                 onBlur={handleBlur('original')}
                  ></TextInput>
                 {touched.original && errors.original?(
-                    <Text style={styles.error}>{errors.original}</Text>
+                    <Text style={bbstyles.error}>{errors.original}</Text>
                 ):(null)}
             </View>
             <View style={styles.formGroup}>
@@ -293,12 +376,11 @@ export default function CreatePost({navigation}) {
                 <TextInput
                  keyboardType='numeric'
                  style={styles.input}
-                 onChangeText={handleChange("price")}
+                 onChangeText={(value)=>calcEarning(value)}
                 onBlur={handleBlur('price')}
-                onChange={(e)=>calcEarning(e,setFieldValue)}
                  ></TextInput>
                   {touched.price && errors.price?(
-                    <Text style={styles.error}>{errors.price}</Text>
+                    <Text style={bbstyles.error}>{errors.price}</Text>
                 ):(null)}
             </View>
 
@@ -306,15 +388,16 @@ export default function CreatePost({navigation}) {
                 <Text style={styles.label}>Your Earning (When Sold)</Text>
                 <TextInput
                  keyboardType='numeric'
+                 value={earningPrice}
                  style={styles.input}
-                 value={values.earning_price}
                  ></TextInput>
             </View>
 
-            <View style={styles.selectForm}>
+            <View style={styles.formGroup}>
                 <Text style={styles.label}>Product Type (Required)</Text>
+                <View style={styles.selectForm}>
                 <Picker
-                    style={styles.input}
+                style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.type}
                         onValueChange={itemValue =>
                         setFieldValue('type',itemValue)
@@ -323,18 +406,15 @@ export default function CreatePost({navigation}) {
                             <Picker.Item  label="Rent" value="rent" />
                             <Picker.Item  label="Sale" value="sale" />
                 </Picker>
+                </View>
                 {touched.type && errors.type?(
-                    <Text style={styles.error}>{errors.type}</Text>
+                    <Text style={bbstyles.error}>{errors.type}</Text>
                 ):(null)}
             </View>
-            <TouchableWithoutFeedback onPress={handleSubmit}>
-                <Text style={bbstyles.btnPrimary}>Submit</Text>
-                </TouchableWithoutFeedback>
-
                </>
            )}
                </Formik>
-        </View>
+        </Animated.View>
      </ScrollView>
      </SafeAreaView>
   )
@@ -343,6 +423,31 @@ export default function CreatePost({navigation}) {
 const styles = StyleSheet.create({
     container:{
         padding:20
+    },
+    cameraIcon:{
+        height:30,
+        width:30,
+    },
+    loginBtn:{
+    paddingVertical:10,
+    paddingHorizontal:10,
+    width:Dimensions.get('window').width-60,
+    backgroundColor:'#663399',
+    borderRadius:10,
+    marginTop:20,
+    marginBottom:20,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+    },
+    loginText:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
+    marginLeft: 5
     },
     formcontrol: {
         fontSize: 14,
@@ -392,27 +497,25 @@ const styles = StyleSheet.create({
 
     },
     formGroup:{
-      
         marginBottom:20,
-        
     },
     selectForm:{
-        padding:10,
         borderBottomColor:'#C4C4C4BF',
         borderBottomWidth:1,
-        marginBottom:20
+        justifyContent: 'center'
     },
     label:{
         color:'#868686',
-        fontSize:15,
+        fontSize:12,
         fontFamily:'Raleway_600SemiBold',
-        marginBottom:10
+        marginBottom:5
     },
     input:{
        fontSize:17,
        fontWeight:'500',
        fontFamily:"Raleway_500Medium",
        borderWidth:0,
+       paddingBottom: 5,
        borderBottomColor:'#C9C9C9',
         borderBottomWidth:1
     },

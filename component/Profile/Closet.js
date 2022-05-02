@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View,Dimensions,SafeAreaView,ScrollView,Image,TouchableOpacity } from 'react-native'
+import { StyleSheet, ActivityIndicator, Text, TouchableWithoutFeedback, View,Dimensions,SafeAreaView,ScrollView,Image,TouchableOpacity } from 'react-native'
 import React,{useState,useEffect,useContext} from 'react'
 import bbstyles from '../Styles'
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
@@ -8,7 +8,6 @@ import { imageLink } from '../ImageLink'
 import { NavigationContainer } from '@react-navigation/native'
 import { FontAwesome } from '@expo/vector-icons'
 import * as imagePicker from 'expo-image-picker'
-import { DEFAULT_ICON_SIZE } from '@expo/vector-icons/build/createIconSet'
 import {Picker} from '@react-native-picker/picker';
 
 
@@ -22,7 +21,9 @@ export default function Closet(props) {
     const {token} = data
     const[sorting,setSorting] = useState('-_id')
     const[modalVisible,setModalVisible] = useState(false)
-
+    const[activeTab,setActiveTab] = useState('listing')
+    const[loading,setLoading] = useState(true)
+    
     const config = {
         headers:{
             'access-token': token
@@ -33,11 +34,14 @@ export default function Closet(props) {
 
     useEffect(() => {
         axios.post('/frontend/closet/'+props.route.params._id).then(response=>{
-            console.log(response.data)
             setProducts(response.data.product)
             setUser(response.data.user)
-            console.log('closet')
+            navigation.setOptions({
+                title: response.data.user.name
+            })
+            setLoading(false)
         }).catch(err=>{
+            setLoading(false)
             console.log(err.request.response)
         }) 
     }, [props])
@@ -45,6 +49,13 @@ export default function Closet(props) {
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+
+
+{loading?(
+<View style={bbstyles.loaderContainer}>
+    <ActivityIndicator size={'large'} color='#663399'/>
+</View>
+):(
        <ScrollView style={[bbstyles.scrollHeight]}>
        <View style={{paddingHorizontal:20}}>
        <View style={styles.header}>
@@ -79,12 +90,22 @@ export default function Closet(props) {
             </TouchableOpacity>
             </View>
 
+
+<View style={{ overflow: 'hidden', paddingBottom: 5 }}>
+    <View style={styles.shadowShow}/>
+</View>
 <View style={styles.closetView}>
-<View style={styles.closetTab}>
-    <View><Text style={styles.listingActive}>Listing</Text></View>
-    <View><Text style={styles.listing}>Sold</Text></View>
+    <View style={styles.closetTab}>
+        <TouchableWithoutFeedback onPress={()=>setActiveTab('listing')}>
+            <Text style={activeTab=="listing" ? styles.listingActive : styles.listing}>Listing</Text>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={()=>setActiveTab('sold')}>
+            <Text style={activeTab=="sold" ? styles.listingActive : styles.listing}>Sold</Text>
+        </TouchableWithoutFeedback>
+    </View>
 </View>
-</View>
+
+
 <View style={styles.productWrapper}>
 {products.map(product=>{
     return(
@@ -103,6 +124,7 @@ export default function Closet(props) {
 
 
         </ScrollView>
+)}
     </SafeAreaView>
   )
 }
@@ -177,37 +199,47 @@ const styles = StyleSheet.create({
            marginTop:5
        },
        closetView:{
-        paddingVertical:20,
-
-        borderTopRightRadius:20,
-        borderTopLeftRadius:20,
-       
-
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 4,
+            borderTopRightRadius:20,
+            borderTopLeftRadius:20,
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 0,
-        elevation: 4,
+        shadowShow: {
+            shadowColor: "#000000",
+            shadowOffset: {
+            width: 0,
+            height: 2,
             },
+            shadowOpacity:  0.17,
+            shadowRadius: 2.54,
+            elevation: 4,
+            backgroundColor: 'white',
+            height: 5,
+        },
        closetTab:{
            flexDirection:'row',
            justifyContent:'space-around',
            alignItems:'center',
-           
        },
        listing:{
            fontSize:14,
            fontWeight:'700',
-           fontFamily:'Raleway_700Bold'
+           fontFamily:'Raleway_700Bold',
+           paddingVertical:20,
+           width: Dimensions.get('window').width/2,
+           textAlign: 'center',
+           color: 'black',
+           borderBottomWidth: 2,
+            borderBottomColor: '#fff',
        },
        listingActive:{
         fontSize:14,
         fontWeight:'700',
         fontFamily:'Raleway_700Bold',
-        color:'#663399'
+        color:'#663399',
+        paddingVertical:20,
+        borderBottomWidth: 2,
+        borderBottomColor: '#663399',
+        width: Dimensions.get('window').width/2,
+        textAlign: 'center'
     },
     productWrapper:{
         flexDirection:'row',

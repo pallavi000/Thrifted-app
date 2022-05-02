@@ -5,7 +5,6 @@ import axios from 'axios'
 import { AuthContext } from './Context'
 import bbstyles from './Styles'
 import AddAddress from './AddAddress'
-import { withDecay } from 'react-native-reanimated'
 import { yupToFormErrors } from 'formik'
 
 

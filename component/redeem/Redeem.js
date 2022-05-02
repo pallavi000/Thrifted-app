@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View,SafeAreaView, ScrollView,Alert, TextInput,Dimensions, TouchableOpacity} from 'react-native'
+import { StyleSheet, Text, View,SafeAreaView, StatusBar, ScrollView,Alert, TextInput,Dimensions, TouchableOpacity} from 'react-native'
 import React,{useContext,useState} from 'react'
 import {Ionicons} from '@expo/vector-icons'
 import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
@@ -41,6 +41,10 @@ async function RedeemForm(data){
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    <StatusBar
+        backgroundColor="#663399"
+        barStyle="light-content"
+    />
     <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Redeem</Text>

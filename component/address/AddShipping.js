@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TextInput,TouchableOpacity,Alert} from 'react-native'
-import React,{useContext} from 'react'
+import { StyleSheet, Text,ActivityIndicator, View ,SafeAreaView,ScrollView,TextInput,TouchableOpacity,Alert} from 'react-native'
+import React,{useContext,useState} from 'react'
 import { Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import {Formik} from 'formik'
 import * as Yup from 'yup'
@@ -17,6 +17,7 @@ const validationSchema = Yup.object().shape({
 })
 
 export default function AddShipping({navigation}) {
+    const[isSubmitting,setIsSubmitting] = useState(false)
         const data = useContext(AuthContext)
         const {token} = data
         const config = {
@@ -26,12 +27,14 @@ export default function AddShipping({navigation}) {
         }
     
     async function add(values){
+        setIsSubmitting(true)
         try {
             var response = await  axios.post('/address',values,config)
             Alert.alert('Success','Address has been added')
-            navigation.navigate('Shipping Address')
+            setIsSubmitting(false)
+            navigation.goBack()
         } catch (error) {
-            console.log(error.message)
+            setIsSubmitting(false)
             Alert.alert('Error',error.request.response)
         }
     }
@@ -128,9 +131,15 @@ export default function AddShipping({navigation}) {
                  ):(null)}
             </View>
 
+                    {isSubmitting ?(
+        <TouchableOpacity style={styles.loginBtn}>
+          <ActivityIndicator size={24} color='#fff'/>
+        </TouchableOpacity>
+      ):(
             <TouchableOpacity style={styles.loginBtn} onPress={handleSubmit} >
             <Text style={styles.login}>Save Address</Text>
             </TouchableOpacity>
+      )}
             </>)}
             </Formik>
         </View>

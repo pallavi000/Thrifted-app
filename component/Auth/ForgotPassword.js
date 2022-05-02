@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet,Dimensions,SafeAreaView, Text, View,TouchableOpacity,TextInput } from 'react-native'
+import { ScrollView, StatusBar,ActivityIndicator,Alert, StyleSheet,Dimensions,SafeAreaView, Text, View,TouchableOpacity,TextInput } from 'react-native'
 import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
@@ -7,7 +7,6 @@ import axios from 'axios';
 import bbstyles from '../Styles'
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-import { Alert } from 'react-native-web';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required('Email is required').email('Email must be a valid email')
@@ -18,20 +17,23 @@ export default function ForgotPassword({navigation}) {
     const [email,setEmail] = useState('')
     const[error,setError] = useState('')
     const[success,setSuccess] = useState('')
+    const[isSubmitting,setIsSubmitting] = useState(false)
+
 
 
 async function changePassword(data){
+  setIsSubmitting(true)
 try {
   var response = await axios.post('/user/forgot/password',data)
+  console.log(response)
   if(response.data){
     Alert.alert('password reset link has been sent to your email')
     navigation.navigate('resetpassword')
   }
- 
-
+  setIsSubmitting(false)
 } catch (error) {
   Alert.alert('Error', error.request.response)
-  console.log(error.request.response)
+  setIsSubmitting(false)
 }
   
 }
@@ -39,6 +41,10 @@ try {
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    <StatusBar
+        backgroundColor="#663399"
+        barStyle="light-content"
+    />
     <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
@@ -53,10 +59,10 @@ try {
           <>
           <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
-            <Ionicons name="mail-outline" size={20} color={'#868686'}></Ionicons>
+            <Ionicons name="mail-outline" size={14} color={'#868686'}></Ionicons>
             <Text style={styles.label} >Email</Text>
           </View>
-          <TextInput keyboardType='email'
+          <TextInput keyboardType='email-address'
            style={styles.inputField}
             onChangeText={handleChange('email')} 
             onBlur={handleBlur('email')}
@@ -65,9 +71,16 @@ try {
               <Text style={bbstyles.error}>{errors.email}</Text>
             ):(null)}
         </View>
-        <TouchableOpacity onPress={handleSubmit}>
-          <View><Text style={styles.loginBtn}>Submit</Text></View>
+        {isSubmitting ?(
+          <TouchableOpacity style={styles.loginBtn}>
+          <ActivityIndicator size={24} color='#fff'/>
         </TouchableOpacity>
+        ):(
+        <TouchableOpacity onPress={handleSubmit} style={styles.loginBtn}>
+          <View><Text style={styles.loginText}>Submit</Text></View>
+        </TouchableOpacity>
+
+        )}
           </>
         )}
 
@@ -126,7 +139,7 @@ const styles = StyleSheet.create({
       marginBottom:5
     },
     label:{
-      fontSize:15,
+      fontSize:12,
       fontWeight:'600',
       fontFamily:'Raleway_700Bold',
       color:'#868686',
@@ -135,7 +148,7 @@ const styles = StyleSheet.create({
     },
     inputField:{
       paddingVertical:5,
-      paddingHorizontal:10,
+      paddingHorizontal:5,
       borderBottomColor:'#c4c4c4',
       borderBottomWidth:1,
        
@@ -148,17 +161,20 @@ const styles = StyleSheet.create({
       marginTop:10
     },
     loginBtn:{
-     fontWeight:'700',
-     fontSize:20,
-     color:'white',
-     paddingVertical:10,
-     paddingHorizontal:50,
-     backgroundColor:'#663399',
-     borderRadius:10,
-     marginTop:70,
-     textAlign:'center',
-     fontFamily:'Raleway_700Bold',
-     
+    paddingVertical:10,
+    paddingHorizontal:10,
+    width:Dimensions.get('window').width-60,
+    backgroundColor:'#663399',
+    borderRadius:10,
+    marginTop:50,
+    marginBottom:30
+    },
+    loginText:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
     },
     create:{
      fontSize:15,

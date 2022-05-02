@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView,TouchableOpacity } from 'react-native'
+import { StyleSheet, TextInput, FlatList, Text, View, SafeAreaView, ScrollView,TouchableOpacity } from 'react-native'
 import React,{useState} from 'react'
 import Checkbox from 'expo-checkbox';
 import { Raleway_500Medium } from '@expo-google-fonts/raleway';
 import BrandCheck from '../../ui/BrandCheck';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function BrandFilter(props) {
+  const [brands, setBrands] = useState(props.brands)
 
   function brand_filter(id){
     if(props.brand_id.includes(id)){
@@ -14,28 +16,48 @@ export default function BrandFilter(props) {
         var b = [...props.brand_id, id];
         props.setBrand_id(b)
     }
-}
+  }
+
+  function searchBrand(text) {
+    if(text.trim().length>0) {
+      let filterBrands = props.brands.filter(brand=>brand.name.includes(text))
+      setBrands(filterBrands)
+    } else {
+      setBrands(props.brands)
+    }
+  }
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-    <ScrollView>
         <View style={styles.container}>
-          {props.brands.map(brand=>{
-            return(
-              <View style={styles.brandFilter}>
+        <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+            <Ionicons  style={styles.searchIcon} name="search" size={20} color="#979797"></Ionicons>
+            <TextInput style={styles.searchText}
+            keyboardType="default"
+            placeholder="Search"
+            onChangeText={(text)=>searchBrand(text)}
+            ></TextInput>
+        </View>
+        </View>
+        <FlatList
+          data={brands}
+          keyExtractor={item => item._id}
+          renderItem={({ item })=>(
+                <View style={styles.brandFilter}>
               <View>
-                <Text style={styles.brandName}>{brand.name}</Text>
+                <Text style={styles.brandName}>{item.name}</Text>
               </View>
               <View style={styles.brandCheck}>
                 <BrandCheck
-                  brand = {brand}
+                  brand = {item}
                   brand_ids = {props.brand_id}
                   brand_filter = {brand_filter}
                 />
               </View>
           </View>
-            )
-          })}
+            )}
+          />
           </View>
           <View style={styles.filterApplySection}>
           <TouchableOpacity onPress={()=>props.setShowBrand(false)}>
@@ -45,7 +67,6 @@ export default function BrandFilter(props) {
               <Text style={styles.apply}>Apply</Text>
               </TouchableOpacity>
           </View>
-        </ScrollView>
         </SafeAreaView>
   )
 }
@@ -53,6 +74,26 @@ export default function BrandFilter(props) {
 const styles = StyleSheet.create({
     container:{
         padding:20,
+    },
+    searchWrapper: {
+      marginBottom: 20,
+    },
+    searchContainer:{
+        padding:10,
+        backgroundColor:'#7676801F',
+        flexDirection:'row',
+        alignItems:'center',
+        borderRadius:10,
+        marginBottom: 10
+    },
+    searchText:{
+        color:'#979797',
+        fontSize:16,
+        fontWeight:'400',
+        fontFamily:'Raleway_400Regular',
+        marginLeft:8,
+        height:25,
+        flexGrow:1
     },
     brandFilter:{
         flexDirection:'row',
@@ -115,7 +156,9 @@ const styles = StyleSheet.create({
         flexWrap:'wrap',
         justifyContent:'space-evenly',
         alignItems:'center',
-        paddingHorizontal:20
+        paddingHorizontal:20,
+        position: 'absolute',
+        bottom: 0
     },
     activeBrand:{
         color:'#663399'

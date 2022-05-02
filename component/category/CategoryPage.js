@@ -1,10 +1,13 @@
-import { StyleSheet, Text, View,SafeAreaView, ScrollView,Image ,Dimensions,TouchableOpacity} from 'react-native'
-import React,{useState,useEffect} from 'react'
+import { StyleSheet, FlatList, ActivityIndicator, Text, View,SafeAreaView, ScrollView,Image ,Dimensions,TouchableOpacity} from 'react-native'
+import React,{useState,useEffect,useRef,useLayoutEffect} from 'react'
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import Filter from '../Product/filters/Filter'
 import axios from 'axios'
 import { imageLink } from '../ImageLink'
+import bbstyles from '../Styles'
+import Sort from '../Product/filters/Sort'
+import Animated from 'react-native-reanimated';
 
 export default function CategoryPage({navigation,route}) {
    const[filter,setFilter] = useState(false)
@@ -14,6 +17,9 @@ export default function CategoryPage({navigation,route}) {
    const[brands,setBrands] = useState([])
    const[colors,setColors] = useState([])
    const[totalProduct,setTotalProduct] = useState(24)
+   const[loader,setLoader] = useState(true)
+
+    const sheetRef = useRef(null);
 
    const[brand_id,setBrand_id] = useState([])
    const[color_id,setColor_id]= useState([])
@@ -23,10 +29,17 @@ export default function CategoryPage({navigation,route}) {
    const[category_id,setCategory_id] = useState([])
    const[currentcatId,setCurrentcatId] = useState(null)
    const[itemsPerPage,setItemsPerPage] = useState(24)
+   const fall = new Animated.Value(1)
 
  
 
    const category = route.params
+
+   useLayoutEffect(() => {
+    navigation.setOptions({
+      title:route.params.name
+    })
+  }, [])
 
    useEffect(() => {
     if(brand_id && brand_id.length!=0|| color_id &&color_id.length!=0 || minprice &&minprice.length!=0 || category_id && category_id.length!=0) {
@@ -37,7 +50,7 @@ export default function CategoryPage({navigation,route}) {
    }, [pageNo,sorting,brand_id,color_id,category_id,minprice])
    
    async function getProducts(){
-      
+       setLoader(true)
        try {
         const data = {
             category_slug:category.slug,
@@ -45,19 +58,21 @@ export default function CategoryPage({navigation,route}) {
             sorting
         }
         var response = await axios.post('/category/filter',data)
-        console.log(response.data)
         setProducts(response.data.products)
         setBrands(response.data.brands)
         setColors(response.data.colors)
         setCurrentcatId(response.data.category._id)
         setTotalProduct(response.data.count)
+        setLoader(false)
        } catch (error) {
+           setLoader(false)
            console.log(error.message)
        }
    }
 
 
    async function filterProducts(){
+       setLoader(true)
         var data={
             brand_id,
             color_id,
@@ -67,7 +82,6 @@ export default function CategoryPage({navigation,route}) {
             pageNo,
             sorting
         }
-
         if(category_id && category_id.length>0){
         } else {
             data={
@@ -80,7 +94,6 @@ export default function CategoryPage({navigation,route}) {
                 sorting
             }
         }
-
         try {
             var response= await axios.post('/category/checkfilter',data)
             var x = response.data.products.filter((v,i,a)=>a.findIndex(t=>(t._id === v._id))===i)
@@ -92,9 +105,24 @@ export default function CategoryPage({navigation,route}) {
                 if(currentPageNo<pageNo){
                     setPageNo(currentPageNo)
                 }
+                setLoader(false)
         } catch (error) {
-            
+            setLoader(false)
         }
+   }
+
+   function getSortingInfo() {
+       if(sorting=="popular") {
+           return 'Popular'
+       } else if(sorting=="-_id") {
+           return 'Newest'
+       } else if(sorting==="lowest") {
+           return 'Price: lowest to high'
+       } else if(sorting==="highest") {
+           return 'Price: highest to low'
+       } else {
+           return 'Newest'
+       }
    }
 
   return (
@@ -114,39 +142,55 @@ export default function CategoryPage({navigation,route}) {
           />
       ):(
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
-    <ScrollView >
+    <Sort
+        sheetRef = {sheetRef}
+        sorting = {sorting}
+        setSorting = {setSorting}
+        fall={fall}
+    />
+    {loader ? (
+        <View style={bbstyles.loaderContainer}>
+            <ActivityIndicator size={'large'} color='#663399'/>
+        </View>
+    ):(
+    <Animated.View style={{
+        opacity: Animated.add(0.3, Animated.multiply(fall, 1.0))
+    }}>
     <View style={styles.row}>
     <TouchableOpacity style={styles.sortContainer} onPress={()=>setFilter(true)}>
       <Ionicons name='filter' size={20}></Ionicons>
       <Text style={styles.filter}>Filters</Text>
     </TouchableOpacity>
-    <View style={styles.sortContainer}>
-    <MaterialCommunityIcons name='swap-vertical' size={20}></MaterialCommunityIcons>
-        <Text style={styles.filter}>Price: lowest to high</Text>
-    </View>
+    <TouchableOpacity onPress={()=>sheetRef.current.snapTo(0)} style={styles.sortContainer}>
+        <MaterialCommunityIcons name='swap-vertical' size={20}></MaterialCommunityIcons>
+        <Text style={styles.filter}>{getSortingInfo()}</Text>
+    </TouchableOpacity>
     </View>
     
-    <View style={styles.container}>
-        {products.map(product=>{
-        return(
-            <View style={styles.productWrapper}>
-            <Image source={{uri:imageLink+product.image}} style={styles.productImage}></Image>
+    <FlatList
+        contentContainerStyle={styles.container}
+        data={products}
+        numColumns={2}
+        keyExtractor={item => item._id}
+        renderItem={({ item })=>(
+            <View key={item._id} style={styles.productWrapper}>
+            <Image source={{uri:imageLink+item.image}} style={styles.productImage}></Image>
             <View style={styles.detailWrapper}>
-            <Text style={styles.productName} numberOfLines={2} >{product.name}</Text>
+            <Text style={styles.productName} numberOfLines={1} >{item.name}</Text>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5, marginRight:5}}>Brands</Text>
-                <Text>{product.brand_id?.name}</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1, marginRight:5}}>Brands</Text>
+                <Text>{item.brand_id?.name}</Text>
             </View>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5,marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:5}}>Rs.{product.price}</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1,marginRight:5}}>Price</Text>
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1}}>Rs.{item.price}</Text>
             </View>
             </View>
         </View>
-        )
-    })}
-    </View>
-    </ScrollView>
+        )}
+    />
+    </Animated.View>
+    )}
     </SafeAreaView>
       )
   )
@@ -161,7 +205,6 @@ const styles = StyleSheet.create({
         paddingBottom:15,
         borderBottomColor:'#3C3C434A',
         borderBottomWidth:0.5,
-        marginBottom:15
     },
     sortContainer:{
         flexDirection:'row',
@@ -171,27 +214,31 @@ const styles = StyleSheet.create({
         fontSize:14,
         fontWeight:'500',
         fontFamily:'Raleway_400Regular',
-        marginLeft:5
+        marginLeft:5,
+        textTransform: 'capitalize'
     },
     container:{
-        flexDirection:'row',
-        flexWrap:'wrap',
-        justifyContent:'space-between',
-        
-     
+        alignItems: 'center',
+        paddingTop: 15,
+        paddingBottom: 50,
     },
     productImage:{
         height:210,
         resizeMode:'cover'
-
     },
     productWrapper:{
-      
         width:(Dimensions.get('window').width-30)/2,
-        marginRight:10,
-        marginBottom:10,
-
-        
+        marginBottom:15,
+        marginHorizontal: 5,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        backgroundColor: 'white',
     },
     productName:{
         fontSize:12,

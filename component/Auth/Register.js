@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet,Dimensions, Text,SafeAreaView,Alert, View,TouchableOpacity,TextInput } from 'react-native'
+import { ScrollView, StatusBar,ActivityIndicator, StyleSheet,Dimensions, Text,SafeAreaView,Alert, View,TouchableOpacity,TextInput } from 'react-native'
 import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
@@ -10,30 +10,38 @@ import * as Yup from 'yup'
 import bbstyles from '../Styles';
 
 const validationSchema= Yup.object().shape({
-  email:Yup.string().required().email(),
-  password:Yup.string().required(),
-  name:Yup.string().required()
+  email:Yup.string().required().email("Email is required."),
+  password:Yup.string().required("Password is Required."),
+  name:Yup.string().required("Full Name is Required.")
 })
 
 export default function Register({navigation}) {
    
     const {setIsLoggedIn} = useContext(AuthContext)
+    const[isSubmitting,setIsSubmitting] = useState(false)
+
     async function registerForm(data){
-    try {
-      var response= await axios.post('/user/all',data)
-      if(response.data){
-        await AsyncStorage.setItem('token',response.data.token)
-        setIsLoggedIn(true)
-      }
-      
-    } catch (error) {
+      setIsSubmitting(true)
+      try {
+        var response= await axios.post('/user/all',data)
+        if(response.data){
+          await AsyncStorage.setItem('token',response.data.token)
+          setIsLoggedIn(true)
+        }
+        setIsSubmitting(false)
+      } catch (error) {
         Alert.alert('Error',error.request.response)
-    }
+        setIsSubmitting(false)
+      }
   }
    
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    <StatusBar
+        backgroundColor="#663399"
+        barStyle="light-content"
+    />
     <ScrollView >
     <View style={styles.container}>
       <Text style={styles.title}>Create an Account</Text>
@@ -47,7 +55,7 @@ export default function Register({navigation}) {
                 <>
                 <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
-            <Ionicons name="person" size={20} color={'#868686'}></Ionicons>
+            <Ionicons name="person" size={14} color={'#868686'}></Ionicons>
             <Text style={styles.label} >Full Name</Text>
           </View>
           <TextInput keyboardType='default'
@@ -61,7 +69,7 @@ export default function Register({navigation}) {
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
-            <Ionicons name="mail-outline" size={20} color={'#868686'}></Ionicons>
+            <Ionicons name="mail-outline" size={14} color={'#868686'}></Ionicons>
             <Text style={styles.label}>Email</Text>
           </View>
           <TextInput keyboardType='email-address'
@@ -75,7 +83,7 @@ export default function Register({navigation}) {
         </View>
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
-            <Ionicons name="lock-closed-outline" size={20} color={'#868686'}></Ionicons>
+            <Ionicons name="lock-closed-outline" size={14} color={'#868686'}></Ionicons>
             <Text style={styles.label}>Password</Text>
           </View>
           <TextInput keyboardType='default'
@@ -89,9 +97,15 @@ export default function Register({navigation}) {
            ):(null)}
         </View>
         
-        <TouchableOpacity onPress={handleSubmit}>
-          <View><Text style={styles.loginBtn}>Register</Text></View>
-        </TouchableOpacity>
+        {isSubmitting?(
+          <TouchableOpacity style={styles.loginBtn}>
+            <ActivityIndicator size={24} color='#fff'/>
+          </TouchableOpacity>
+        ):(
+              <TouchableOpacity onPress={handleSubmit} style={styles.loginBtn}>
+                <Text style={styles.loginText}>Register</Text>
+              </TouchableOpacity>
+        )}
                 </>
               )}
             </Formik>
@@ -151,7 +165,7 @@ const styles = StyleSheet.create({
       marginBottom:5
     },
     label:{
-      fontSize:15,
+      fontSize:12,
       fontWeight:'600',
       fontFamily:'Raleway_700Bold',
       color:'#868686',
@@ -159,7 +173,7 @@ const styles = StyleSheet.create({
     },
     inputField:{
       paddingVertical:5,
-      paddingHorizontal:10,
+      paddingHorizontal:5,
       borderBottomColor:'#c4c4c4',
       borderBottomWidth:1,
     },
@@ -171,17 +185,20 @@ const styles = StyleSheet.create({
       marginTop:10
     },
     loginBtn:{
-     fontWeight:'700',
-     fontSize:20,
-     color:'white',
-     paddingVertical:10,
-     paddingHorizontal:50,
-     backgroundColor:'#663399',
-     borderRadius:10,
-     marginTop:70,
-     textAlign:'center',
-     fontFamily:'Raleway_700Bold',
-     
+    paddingVertical:10,
+    paddingHorizontal:10,
+    width:Dimensions.get('window').width-60,
+    backgroundColor:'#663399',
+    borderRadius:10,
+    marginTop:50,
+    marginBottom:30
+    },
+    loginText:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
     },
     create:{
      fontSize:15,

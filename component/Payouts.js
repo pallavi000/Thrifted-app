@@ -7,7 +7,6 @@ import * as Yup from 'yup'
 import axios from 'axios'
 import { AuthContext } from './Context'
 import {Picker} from '@react-native-picker/picker'
-import { greaterOrEq, tan } from 'react-native-reanimated'
 
 
 

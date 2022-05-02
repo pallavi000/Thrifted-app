@@ -1,56 +1,40 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState,useEffect, useContext } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Image, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import {createNativeStackNavigator }  from '@react-navigation/native-stack'
-import Home from './component/Home';
 import Login from './component/Auth/Login'
 import Register from './component/Auth/Register';
 import Welcome from './component/Home/Welcome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ProductDetail from './component/ProductDetail';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
-import Profile from './component/Profile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import {Feather, FontAwesome} from '@expo/vector-icons'
-import CartItem from './component/CartItem';
+import {Feather} from '@expo/vector-icons'
 import axios from 'axios'
 import { AuthContext } from './component/Context';
-import CartContext, { cartContext } from './component/CartContext';
-import { spring } from 'react-native-reanimated';
-import Address from './component/Address';
-import Closet from './component/Profile/Closet';
 import jwt_decode from "jwt-decode";
-import Checkout from './component/Checkout';
-import Payment from './component/Payment';
-import OrderReceived from './component/OrderReceived';
-import OrderHistory from './component/Order/OrderHistory';
-import EditAddress from './component/EditAddress';
+
 import CreatePost from './component/post/CreatePost'
-import SaleHistory from './component/SaleHistory';
-import Payouts from './component/Payouts';
-import Category from './component/Category'
+
 import ForgotPassword from './component/Auth/ForgotPassword'
 import ResetPassword from './component/Auth/ResetPassword';
-import ChangePassword from './component/ChangePassword'
-import Setting from './component/Setting';
-import { accountNavigation, CartNavigation, categoryNavigation, homeNavigation, profileNavigation } from './component/StackNavigator';
+import { CartNavigation, categoryNavigation, homeNavigation, profileNavigation } from './component/StackNavigator';
 
 //axios.defaults.baseURL="http://localhost:5000/api"
 axios.defaults.baseURL="http://167.86.77.80/api"
 
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator()
-const Drawer = createDrawerNavigator()
  
 export default function App(props) {
-
   const[isLoggedIn,setIsLoggedIn] = useState(false)
   const[cartCount,setCartCount]= useState(0)
   const[token,setToken] = useState('')
   const[decode,setDecode] = useState([])
   const[cartItems,setCartItems] = useState([])
   const[subtotal,setSubtotal] = useState([])
+  const[loadingComplete, setLoadingComplete] = useState(false)
+  
   const[titleShown,setTitleShown] = useState(
     {
       display: 'flex',
@@ -61,7 +45,6 @@ export default function App(props) {
 
 
   function retotal(cartitems){
-    Alert.alert("retotal",'retotal running')
     var a = 0
     var total = 0
       cartitems.map(q=>{
@@ -75,49 +58,29 @@ export default function App(props) {
   
   async function getToken(){
     try {  
-      const authConfig = await  AsyncStorage.getItem('token') 
-    setToken(authConfig)
-    var token = authConfig;
-    var decoded = jwt_decode(token);
-    setDecode(decoded)
-
-    const config = {
-      headers: {
-        'access-token':token
+      const authConfig = await AsyncStorage.getItem('token')
+      if(authConfig) {
+        setToken(authConfig)
+        var token = authConfig;
+        var decoded = jwt_decode(token);
+        setDecode(decoded)
+        const config = {
+          headers: {
+            'access-token':token
+          }
+        }
+        const response = await axios.get('/addtocart/cartcount',config)
+        retotal(response.data)
+        setIsLoggedIn(true)
       }
-    } 
-    axios.get('/addtocart/cartcount',config).then(response=>{
-     retotal(response.data)
-     console.log(response.data)
-    })
-    console.log(decoded)
-    if(authConfig){
-      setIsLoggedIn(true)   
-    }
-    } catch (error) {  
+    } catch (error) { 
+      console.log(error.message)
     }
   }
 
   useEffect(() => {
     getToken()
 }, [props])
-
-
-// function toggleNavigaton(){  
-//   return(
-//     <Drawer.Navigator>
-//       <Drawer.Screen name="Profile" component={Profile}/>
-//       <Drawer.Screen name="Address" component={Address}/>
-//       <Drawer.Screen name="My Closet" component={MyCloset}/>
-//       <Drawer.Screen name="Order List" component={OrderList}/>
-//       <Drawer.Screen name="Create Post" component={CreatePost}/>
-//       <Drawer.Screen name="Sales History" component={SaleHistory}/>
-//       <Drawer.Screen name="Payouts" component={Payouts}/>
-//       <Drawer.Screen name="Logout" component={Logout}/>
-
-//     </Drawer.Navigator>
-//   )
-// }
 
   return (
     <>
@@ -134,7 +97,7 @@ export default function App(props) {
           ...titleShown,    
           paddingHorizontal: 10,
           justifyContent: 'center',
-          height: 60,
+          height: 50,
           shadowColor: '#ddd',
           shadowOffset: {
             width: 0,
@@ -150,15 +113,11 @@ export default function App(props) {
         <Tab.Screen name="home"  component={homeNavigation} options={{
          
             tabBarIcon:()=>(
-            <Feather name="home" size={25}  color={'white'}/>
+              <Feather name='home' size={25} color='white' />
             )
           }}/> 
-          
-
-
         <Tab.Screen name="Category Nav" component={categoryNavigation}
         options= {{
-         
           tabBarIcon:()=>(<Feather name="grid" size={25}  color={'white'} />)
         }}/>
 
@@ -167,11 +126,11 @@ export default function App(props) {
         }}/>
 
         <Tab.Screen name="addtocart" component={CartNavigation} options={{
-          tabBarIcon:()=>(<><Feather name="shopping-bag" size={25}  color={'white'}/><Text style={styles.cartcount}>{cartCount}</Text></>)
+          tabBarIcon:()=>(<><Feather name='shopping-cart' size={25} color='white'/><Text style={styles.cartcount}>{cartCount}</Text></>)
         }}/>
         
         <Tab.Screen name="account" component={profileNavigation} options={{
-          tabBarIcon:()=>(<Feather name="user" size={25}  color={'white'}/>)
+          tabBarIcon:()=>(<Feather name='user' size={25} color='white'/>)
         }}/>
 
       </Tab.Navigator>
@@ -181,8 +140,23 @@ export default function App(props) {
           <Stack.Screen name="home" component={Welcome} />
           <Stack.Screen name="login" component={Login}/>
           <Stack.Screen name="register" component={Register}/>
-            <Stack.Screen name="forgotpassword" component = {ForgotPassword}/>
-            <Stack.Screen name="resetpassword" component = {ResetPassword}/>
+          <Stack.Screen name="forgotpassword" options={{
+            headerShown: true,
+            headerShadowVisible: false,
+            headerStyle:{
+              backgroundColor:'#663399',
+              color:'white'
+            },
+            headerTitle: 'Forgot Password ?',
+            headerTintColor:'white',
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+              color:'white'
+            } 
+            
+          }} component = {ForgotPassword}/>
+          <Stack.Screen name="resetpassword" component = {ResetPassword}/>
         </Stack.Navigator>
         )}
         </AuthContext.Provider>
@@ -198,10 +172,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  smallIcon: {
+        height: 30,
+        width: 30,
+    },
   cartcount:{
     position:'absolute',
-    right:18,
-    top:10,
+    right:12,
+    top:5,
     height:20,
     width:20,
     borderRadius:10,

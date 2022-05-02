@@ -8,7 +8,7 @@ export default function ChildCat({navigation,route}) {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle:category.name
+      title:category.name
     })
   }, [])
 

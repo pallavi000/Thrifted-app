@@ -54,7 +54,8 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >
         <View style={styles.container}>
-            <View style={styles.card}>
+            
+            
                 <TouchableOpacity onPress={()=>navigation.navigate('My Closet',decode)}  style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                     <MaterialCommunityIcons name='hanger' size={20}></MaterialCommunityIcons>
@@ -64,9 +65,6 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>  
                 </TouchableOpacity>
-
-                <View style={styles.border}></View>
-
                 <TouchableOpacity onPress={()=>navigation.navigate('Profile')} style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <MaterialIcons name='person-outline' size={20}></MaterialIcons>
@@ -76,9 +74,8 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>
                 </TouchableOpacity>
-            </View>
 
-            <View style={styles.card}>
+            
                 <TouchableOpacity onPress={()=>navigation.navigate('My Orders')} style={styles.pagesWrapper}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                 <Feather name='shopping-bag' size={20}></Feather>
@@ -89,9 +86,12 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                 </View>  
                 </TouchableOpacity>
 
+
+                
+
                 <View style={styles.border}></View>
 
-                <TouchableOpacity onPress={()=>navigation.navigate('Shipping Address')} style={styles.pagesWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Addresses')} style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <Ionicons name='location-outline' size={20}></Ionicons>
                         <Text style={styles.pageName}>My Addresses</Text>
@@ -100,9 +100,7 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>
                 </TouchableOpacity>
-            </View>
 
-            <View style={styles.card}>
                 <View style={styles.pagesWrapper}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                 <FontAwesome name='money' size={20}></FontAwesome>
@@ -124,9 +122,7 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>
                 </View>
-            </View>
 
-            <View style={styles.card}>
                 <TouchableOpacity onPress={()=>navigation.navigate('Redeem')} style={styles.pagesWrapper}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                 <MaterialCommunityIcons name='briefcase' size={20}></MaterialCommunityIcons>
@@ -137,8 +133,6 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                 </View>  
                 </TouchableOpacity>
 
-                <View style={styles.border}></View>
-
                 <TouchableOpacity onPress={()=>navigation.navigate('Redeemption History')} style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <MaterialCommunityIcons name='history' size={20}></MaterialCommunityIcons>
@@ -148,9 +142,11 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
                     </View>
                 </TouchableOpacity>
-            </View>
 
-            <View style={styles.card}>
+                <View style={styles.border}></View>
+
+                
+
                 <View style={styles.pagesWrapper}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                 <MaterialIcons name='notifications-none' size={20}></MaterialIcons>
@@ -167,7 +163,6 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                 </View>  
                 </View>
 
-                <View style={styles.border}></View>
                 <View style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <MaterialIcons name='notifications-none' size={20}></MaterialIcons>
@@ -183,7 +178,6 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         />
                     </View>
                 </View>
-                <View style={styles.border}></View>
                 <View style={styles.pagesWrapper}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                         <MaterialIcons name='notifications-none' size={20}></MaterialIcons>
@@ -199,7 +193,6 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         />
                     </View>
                 </View>
-            </View>
         </View>
     </ScrollView>
     </SafeAreaView>
@@ -243,7 +236,7 @@ elevation: 1,
         borderBottomWidth:1,
         margin:'auto',
        marginBottom:10,
-        width:'80%',
+        width:'100%',
         textAlign:'center'
     }
 })

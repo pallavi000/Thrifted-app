@@ -1,13 +1,12 @@
-import React,{useEffect,useState,usestate} from 'react'
-import { Image, StyleSheet, Text, ListView,TouchableOpacity,Dimensions, TouchableWithoutFeedback, View,ScrollView } from 'react-native'
+import React,{useContext, useEffect,useState} from 'react'
+import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl, View,ScrollView, FlatList, ActivityIndicator } from 'react-native'
 import axios from 'axios'
 import {Ionicons,Feather } from '@expo/vector-icons'
 import bbstyles from '../Styles'
 import { imageLink } from '../ImageLink'
-import { SafeAreaView } from 'react-native-safe-area-context'
-// import { SliderBox } from "react-native-image-slider-box";
-
-
+import { SliderBox } from "react-native-image-slider-box";
+import { AuthContext } from '../Context'
+import { useIsFocused } from '@react-navigation/native'
 
 export default function Home({navigation}) {
 
@@ -16,114 +15,184 @@ export default function Home({navigation}) {
     const [categories, setCategories] = useState([])
     const[sellProducts,setSellProducts] = useState([])
     const[rentProducts,setRentProducts] = useState([])
+    const [refreshing, setRefreshing] = useState(false);
+    const[activePage,setActivePage] = useState(1)
+    const[itemsCountPerPage,setItemsCountPerPage]= useState(10)
+    const[loader,setLoader] = useState(true)
+    const[nextPage,setNextPage] = useState(true)
 
-useEffect(() => {
-    axios.get('/frontend/home').then(response=>{
-        setProducts(response.data.product)
-        setBanners(response.data.banner)
-        setRentProducts(response.data.rentProduct)
-        setSellProducts(response.data.saleProduct)
-        setCategories(response.data.categories)
-        console.log(response.data.product) 
-    })
-}, [])
+    async function getProducts(currentPage, countPerPage, productOnly) {
+        console.log('called')
+        const data = {
+            activePage: currentPage,
+            itemsCountPerPage: countPerPage,
+            productOnly
+        }
+        try {
+            const response = await axios.post('/frontend/app/home', data)
+            if(!productOnly) {
+                setProducts(response.data.product)
+                setBanners(response.data.banner)
+                setRentProducts(response.data.rentProduct)
+                setSellProducts(response.data.saleProduct)
+                setCategories(response.data.categories)
+            } else {
+                setProducts([...products, ...response.data.product])
+            }
+            setLoader(false)
+            setNextPage(false)
+            console.log('ends')
+        } catch (error) {
+            setLoader(false)
+        }
+        
+    }
+
+    function GetNextPage() {
+        console.log('next page')
+        setActivePage(activePage + 1);
+        if (!nextPage) {
+            setNextPage(true)
+            getProducts(activePage+1,itemsCountPerPage, true)
+        }
+    }
+
+    useEffect(() => {
+        getProducts(activePage, itemsCountPerPage, false)
+    }, [])
+
+    function onRefresh() {
+        setActivePage(1)
+        getProducts(1, itemsCountPerPage, true)
+    }
+
+    function parseImages(image, images){
+        var arr=[imageLink+image]
+        images.forEach(image => {
+            arr.push(imageLink+image)
+        });
+        return arr
+    }
 
 
-function parseImages(image, images){
-    var arr=[imageLink+image]
-    images.forEach(image => {
-        arr.push(imageLink+image)
-    });
-    return arr
-}
-
-
+    const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+    const paddingToBottom = contentSize.height/2;
+    return layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingToBottom;
+    }
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-<View  style={styles.homeNav}>
-        <View style={styles.navlogo}>
-                    <Ionicons name='aperture' size={30}></Ionicons>
+        <StatusBar
+            backgroundColor="#fff"
+            barStyle="dark-content"
+        />
+        {loader ? (
+            <View style={bbstyles.loaderContainer}>
+                <ActivityIndicator size={'large'} color='#663399'/>
+            </View>
+        ):(
+        <>
+        <View  style={styles.homeNav}>
+            <View style={styles.navlogo}>
+                <Feather name='instagram' size={30} color='black'/>
+            </View>
+            <View style={styles.navcontent}>
+                <View style={styles.icons}>
+                <Image source={require('../../assets/icons/Search.png')} style={styles.icon}/>
                 </View>
-                <View style={styles.navcontent}>
-                    <View style={styles.icons}>
-                    <Ionicons name="search" size={30} ></Ionicons>
-                    </View>
-                    <View style={styles.icons}>
-                    <Ionicons name="heart-outline" size={30}></Ionicons>
-                    </View>
-                    <TouchableOpacity onPress={()=>navigation.navigate('Messages')} style={styles.icons}>
-                    <Ionicons name="mail-outline" size={30}></Ionicons> 
-                    </TouchableOpacity>
+                <View style={styles.icons}>
+                    <Image source={require('../../assets/icons/Like.png')} style={styles.icon}/>
                 </View>
-      </View>
+                <TouchableOpacity onPress={()=>navigation.navigate('Messages')} style={styles.icons}>
+                    <Image source={require('../../assets/icons/Messenger.png')} style={styles.icon}/>
+                </TouchableOpacity>
+            </View>
+        </View>
 
-<View style={{paddingBottom:100,backgroundColor:'white'}}>
-    <ScrollView style={bbstyles.scrollHeight}>
-    
-   
+        <View style={{paddingBottom:50}}>
+        
+        <ScrollView 
+        style={bbstyles.scrollHeight}
+        onScroll={({nativeEvent})=>{
+            if(isCloseToBottom(nativeEvent)) {
+                GetNextPage()
+            }
+        }}
+        refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        >
         <View>
             <ScrollView   horizontal={true} showsHorizontalScrollIndicator={false} >
-            <View style={styles.wrapper} >
-          {categories.map(category=>{
-              return(
-                <TouchableOpacity onPress={()=>navigation.navigate('Category Title')} style={styles.cateWrapper}>
-                <Image style={styles.category} source={{uri:imageLink+category.image}}/>
-                <Text style={styles.cateText}>{category.name}</Text>
-             </TouchableOpacity>
-              )
-                })}
+                <View style={styles.wrapper} >
+                    {categories.map(category=>{
+                        return(
+                            <TouchableOpacity key={category._id} onPress={()=>navigation.navigate('Category Title')} style={styles.cateWrapper}>
+                            <Image style={styles.category} source={{uri:imageLink+category.image}}/>
+                            <Text numberOfLines={1} style={styles.cateText}>{category.name}</Text>
+                        </TouchableOpacity>
+                        )
+                    })}
                 </View>
           </ScrollView>
 
-         
+         {/* <FlatList
+            data={products}
+            keyExtractor={item => item._id}
+            renderItem={({ item })=>(
+                 
+            )}
+        /> */}
 
-          {products.map(product=>{
-               return(
-          <TouchableWithoutFeedback  onPress={()=>navigation.navigate('Product Detail',product)}>
-          <View style={styles.productWrapper} key={product._id}>
-            <TouchableOpacity onPress={()=>navigation.navigate('My Closet',product.seller_id)} style={styles.userWrapper}>
-               <Image style={styles.userimage} source={{uri:imageLink+product.seller_id?.image}}></Image> 
-               <Text style={styles.username}>{product.seller_id?.name}</Text>   
+        {products.map(item=>{
+            return(
+                <TouchableOpacity key={item._id}  onPress={()=>navigation.navigate('Product Detail',item)}>
+          <View style={styles.productWrapper} key={item._id}>
+            <TouchableOpacity onPress={()=>navigation.navigate('My Closet',item.seller_id)} style={styles.userWrapper}>
+               <Image style={styles.userimage} source={{uri:imageLink+item.seller_id?.image}}></Image> 
+               <Text style={styles.username}>{item.seller_id?.name}</Text>   
             </TouchableOpacity>
             <View style={styles.product}>
                 {/* <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image> */}
 
-                {/* <SliderBox
-            images={parseImages(product.image, product.feature_image)}
-            ImageComponentStyle	= {styles.productImage}
-            dotColor="#663399"
-            imageLoadingColor="#663399"
-            /> */}
+                <SliderBox
+                images={parseImages(item.image, item.feature_image)}
+                ImageComponentStyle	= {styles.productImage}
+                dotColor="#663399"
+                imageLoadingColor="#663399"
+                onCurrentImagePressed={()=>navigation.navigate('Product Detail',item)}
+                />
                 <View style={styles.productreview}>
                 <View>
-                <Feather name="heart" style={styles.reviewicon} size={25}></Feather>
+                    <Image source={require('../../assets/icons/Like.png')} style={styles.smallIcon}/>
                 </View>
                 <View>
-                <Feather name="shopping-bag" style={styles.reviewicon}  size={25}></Feather>
+                <Image source={require('../../assets/icons/Shop.png')} style={styles.smallIcon}/>
                 </View>
                 <View>
-                <Feather name="mail" style={styles.reviewicon}  size={25}></Feather>
+                <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
                 </View>
                 </View>
                 <View style={styles.typeWrapper}> 
-                    <View><Text style={styles.productname} numberOfLines={1}>{product.name}</Text></View> 
-                    <View><Text style={styles.type}>{product.type}</Text></View> 
+                    <View><Text style={styles.productname} numberOfLines={1}>{item.name}</Text></View> 
+                    <View><Text style={styles.type}>{item.type}</Text></View> 
                 </View>
                 <View style={styles.detailWrapper}>
-                    <Text style={styles.price}>Rs. {product.price}</Text><Text>|</Text><Text style={styles.size}>Size: {product.size_id?.name}</Text><Text>|</Text><Text style={styles.brand}>{product.brand_id?.name}</Text>
+                    <Text style={styles.price}>Rs. {item.price}</Text><Text>|</Text><Text style={styles.size}>Size: {item.size_id?.name}</Text><Text>|</Text><Text style={styles.brand}>{item.brand_id?.name}</Text>
                 </View>   
             </View>
             </View>
-            </TouchableWithoutFeedback>
-         
-                 )
-          })}
-
-
+            </TouchableOpacity>
+            )
+        })}
+        
+        
         </View>
     </ScrollView>
     </View>
+    </>
+    )}
     </SafeAreaView>
   )
 }
@@ -137,6 +206,15 @@ const styles = StyleSheet.create({
         padding:10,
         backgroundColor:'white'
 
+    },
+    icon: {
+        height: 30,
+        width: 30
+    },
+    smallIcon: {
+        height: 25,
+        width: 25,
+        marginRight: 5
     },
     navcontent:{
         flexDirection:'row',
@@ -173,7 +251,8 @@ const styles = StyleSheet.create({
         marginTop:4,
         textTransform:'capitalize',
         fontSize:14,
-        fontWeight:'500'
+        fontWeight:'500',
+        width: 60
     },
 
     productWrapper:{

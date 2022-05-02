@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View,Image,Dimensions,ScrollView,SafeAreaView } from 'react-native'
+import { StyleSheet, StatusBar, Text, View,Image,Dimensions,TouchableOpacity,SafeAreaView } from 'react-native'
 import React from 'react'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useFonts, Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway';
 
 
@@ -15,29 +14,28 @@ export default function Welcome({navigation}) {
 
   return (
     <SafeAreaView style={{backgroundColor:'#663399',flex:1}}>
-    <ScrollView>
+    <StatusBar
+        backgroundColor="#663399"
+        barStyle="light-content"
+    />
     <View style={styles.container}>
-    <Text style={styles.title}>Affordable Thrift Store</Text>
-        <View>
+        <Text style={styles.title}>Affordable Thrift Store</Text>
             <Image source={require('../../assets/Saly-10.png')} style={styles.imagecss}></Image>
-        </View>
-        <TouchableOpacity onPress={()=>navigation.navigate('login')}>
-            <View><Text style={styles.started}>Get Started</Text></View>
+        <TouchableOpacity onPress={()=>navigation.navigate('login')} style={styles.started}>
+           <Text style={styles.startedText}>Get Started</Text>
         </TouchableOpacity>
     </View>
-    </ScrollView>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
     container:{
-       padding:20,
         backgroundColor:'#663399',
-        paddingTop:50
-
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: 10
     },
-
     title:{
         fontWeight: '800',
         fontSize: 50,
@@ -45,21 +43,24 @@ const styles = StyleSheet.create({
         fontFamily:'Raleway_800ExtraBold',    
     },
     imagecss:{
-     width:Dimensions.get('window').width-40,
+        width:Dimensions.get('window').width-60,
         height:314,
-     resizeMode:'contain',
+        resizeMode:'contain',
     },
 
     started:{
-        fontWeight:'700',
-        fontSize:20,
-        color:'#663399',
-        paddingVertical:10,
+        paddingVertical:15,
         backgroundColor:'white',
         borderRadius:10,
-        marginTop:90,
+        marginTop:70,
         textAlign:'center',
-        fontFamily:'Raleway_700Bold'
+        width:Dimensions.get('window').width-80,
+    },
+    startedText: {
+        textAlign:'center',
+        fontFamily:'Raleway_700Bold',
+        fontSize:20,
+        color:'#663399',
     }
 
 })

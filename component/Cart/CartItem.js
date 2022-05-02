@@ -1,7 +1,7 @@
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold, } from '@expo-google-fonts/raleway';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import React,{useEffect,useState,useContext} from 'react'
-import { View ,Text,SafeAreaView,Alert, Image,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent, TouchableOpacity} from 'react-native'
+import { View,ActivityIndicator, Text,SafeAreaView,Alert, Image,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent, TouchableOpacity} from 'react-native'
 import bbstyles from '../Styles'
 import axios from 'axios'
 import { AuthContext } from '../Context';
@@ -13,8 +13,8 @@ export default function CartItem({navigation}) {
 
     const data = useContext(AuthContext)
     const {cartItems,setCartItems,token,subtotal,retotal} = data
+    const [deletingItemId, setDeletingItemId] = useState(0)
     
-    console.log(cartItems)
     const config = {
         headers:{
             'access-token': token
@@ -23,13 +23,16 @@ export default function CartItem({navigation}) {
 
     
     async function removeCart(item){
+        setDeletingItemId(item._id)
         try {
             var res = await axios.delete('/addtocart/cartremove/'+item._id,config)
             var products =  cartItems.filter(product=>product.product_id?._id!=item.product_id._id)     
             setCartItems(products)
             retotal(products)
+            setDeletingItemId(0)
         } catch (error) {
             Alert.alert('Error', error.request.response)
+            setDeletingItemId(0)
         }
     }
    
@@ -37,12 +40,13 @@ export default function CartItem({navigation}) {
 
   return (
 <SafeAreaView style={{backgroundColor:'white',flex:1}} >
-     <ScrollView >
      {cartItems && cartItems.length>0?(
+    <>
+     <ScrollView>
         <View style={styles.cardWrapper}>
         {cartItems.map(item=>{
                 return(
-            <View style={styles.card}>
+            <View key={item._id} style={styles.card}>
                <View style={styles.imageWrapper}>
                   <Image style={styles.image} source={{uri:imageLink+item.product_id?.image}}></Image>
                </View>
@@ -60,26 +64,30 @@ export default function CartItem({navigation}) {
                     </View>
                     
                </View>
-               <TouchableOpacity onPress={()=>removeCart(item)}><Feather name="trash" size={20} color="#FA4A0C"></Feather></TouchableOpacity>
-
+               {deletingItemId==item._id?(
+                   <ActivityIndicator size={'small'} color='#fa4a0c' />
+               ):(
+                   <TouchableOpacity onPress={()=>removeCart(item)}><Feather name="trash" size={20} color="#FA4A0C"></Feather></TouchableOpacity>
+               )}
             </View>
                 )})
                 }
-            
-            <View style={styles.cartTotal}>
-            <Text style={styles.total}>Total</Text>
-            <Text style={styles.totalValue}>Rs. {subtotal}</Text>
-            </View>
-
-            <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Checkout')} >
-            <Text style={styles.login}>Checkout</Text>
-            </TouchableOpacity>
         </View>
-        
+     </ScrollView>
+
+        <View style={{paddingHorizontal: 20}}>
+        <View style={styles.cartTotal}>
+        <Text style={styles.total}>Total</Text>
+        <Text style={styles.totalValue}>Rs. {subtotal}</Text>
+        </View>
+        <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Checkout')} >
+            <Text style={styles.login}>Checkout</Text>
+        </TouchableOpacity>
+        </View>
+    </>
      ):(
          <Text>No Items.</Text>
      )}
-     </ScrollView>
 </SafeAreaView>
   )
 }
@@ -89,7 +97,6 @@ const styles = StyleSheet.create({
 cardWrapper:{
     padding:20,
     paddingHorizontal:30
-
 },
 
 card:{
@@ -167,15 +174,12 @@ value:{
     fontWeight:'600'
 },
 loginBtn:{
-
     paddingVertical:10,
-    paddingHorizontal:50,
     backgroundColor:'#663399',
     borderRadius:10,
-    marginTop:30,
-    marginBottom:30
-   
-
+    marginTop:20,
+    marginBottom:20,
+    width: '100%'
    },
    login:{
     textAlign:'center',
@@ -188,7 +192,7 @@ loginBtn:{
        flexDirection:'row',
        justifyContent:'space-between',
        alignItems:'center',
-       marginTop:100
+       marginTop:20
    },
    total:{
     fontSize:17,

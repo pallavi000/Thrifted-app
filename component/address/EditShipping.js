@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TextInput,TouchableOpacity,Alert} from 'react-native'
-import React,{useContext} from 'react'
+import { StyleSheet, ActivityIndicator, Text, View ,SafeAreaView,ScrollView,TextInput,TouchableOpacity,Alert} from 'react-native'
+import React,{useContext,useState} from 'react'
 import { Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import {Formik} from 'formik'
 import * as Yup from 'yup'
@@ -20,6 +20,7 @@ const validationSchema = Yup.object().shape({
 
 export default function EditShipping({navigation,route}) { 
   const address = route.params
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const data = useContext(AuthContext)
   const {token} = data
@@ -30,14 +31,15 @@ export default function EditShipping({navigation,route}) {
   }
 
 async function Edit(data){
+    setIsSubmitting(true)
     try {
         var response = await axios.put('/address/edit/'+address._id,data,config)
         Alert.alert('Success','Address has been updated')
-        navigation.navigate('Shipping Address')   
-        console.log(response.data)
+        navigation.goBack()
+        setIsSubmitting(false) 
     } catch (error) {
-        console.log(error.request.response)
-        // Alert.alert('Error',error.request.response)
+        Alert.alert('Error',error.request.response)
+        setIsSubmitting(false) 
     }
 
 }
@@ -118,8 +120,7 @@ async function Edit(data){
                  style={styles.input}
                  onChangeText={handleChange('zipcode')}
                  onBlur={handleBlur('zipcode')}
-                 defaultValue={address.zipcode}
-
+                 defaultValue={address.zipcode?.toString()}
                  ></TextInput>
 
                  {touched.zipcode && errors.zipcode?(
@@ -134,7 +135,7 @@ async function Edit(data){
                  style={styles.input}
                  onChangeText={handleChange('phone')}
                  onBlur={handleBlur('phone')}
-                 defaultValue={address.phone}
+                 defaultValue={address.phone?.toString()}
 
                  ></TextInput>
 
@@ -143,9 +144,16 @@ async function Edit(data){
                  ):(null)}
             </View>
 
+            {isSubmitting ?(
+                <TouchableOpacity style={styles.loginBtn}>
+                    <ActivityIndicator size={'small'} color='#fff'/>
+                </TouchableOpacity>
+            ):(
             <TouchableOpacity style={styles.loginBtn} onPress={handleSubmit} >
-            <Text style={styles.login}>Update Address</Text>
+                <Text style={styles.login}>Update Address</Text>
             </TouchableOpacity>
+            )}
+
             </>)}
             </Formik>
         </View>

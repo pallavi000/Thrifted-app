@@ -1,14 +1,16 @@
-import React,{useEffect, useState} from 'react'
+import React,{useEffect, useState, useRef} from 'react'
 import { View, Text, Button, Image, Modal, Alert, StyleSheet, Dimensions, KeyboardAvoidingViewBase,TouchableOpacity } from 'react-native'
 import * as imagePicker from 'expo-image-picker'
 import { useFormikContext } from 'formik'
 import { FontAwesome ,Feather} from '@expo/vector-icons'
 import { imageLink } from '../ImageLink'
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
 
 
 
 
-const MainImage = () => {
+const MainImage = (props) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [imageIndex,setImageIndex] = useState('')
 
@@ -36,16 +38,21 @@ async function getCameraPermission(){
 const {setFieldValue,values,touched,errors} = useFormikContext()
 
 useEffect(() => {
+    props.openCameraRef.current = openCamera
+    props.selectImageRef.current = selectImage
    getRequestPermission()
    getCameraPermission()
 }, [])
 
 async function selectImage(){
-    const result = await imagePicker.launchImageLibraryAsync()
+    const result = await imagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      mediaTypes: imagePicker.MediaTypeOptions.Images
+    })
     if(!result.cancelled){
         setFieldValue(`image${imageIndex}`,result.uri)
         setModalVisible(false)
-
+        props.sheetRef.current.snapTo(1)
     }
 }
 
@@ -54,12 +61,19 @@ async function openCamera(){
     if(!result.cancelled){
         setFieldValue(`image${imageIndex}`,result.uri)
         setModalVisible(false)
+        props.sheetRef.current.snapTo(1)
     }
 }
 
+useEffect(()=>{
+  props.openCameraRef.current = openCamera
+    props.selectImageRef.current = selectImage
+},[imageIndex])
+
 function toggleImage(index){
-  setModalVisible(true)
+  //setModalVisible(true)
   setImageIndex(index)
+  props.sheetRef.current.snapTo(0)
 }
 
 function multiImage(){
@@ -69,11 +83,11 @@ function multiImage(){
 
 
 
+
     return (
         <View>
  
- 
- <View style={styles.centeredView}>
+ {/* <View style={styles.centeredView}>
       <Modal
         animationType="slide"
         transparent={true}
@@ -107,21 +121,21 @@ function multiImage(){
         </View>
       </Modal>
 
-    </View>
+    </View> */}
 
     
 
 
     <View style={styles.uploadImageWrapper}>
-    <TouchableOpacity onPress={()=>toggleImage(1)}>
-  {values.image1?(
-    <Image source={{uri:values.image1}} style={styles.userImage} ></Image>
-  ):(
-    <View style={styles.cameraContainer}>
-      <Feather name='camera' size={40} color="#C4C4C4BF"></Feather>
-    </View>
-  )}
-</TouchableOpacity>
+      <TouchableOpacity onPress={()=>toggleImage(1)}>
+        {values.image1?(
+          <Image source={{uri:values.image1}} style={styles.userImage} ></Image>
+        ):(
+          <View style={[styles.cameraContainer, {height:150, width:170}]}>
+            <Feather name='camera' size={40} color="#C4C4C4BF"></Feather>
+          </View>
+        )}
+        </TouchableOpacity>
 
 
                <View style={styles.row}>
@@ -170,10 +184,7 @@ function multiImage(){
     {/* <Pressable style={[styles.button, styles.buttonOpen]} onPress={() => setModalVisible(true)}>
         <Text style={styles.textStyle}>Show Modal</Text>
       </Pressable> */}
-         {values.image?(
-            <Image source={{uri:values.image}} style={{width:200,height:200}}/>
-           ):(null)}
-            {touched.image?( <Text style={{color:'red'}}>{errors.image}</Text>):(null)}
+         
         </View>
     )
 }
@@ -188,15 +199,17 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
-  
-    width:'100%'
+    width:'100%',
+    marginTop: 20
 },
 cameraContainer:{
   width:(Dimensions.get('window').width/3)-20,
   height:90,
   padding:25,
-    borderColor:'#C4C4C4BF',
-    borderWidth:0.5
+  borderColor:'#C4C4C4BF',
+  borderWidth:0.5,
+  alignItems: 'center',
+  justifyContent: 'center'
 },
 userImage:{
     height:150,
@@ -205,8 +218,8 @@ userImage:{
     borderColor:'#C4C4C4BF',
     borderWidth:0.5,
     margin:'auto',
-    marginBottom:30,
-    alignItems:'center'
+    marginBottom:20,
+    alignItems:'center',
 },
 uploadBtn:{
     paddingHorizontal:20,
@@ -245,7 +258,6 @@ textSecondary:{
     height:90,
     borderWidth:1,
     borderColor:'#ddd',
-    textAlign:'center',
     margin:'auto',
     lineHeight:70,
     display:'flex',

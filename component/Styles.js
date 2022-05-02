@@ -1,6 +1,4 @@
-import ImageTile from 'expo-image-picker-multiple/src/ImageTile'
 import {StyleSheet,Dimensions} from 'react-native'
-import { SpringUtils } from 'react-native-reanimated'
 import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold, Raleway_400Regular  } from '@expo-google-fonts/raleway';
 
 
@@ -18,6 +16,12 @@ const bbstyles = StyleSheet.create({
         margin: 20,
         fontSize: 20,
         fontWeight: 'bold'
+    },
+    loaderContainer: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
       error:{
         color:'#FF2424',

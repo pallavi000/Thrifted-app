@@ -11,6 +11,9 @@ import {Picker} from '@react-native-picker/picker';
 import MainImage from '../Image/MainImage'
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
+import CategorySelect from './selects/CategorySelect'
+import SimpleSelect from './selects/SimpleSelect'
+import BrandSelect from './selects/BrandSelect'
 
 const validationSchema = Yup.object().shape({
     image1:Yup.string().required('Image is required'),
@@ -38,6 +41,22 @@ export default function CreatePost({navigation}) {
     const selectImageRef = useRef()
     const fill = new Animated.Value(1)
     const[earningPrice, setEarningPrice] = useState()
+    const[openSelectField, setOpenSelectField] = useState(null)
+    const [productTypes, setProductTypes] = useState([
+        {
+            _id: 'rent',
+            name: 'Rent'
+        },
+        {
+            _id: 'sale',
+            name: 'Sale'
+        }
+    ])
+    const [selectedCategory, setSelectedCategory] = useState({name:"Select Category"})
+    const [selectedColor, setSelectedColor] = useState({name:"Select Color"})
+    const [selectedSize, setSelectedSize] = useState({name:"Select Product Size"})
+    const [selectedType, setSelectedType] = useState({name: 'Select Product Type'})
+    const [selectedBrand, setSelectedBrand] = useState({name: 'Select Brand'})
 
     const data = useContext(AuthContext)
     const {token} = data
@@ -49,8 +68,8 @@ export default function CreatePost({navigation}) {
     }
 
     function addPost() {
+        console.log(formRef.current.values)
         var errors = Object.values(formRef.current.errors)
-        console.log(formRef.current)
         if(errors && errors.length>0) {
             Alert.alert('Error', errors[0])
             return
@@ -119,6 +138,23 @@ export default function CreatePost({navigation}) {
         setEarningPrice(profit.toString())
      }
 
+     useEffect(()=>{
+         formRef.current.setFieldValue('category', selectedCategory._id)
+     },[selectedCategory])
+     
+     useEffect(()=>{
+         formRef.current.setFieldValue('color', selectedColor._id)
+     },[selectedColor])
+     useEffect(()=>{
+         formRef.current.setFieldValue('size', selectedSize._id)
+     },[selectedSize])
+     useEffect(()=>{
+         formRef.current.setFieldValue('type', selectedType._id)
+     },[selectedType])
+     useEffect(()=>{
+         formRef.current.setFieldValue('brand', selectedBrand._id)
+     },[selectedBrand])
+
      
      const renderHeader = () =>(
         <>
@@ -165,6 +201,59 @@ export default function CreatePost({navigation}) {
 
 
   return (
+      <>
+    
+    {openSelectField==="category" ? (
+        <CategorySelect
+            categories={categories}
+            navigation={navigation}
+            setOpenSelectField={setOpenSelectField}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+        />
+    ):(null)}
+
+    {openSelectField==="color" ? (
+        <SimpleSelect
+        selects={colors}
+        selectedSelect={selectedColor}
+        setOpenSelectField={setOpenSelectField}
+        setSelectedSelect={setSelectedColor}
+        navigation={navigation}
+        />
+    ):(null)}
+
+    {openSelectField==="size" ? (
+        <SimpleSelect
+        selects={sizes}
+        selectedSelect={selectedSize}
+        setOpenSelectField={setOpenSelectField}
+        setSelectedSelect={setSelectedSize}
+        navigation={navigation}
+        />
+    ):(null)}
+
+    {openSelectField==="type" ? (
+        <SimpleSelect
+        selects={productTypes}
+        selectedSelect={selectedType}
+        setOpenSelectField={setOpenSelectField}
+        setSelectedSelect={setSelectedType}
+        navigation={navigation}
+        />
+    ):(null)}
+
+    {openSelectField==="brand" ? (
+        <BrandSelect
+        brands={brands}
+        selectedSelect={selectedBrand}
+        setOpenSelectField={setOpenSelectField}
+        setSelectedSelect={setSelectedBrand}
+        navigation={navigation}
+        />
+    ):(null)}
+
+
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
 
         <BottomSheet
@@ -240,8 +329,10 @@ export default function CreatePost({navigation}) {
 
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Category (Required)</Text>
-                <View style={styles.selectForm}>
-                <Picker
+                <TouchableOpacity onPress={()=>setOpenSelectField('category')}>
+                <View style={styles.selectField}>
+                <Text style={{color: 'black',textTransform:'capitalize'}}>{selectedCategory.name}</Text>
+                {/* <Picker
                 style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.category}
                         onValueChange={itemValue =>
@@ -255,11 +346,12 @@ export default function CreatePost({navigation}) {
                             renderChildren(category.childrens,1)] 
                         )
                     })}
-                </Picker>
+                </Picker> */}
                 </View>
+                </TouchableOpacity>
                 {errors.category && touched.category?(
-                            <Text style={bbstyles.error}>{errors.category}</Text>
-                         ):(null)}
+                    <Text style={bbstyles.error}>{errors.category}</Text>
+                    ):(null)}
             </View>
 
             <View style={styles.formGroup}>
@@ -274,10 +366,16 @@ export default function CreatePost({navigation}) {
                             <Text style={bbstyles.error}>{errors.stock}</Text>
                          ):(null)}
             </View>
+            
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Color (Required)</Text>
-                <View style={styles.selectForm}>
-                <Picker
+                <TouchableOpacity onPress={()=>setOpenSelectField('color')}>
+                <View style={styles.selectField}>
+                <Text style={{color: 'black',textTransform:'capitalize'}}>{selectedColor.name}</Text>
+                </View>
+                </TouchableOpacity>
+                
+                {/* <Picker
                 style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.color}
                         onValueChange={itemValue =>
@@ -292,16 +390,20 @@ export default function CreatePost({navigation}) {
                             <Picker.Item key={color._id}  label={color.name} value={color._id} />
                         )
                     })}
-                </Picker>
-                </View>
+                </Picker> */}
                 {errors.color && touched.color?(
                 <Text style={bbstyles.error}>{errors.color}</Text>
                 ):(null)}
             </View>
+            
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Brand (Optional)</Text>
-                <View style={styles.selectForm}>
-                <Picker
+                <TouchableOpacity onPress={()=>setOpenSelectField('brand')}>
+                <View style={styles.selectField}>
+                <Text style={{color: 'black',textTransform:'capitalize'}}>{selectedBrand.name}</Text>
+                </View>
+                </TouchableOpacity>
+                {/* <Picker
                 style={{height:30,marginLeft:-8,marginRight: -8}}
                     selectedValue={values.brand}
                         onValueChange={itemValue =>
@@ -316,8 +418,7 @@ export default function CreatePost({navigation}) {
                         )
                     })}
                     <Picker.Item  label="Others.." value="others"  />
-                </Picker>
-                </View>
+                </Picker> */}
                     
                     {showBrand?(
                         <View>
@@ -335,10 +436,15 @@ export default function CreatePost({navigation}) {
                     
                 <Text style={bbstyles.error}>{errors.brand}</Text>
             </View>
+            
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Size (Required)</Text>
-                <View style={styles.selectForm}>
-                <Picker
+                <TouchableOpacity onPress={()=>setOpenSelectField('size')}>
+                <View style={styles.selectField}>
+                <Text style={{color: 'black',textTransform:'capitalize'}}>{selectedSize.name}</Text>
+                </View>
+                </TouchableOpacity>
+                {/* <Picker
                 style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.size}
                         onValueChange={itemValue =>
@@ -352,8 +458,7 @@ export default function CreatePost({navigation}) {
                             <Picker.Item key={size._id} label={size.name} value={size._id} />
                         )
                     })}
-                </Picker>
-                </View>
+                </Picker> */}
                 {touched.size && errors.size?(
                     <Text style={bbstyles.error}>{errors.size}</Text>
                 ):(null)}
@@ -395,8 +500,12 @@ export default function CreatePost({navigation}) {
 
             <View style={styles.formGroup}>
                 <Text style={styles.label}>Product Type (Required)</Text>
-                <View style={styles.selectForm}>
-                <Picker
+                <TouchableOpacity onPress={()=>setOpenSelectField('type')}>
+                <View style={styles.selectField}>
+                <Text style={{color: 'black',textTransform:'capitalize'}}>{selectedType.name}</Text>
+                </View>
+                </TouchableOpacity>
+                {/* <Picker
                 style={{height:30,marginLeft:-8,marginRight: -8}}
                      selectedValue={values.type}
                         onValueChange={itemValue =>
@@ -405,8 +514,7 @@ export default function CreatePost({navigation}) {
                              <Picker.Item  label="Selelct Product Type" value="" />
                             <Picker.Item  label="Rent" value="rent" />
                             <Picker.Item  label="Sale" value="sale" />
-                </Picker>
-                </View>
+                </Picker> */}
                 {touched.type && errors.type?(
                     <Text style={bbstyles.error}>{errors.type}</Text>
                 ):(null)}
@@ -417,6 +525,7 @@ export default function CreatePost({navigation}) {
         </Animated.View>
      </ScrollView>
      </SafeAreaView>
+    </>
   )
 }
 
@@ -503,6 +612,12 @@ const styles = StyleSheet.create({
         borderBottomColor:'#C4C4C4BF',
         borderBottomWidth:1,
         justifyContent: 'center'
+    },
+    selectField: {
+        borderBottomColor:'#C4C4C4BF',
+        borderBottomWidth:1,
+        justifyContent: 'center',
+        height: 30
     },
     label:{
         color:'#868686',

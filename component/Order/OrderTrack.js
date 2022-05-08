@@ -1,11 +1,17 @@
-import { StyleSheet, Text, View,ScrollView,Dimensions,Image} from 'react-native'
+import { StyleSheet, Text, View,ScrollView,Dimensions,Image, SafeAreaView, StatusBar} from 'react-native'
 import React from 'react'
-import { Feather } from '@expo/vector-icons'
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Raleway_400Regular } from '@expo-google-fonts/raleway'
 
-export default function OrderTrack() {
+export default function OrderTrack({route}) {
+    const order = route.params
   return (
-    <ScrollView style={{height:Dimensions.get('window').height}}>
+      <SafeAreaView style={{flex:1}}>
+      <StatusBar
+        backgroundColor="#663399"
+        barStyle="light-content"
+    />
+    <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Delivery Status</Text>
       <View style={styles.loginForm}>
@@ -31,22 +37,53 @@ export default function OrderTrack() {
                 <Text style={styles.orderTick}><Feather name='check' size={15} color="white"></Feather></Text>
             </View>
       </View>
-      <View style={styles.deliver}>
+      {order.order_status=="shipped"?(
+        <View style={styles.deliver}>
             <View style={styles.noteWrapper}>
-            <View style={styles.imageView}>
-            <Image source={require('../../assets/deliver.png')} style={styles.logo}></Image>
-            </View>
-            <View>
-            <Text style={styles.logoTitle}>Order Is Being Delivered</Text>
-                <Text style={styles.subtitle}>Your delivery agent is coming</Text>
-            </View>
-              
+                <View style={styles.imageView}>
+                    <Image source={require('../../assets/deliver.png')} style={styles.logo}></Image>
+                </View>
+                <View>
+                    <Text style={styles.logoTitle}>Order Is Being Delivered</Text>
+                    <Text style={styles.subtitle}>Your delivery agent is coming</Text>
+                </View>
             </View>
             <View style={{ justifyContent:'center',
-        alignItems:'center',display:'flex'}}>
+            alignItems:'center',display:'flex'}}>
                 <Text style={styles.phoneTick}><Feather name='phone-call' size={15} color="white"></Feather></Text>
             </View>
-      </View>
+        </View>
+      ): order.order_status!="completed" ?(
+          <View style={styles.deliver}>
+            <View style={styles.noteWrapper}>
+                <View style={styles.imageView}>
+                    <Image source={require('../../assets/deliver.png')} style={styles.logo}></Image>
+                </View>
+                <View>
+                    <Text style={styles.logoTitle}>Order Is Not Yet Shipped</Text>
+                </View>
+            </View>
+            <View style={{ justifyContent:'center',
+            alignItems:'center',display:'flex'}}>
+                <Text style={styles.phoneTick}><Feather name='phone-call' size={15} color="white"></Feather></Text>
+            </View>
+        </View>
+      ):(
+         <View style={styles.deliver}>
+            <View style={styles.noteWrapper}>
+                <View style={styles.imageView}>
+                    <Image source={require('../../assets/deliver.png')} style={styles.logo}></Image>
+                </View>
+                <View>
+                    <Text style={styles.logoTitle}>Order Is Delivered</Text>
+                </View>
+            </View>
+            <View style={{ justifyContent:'center',
+            alignItems:'center',display:'flex'}}>
+                <Text style={styles.orderTick}><Feather name='check' size={15} color="white"></Feather></Text>
+            </View>
+        </View> 
+      )}
 
       <View style={styles.mapContainer}>
       <Image source={require('../../assets/map.png')} style={styles.map}></Image>
@@ -56,6 +93,7 @@ export default function OrderTrack() {
     </View>
 
   </ScrollView>
+  </SafeAreaView>
   )
 }
 
@@ -78,7 +116,7 @@ const styles = StyleSheet.create({
        borderTopRightRadius:18,
        borderTopLeftRadius:18,
      flex:1,
-     padding:30,
+     padding:20,
      paddingTop:50
       },
       deliver:{
@@ -124,6 +162,15 @@ const styles = StyleSheet.create({
           borderRadius:10,
           lineHeight:20
       },
+      pendingAction:{
+        backgroundColor:'#68B6F3',
+        height:20,
+        width:20,
+        borderRadius:12,
+        justifyContent:'center',
+        alignItems:'center',
+        color:'white'
+    },
       phoneTick:{
         backgroundColor:'#663399',
         height:40,

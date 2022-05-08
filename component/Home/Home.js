@@ -128,7 +128,7 @@ export default function Home({navigation}) {
                 <View style={styles.wrapper} >
                     {categories.map(category=>{
                         return(
-                            <TouchableOpacity key={category._id} onPress={()=>navigation.navigate('Category Title')} style={styles.cateWrapper}>
+                            <TouchableOpacity key={category._id} onPress={()=>navigation.navigate('Category Title',category)} style={styles.cateWrapper}>
                             <Image style={styles.category} source={{uri:imageLink+category.image}}/>
                             <Text numberOfLines={1} style={styles.cateText}>{category.name}</Text>
                         </TouchableOpacity>

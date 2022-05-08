@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TouchableOpacity,Alert} from 'react-native'
+import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TouchableOpacity,Alert, ActivityIndicator} from 'react-native'
 import React,{useState,useEffect,useContext} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import {Ionicons} from '@expo/vector-icons'
@@ -8,6 +8,7 @@ import { AuthContext } from '../Context'
 import {useFocusEffect, useIsFocused} from '@react-navigation/native'
 import CustomCheckBox from '../ui/CustomCheckBox'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import bbstyles from '../Styles'
 
 
 export default function Shipping(props) {
@@ -16,6 +17,8 @@ export default function Shipping(props) {
     const {navigation} = props
     const IsFocused = useIsFocused()
     const [isSelected, setSelection] = useState(0);
+    const [loader, setLoader] = useState(true)
+    const [isSubmitting, setIsSubmitting] = useState(0)
 
     async function loadSelectedCheckBox() {
         var addressId = await AsyncStorage.getItem('shippingId')
@@ -50,6 +53,7 @@ async function getaddress(){
             setSelection(response.data[0]._id)
             await AsyncStorage.setItem('shippingId',response.data[0]._id)
         }
+        setLoader(false)
     } catch (error) {
        Alert.alert('Error', error.request.response)
     }
@@ -57,8 +61,8 @@ async function getaddress(){
 }
 
 async function removeAddress(id){
+    setIsSubmitting(id)
     try {
-
         var response =await axios.delete('/address/'+id,config)
         var deleted= addresses.filter(address=>address._id!= id)
         setAddresses(deleted)
@@ -71,14 +75,21 @@ async function removeAddress(id){
                 setSelection(0)
             }
         }
-        Alert.alert('Success','Address Deleted!')
+        setIsSubmitting(0)
+        // Alert.alert('Success','Address Deleted!')
     } catch (error) {
+        setIsSubmitting(0)
         Alert.alert('Error',error.request.response)
     }
 }
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+    {loader ? (
+        <View style={bbstyles.loaderContainer}>
+            <ActivityIndicator size={'large'} color='#663399'/>
+        </View>
+    ):(
     <ScrollView >
     {addresses && addresses.length !=0?(
         addresses.map(address=>{
@@ -104,9 +115,15 @@ async function removeAddress(id){
         <TouchableOpacity onPress={()=>navigation.navigate('Edit Address',address)}>
             <Text style={styles.edit}>Edit</Text>
             </TouchableOpacity>
+            {isSubmitting==address._id?(
+                <TouchableOpacity style={[styles.edit,{color:'red',marginBottom:10}]}>
+                    <ActivityIndicator size={'small'} color='#fa4a0c' />
+                </TouchableOpacity>
+            ):(
             <TouchableOpacity onPress={()=>removeAddress(address._id)}>
                 <Text style={[styles.edit,{color:'red',marginBottom:10}]}>Delete</Text>
-                </TouchableOpacity>
+            </TouchableOpacity>
+            )}
         </View>
     </View>
         )
@@ -117,9 +134,8 @@ async function removeAddress(id){
     <TouchableOpacity onPress={()=>navigation.navigate('Add Address')} style={styles.add}>
         <Ionicons name="add" size={20} style={styles.addIcon}></Ionicons>
     </TouchableOpacity>
-
-
     </ScrollView>
+    )}
     </SafeAreaView>
   )
 }

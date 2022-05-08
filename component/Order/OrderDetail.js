@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View,SafeAreaView,ScrollView,Image,Dimensions } from 'react-native'
+import { StyleSheet, Text, View,SafeAreaView,ScrollView,Image,Dimensions, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import { imageLink } from '../ImageLink'
+import { Feather, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 
-export default function OrderDetail({route}) {
+export default function OrderDetail({navigation, route}) {
     const item = route.params
   
 
@@ -24,28 +25,49 @@ return (
     <ScrollView>
         <View style={styles.container}>
             <View style={styles.orderDetail}>
-                <Text style={styles.orderNo}>Order No {item._id}</Text>
+                <View>
+                    <Text style={[styles.orderNo]}>Order No:</Text>
+                    <Text style={styles.orderValue}>{item._id}</Text>
+                </View>
                 <Text style={styles.orderDate}>{changeDate(item.createdAt)}</Text>
             </View>
 
             <View style={styles.orderDetail}>
-                <View style={styles.row}>
-                    <Text style={styles.orderDate}>Tracking number</Text>
-                    <Text style={styles.orderValue}>{item.transaction_id}</Text>
+                <View>                        
+                    <Text style={styles.orderNo}>Tracking No:</Text>
+                    <Text style={styles.transaction}>{item.transaction_id}</Text>
                 </View>
                 <Text style={styles.delivered}>Delivered</Text>
             </View>
+            
             <Text style={styles.orderValue}>{item.orders.length} items</Text>
 
             {item.orders.map(order=>{
                 return(
-                    <View style={styles.addressCard}>
+                    <View style={styles.addressCard} key={order._id}>
                 <View style={styles.row}>
                 
                     <Image source={{uri:imageLink+ order.product_id?.image}} style={styles.image}></Image>
                     <View>
                     <View style={{flexDirection:'row'}}> 
-                        <Text style={styles.name} ellipsizeMode='tail'>{order.product_id?.name}</Text>
+                    <View style={[styles.row,{justifyContent:'space-between',width: Dimensions.get('window').width-180}]}>
+                        <View>
+                            <Text style={styles.name} ellipsizeMode='tail'>{order.product_id?.name}</Text>
+                        </View>
+                        {order.order_status=="processing" ?(
+                            <View style={styles.pendingAction}>
+                                <MaterialCommunityIcons style={styles.icon} name='timer-sand-empty' size={20}></MaterialCommunityIcons>
+                            </View>
+                        ):order.order_status=="shipped" ?(
+                            <View style={styles.pendingAction}>
+                                <MaterialIcons style={styles.icon} name='local-shipping' size={20}></MaterialIcons>
+                            </View>
+                        ):(
+                            <View style={styles.successAction}>
+                                <Feather name='check' style={styles.icon} size={20}></Feather>
+                            </View>
+                        )}
+                    </View>
                         </View>
                         <Text style={styles.brand}>Nike</Text>
                         <View style={styles.row}>
@@ -65,8 +87,13 @@ return (
                             </View>
                             <Text style={styles.orderValue}>Rs.{order.price}</Text>
                         </View>
+                        <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Track Order', order)}>
+                            <Text style={styles.login}>Track</Text>
+                        </TouchableOpacity>
                     </View>
+                    
                 </View>
+                
             </View>
                 )
             })}
@@ -126,6 +153,11 @@ return (
             </View>
         </View>
     </ScrollView>
+    <View style={{paddingHorizontal: 20,borderTopWidth:1,borderTopColor:'#ddd'}}>
+        <TouchableOpacity style={styles.loginBtn}>
+            <Text style={styles.login}>Download Invoice</Text>
+        </TouchableOpacity>
+    </View>
 </SafeAreaView>
 )
 }
@@ -139,6 +171,62 @@ flexDirection:'row',
 alignItems:'center'
 
 },
+pendingAction:{
+        backgroundColor:'#68B6F3',
+        height:24,
+        width:24,
+        borderRadius:12,
+        justifyContent:'center',
+        alignItems:'center',
+        color:'white'
+
+    },
+    cancelledAction:{
+        backgroundColor:'#FF2424',
+        height:24,
+        width:24,
+        borderRadius:12,
+        justifyContent:'center',
+        alignItems:'center',
+        color:'white'
+
+    },
+    successAction:{
+        backgroundColor:'#4CD964',
+        height:24,
+        width:24,
+        borderRadius:12,
+        justifyContent:'center',
+        alignItems:'center',
+        color:'white'
+
+    },
+    icon:{
+        fontSize:15,
+        alignItems:'center',
+        fontWeight:'500',
+        color:'white'
+    },
+loginBtn:{
+        paddingVertical:8,
+        backgroundColor:'#663399',
+        borderRadius:5,
+        marginTop:20,
+        marginBottom:20,
+        borderWidth:1,
+        borderColor: '#663399',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+       },
+       login:{
+        textAlign:'center',
+        fontFamily:'Raleway_700Bold',
+        fontWeight:'700',
+        fontSize:15,
+        color:'white',
+        marginRight: 10
+       },
 orderDetail:{
 flexDirection:'row',
 justifyContent:'space-between',
@@ -158,9 +246,15 @@ fontFamily:'Raleway_400Regular'
 },
 orderValue:{
 fontSize:14,
-fontWeight:'500',
 fontFamily:'Raleway_500Medium',
 marginLeft:4
+},
+transaction: {
+fontSize:14,
+fontWeight:'500',
+fontFamily:'Raleway_500Medium',
+marginLeft:4,
+width: (Dimensions.get('window').width-40)*0.75
 },
 delivered:{
 color:'#4CD964',
@@ -175,22 +269,22 @@ borderRadius:10,
 marginTop:30,
 shadowColor: "rgba(0, 0, 0, 0.3)",
 shadowOffset: {
-width: 0,
-height: 4,
+    width: 0,
+    height: 4,
 },
 shadowOpacity: 0.6,
 shadowRadius: 3,
 elevation: 1,
-
-
-
+paddingVertical: 20,
+paddingBottom: 0
 },
 image:{
-height:140,
+height:170,
 width:120,
 resizeMode:'cover',
 borderRadius:10,
-marginRight:10
+marginRight:10,
+marginTop: -20
 },
 productDetail:{
 padding:10,

@@ -173,7 +173,7 @@ export default function CategoryPage({navigation,route}) {
         numColumns={2}
         keyExtractor={item => item._id}
         renderItem={({ item })=>(
-            <View key={item._id} style={styles.productWrapper}>
+            <TouchableOpacity onPress={()=>navigation.navigate('Product Detail',item)} key={item._id} style={styles.productWrapper}>
             <Image source={{uri:imageLink+item.image}} style={styles.productImage}></Image>
             <View style={styles.detailWrapper}>
             <Text style={styles.productName} numberOfLines={1} >{item.name}</Text>
@@ -186,7 +186,7 @@ export default function CategoryPage({navigation,route}) {
                 <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1}}>Rs.{item.price}</Text>
             </View>
             </View>
-        </View>
+        </TouchableOpacity>
         )}
     />
     </Animated.View>

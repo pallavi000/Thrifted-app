@@ -1,66 +1,87 @@
-import { StyleSheet,Image, SafeAreaView, ScrollView, Text, View ,Dimensions} from 'react-native'
-import React from 'react'
+import { StyleSheet,Image, SafeAreaView, ScrollView, Text, View ,Dimensions, ActivityIndicator, TouchableOpacity} from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
+import { AuthContext } from '../Context'
+import axios from 'axios'
+import bbstyles from '../Styles'
+import { imageLink } from '../ImageLink'
 
-export default function Profile() {
+export default function Profile({navigation}) {
+    const[user,setUser] = useState()
+    const[loader,setLoader] = useState(true)
+    const data = useContext(AuthContext)
+    const {token} = data
+    const config = {
+        headers:{
+            'access-token': token
+        }
+    }
+    useEffect(() => {
+        axios.get('/user/currentuser',config).then(response=>{
+            setUser(response.data.user)
+            setLoader(false)
+        }).catch(err=>{
+            
+        })
+    }, [])
+    
   return (
 <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+{loader?(
+<View style={bbstyles.loaderContainer}>
+    <ActivityIndicator size={'large'} color='#663399'/>
+</View>
+):(
      <ScrollView style={{position:'relative'}} >
         <View style={styles.cardWrapper}>
         <Text style={styles.MainHeader}>My Profile</Text>
             <View style={styles.card}>
-            <Image style={styles.userImg} source={require('../../assets/Saly-10.png')}></Image>
-            <Text style={[styles.userName,{marginTop:30,marginBottom:10}]}>John Sudo</Text>
+            <Image style={styles.userImg} source={{uri:imageLink+user.image}}></Image>
+            <Text style={[styles.userName,{marginTop:30,marginBottom:10}]}>{user.name}</Text>
                 <View style={styles.emailContainer}>
                 <Feather name="mail" size={20}></Feather>
-                <Text style={styles.mail}>bgattaraipallavi4@gmail.com</Text>
+                <Text style={styles.mail}>{user.email}</Text>
                 </View>
                 <View style={styles.emailContainer}>
                 <FontAwesome name='money' size={20}></FontAwesome>
-                <Text style={styles.mail}>bgattaraipallavi4@gmail.com</Text>
+                <Text style={styles.mail}>रु {user.balance}</Text>
                 </View>
             </View>
-            <View style={styles.card}>
+            {/* <View style={styles.card}>
             <View style={styles.titleWrapper}>
-            <Text style={styles.userName}>Edit</Text>
-            <FontAwesome5 name="angle-right" size={20}></FontAwesome5>
+                <Text style={styles.userName}>Edit</Text>
+                <FontAwesome5 name="angle-right" size={20}></FontAwesome5>
             </View>
            
-            </View>
+            </View> */}
 
-            <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={()=>navigation.navigate('Change Password')}>
             <View style={styles.titleWrapper}>
             <Text style={styles.userName}>Change Password</Text>
             <FontAwesome5 name="angle-right" size={20}></FontAwesome5>
             </View>
-            </View>
+            </TouchableOpacity>
 
-            <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={()=>navigation.navigate('My Orders')}>
             <View style={styles.titleWrapper}>
             <Text style={styles.userName}>Order History</Text>
             <FontAwesome5 name="angle-right" size={20}></FontAwesome5>
             </View>
-            </View>
+            </TouchableOpacity>
 
-            <View style={styles.card}>
-            <View style={styles.titleWrapper}>
-            <Text style={styles.userName}>Cards</Text>
-            <FontAwesome5 name="angle-right" size={20}></FontAwesome5>
-            </View>
-            </View>
-
-            <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={()=>navigation.navigate('Setting')}>
             <View style={styles.titleWrapper}>
             <Text style={styles.userName}>Notification</Text>
             <FontAwesome5 name="angle-right" size={20}></FontAwesome5>
             </View>
-            </View>
+            </TouchableOpacity>
 
 
 
         </View>
     </ScrollView>
+)}
 </SafeAreaView>
   )
 }

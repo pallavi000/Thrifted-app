@@ -4,13 +4,6 @@ import { Raleway_400Regular, Raleway_700Bold } from '@expo-google-fonts/raleway'
 
 export default function OrderHistory({navigation}) {
 
-
-    React.useEffect(() => {
-        navigation.getParent()?.setOptions({
-            tabBarStyle: {display: 'none'}
-          });
-      }, [navigation]);
-
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView style={{position:'relative'}} >
@@ -21,8 +14,8 @@ export default function OrderHistory({navigation}) {
         <Text style={styles.subtitle}>Hit the button down
 below to Create an order</Text>
 
-<TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Checkout')} >
-            <Text style={styles.login}>Start Ordering</Text>
+            <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('addtocart', {screen:'Cart Items'})} >
+                <Text style={styles.login}>Start Ordering</Text>
             </TouchableOpacity>
     </View>
 
@@ -39,8 +32,6 @@ const styles = StyleSheet.create({
      resizeMode:'contain',
         marginBottom:20,
         marginTop:30,
-        textAlign:'center',
-
     },
     title:{
         fontSize:28,

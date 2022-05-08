@@ -1,18 +1,20 @@
-import { StyleSheet, ActivityIndicator, Text, TouchableWithoutFeedback, View,Dimensions,SafeAreaView,ScrollView,Image,TouchableOpacity } from 'react-native'
-import React,{useState,useEffect,useContext} from 'react'
+import { StyleSheet, ActivityIndicator, Text, TouchableWithoutFeedback, View,Dimensions,SafeAreaView,ScrollView,Image,TouchableOpacity, Alert } from 'react-native'
+import React,{useState,useEffect,useContext, useRef} from 'react'
 import bbstyles from '../Styles'
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { NavigationContainer } from '@react-navigation/native'
-import { FontAwesome } from '@expo/vector-icons'
+import { EvilIcons, FontAwesome, SimpleLineIcons } from '@expo/vector-icons'
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
 import * as imagePicker from 'expo-image-picker'
-import {Picker} from '@react-native-picker/picker';
-
 
 export default function Closet(props) {
 
+    const sheetRef = useRef(null)
+    const fill = new Animated.Value(1)
     const[products,setProducts] = useState([])
     const[user,setUser] = useState([])
     const navigation = props.navigation
@@ -23,32 +25,193 @@ export default function Closet(props) {
     const[modalVisible,setModalVisible] = useState(false)
     const[activeTab,setActiveTab] = useState('listing')
     const[loading,setLoading] = useState(true)
+    const[sales, setSales] = useState([])
+    const[followSubmit, setFollowSubmit] = useState(false)
+    const[isFollowing, setIsFollowing] = useState(false)
+    const[imageUploading, setImageUploading] = useState(false)
     
     const config = {
         headers:{
             'access-token': token
         }
     }
-    
-
 
     useEffect(() => {
-        axios.post('/frontend/closet/'+props.route.params._id).then(response=>{
+        getProducts()
+        getSales()
+    }, [props])
+
+    async function getProducts() {
+        try {
+            const response = await axios.post('/frontend/closet/'+props.route.params._id)
             setProducts(response.data.product)
             setUser(response.data.user)
             navigation.setOptions({
                 title: response.data.user.name
             })
             setLoading(false)
-        }).catch(err=>{
+        } catch (error) {
             setLoading(false)
-            console.log(err.request.response)
-        }) 
-    }, [props])
+        }
+    }
+
+    async function getSales() {
+        try {
+            const response = await axios.get('/order/all',config)
+            setSales(response.data)            
+        } catch (error) {
+        }        
+    }
+
+    function toggleTab(action) {
+        setActiveTab(action)
+    }
+
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    async function followUser() {
+        setFollowSubmit(true)
+        setTimeout(() => {
+            setIsFollowing(true)
+            setFollowSubmit(false)
+        }, 2000);
+    }
+
+    async function doUnfollow() {
+        setFollowSubmit(true)
+        setTimeout(() => {
+            setIsFollowing(false)
+            setFollowSubmit(false)
+        }, 2000);
+    }
+
+    function unFollowUser() {
+        Alert.alert("Unfollow User", "Are you sure you want to unfollow?", [
+            {text: 'Yes', onPress: doUnfollow},
+            {text: 'Cancel'}
+        ])
+    }
+
+    async function selectImage() {
+        const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
+        if(!granted){
+            const result = await imagePicker.requestMediaLibraryPermissionsAsync()
+            if(!result.granted) {
+                return Alert.alert("Error", "Permission denied")
+            }
+        }
+        const imageResult = await imagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            base64: true,
+            aspect: [4,4],
+            mediaTypes: imagePicker.MediaTypeOptions.Images
+        })
+        if(!imageResult.cancelled){
+            var uri = null
+            if(imageResult.base64) {
+                uri  = `data:image/jpeg;base64,${imageResult.base64}`
+            }
+            uploadUserImage(uri)
+        }
+    }
+
+    async function openCamera() {
+        const {granted} = await imagePicker.getCameraPermissionsAsync()
+        if(!granted){
+            const result = await imagePicker.requestCameraPermissionsAsync()
+            if(!result.granted) {
+                return Alert.alert("Error", "Permission denied")
+            }
+        }
+        const imageResult = await imagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4,4],
+            base64: true
+        })
+        if(!imageResult.cancelled){
+            var uri = null
+            if(imageResult.base64) {
+                uri  = `data:image/jpeg;base64,${imageResult.base64}`
+            }
+            uploadUserImage(uri)
+        }
+    }
+
+    async function uploadUserImage(uri) {
+        sheetRef.current.snapTo(1)
+        setImageUploading(true)
+        try {
+            const data = {
+                image: uri
+            }
+            const response = await axios.post('/user/change/avatar', data, config)
+            setUser({...user, image: response.data})
+            setImageUploading(false)
+        } catch (error) {
+            Alert.alert(error.request.response)
+            setImageUploading(false)
+        }
+    }
+
+
+    const renderHeader = () =>(
+        <>
+        <View style={{
+            backgroundColor: '#fff',
+            padding: 10,
+            alignItems: 'center',
+            paddingTop: 20,
+            borderTopWidth: 1,
+            borderTopColor: '#ddd',
+        }}>
+            <Text
+            style={{
+                fontFamily: "Raleway_600SemiBold",
+                fontSize: 20,
+                color: 'black',
+                borderTopWidth: 5,
+                borderTopColor: '#663399',              
+                paddingTop: 5,
+                borderRadius: 3
+            }}
+            >Choose Image</Text>
+        </View>
+        </>
+    )
+    function renderContent() {
+        return(
+        <View
+        style={{
+            backgroundColor: '#fff',
+            height:300
+        }}
+        >
+        <TouchableOpacity onPress={()=>selectImage()} style={[styles.cameraIconWrapper,{borderRadius:0}]}>
+            <Image style={styles.cameraIcon} source={require('../../assets/gallery.png')}/><Text style={styles.loginText}>Select Image</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={()=>openCamera()} style={[styles.cameraIconWrapper,{borderRadius:0}]}>
+            <Image style={styles.cameraIcon} source={require('../../assets/camera.png')}/><Text style={styles.loginText}>Open Camera</Text>
+        </TouchableOpacity>
+        </View>
+        )
+    }
 
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+
+    <BottomSheet
+        ref={sheetRef}
+        snapPoints={[300, 0]}
+        borderRadius={10}
+        initialSnap={1}
+        enabledContentTapInteraction={false}
+        renderHeader={renderHeader}
+        renderContent={renderContent}
+        callbackNode={fill}
+    />
 
 
 {loading?(
@@ -56,38 +219,68 @@ export default function Closet(props) {
     <ActivityIndicator size={'large'} color='#663399'/>
 </View>
 ):(
+    <Animated.View  style={[styles.container,{
+            opacity: Animated.add(0.3, Animated.multiply(fill, 1.0))
+        }]}>
+
        <ScrollView style={[bbstyles.scrollHeight]}>
        <View style={{paddingHorizontal:20}}>
        <View style={styles.header}>
 
 
+{imageUploading?(
+    <TouchableOpacity style={styles.imageWrapper}>
+    <ActivityIndicator size={'large'} color='#663399'/>
+    </TouchableOpacity>
+): decode._id==user._id ?(
+<TouchableOpacity style={styles.imageWrapper} onPress={()=>sheetRef.current.snapTo(0)}>
+<Image source ={{uri: imageLink+user.image}} style={styles.image}></Image>
+</TouchableOpacity>
+):(
+    <TouchableOpacity style={styles.imageWrapper}>
+<Image source ={{uri: imageLink+user.image}} style={styles.image}></Image>
+</TouchableOpacity>
+)}
 
-<View style={styles.imageWrapper}>
-<Image source ={require('../../assets/Saly-11.png')} style={styles.image}></Image>
-</View>
 <View style={styles.records}>
 <View style={styles.recordContainer}>
-<Text style={styles.recordCount}>10,000</Text>
-<Text style={styles.recordTitle}>Posts</Text>
+<Text style={styles.recordCount}>{numberWithCommas(products.length)}</Text>
+<Text style={styles.recordTitle}>Products</Text>
 </View>
 <View style={styles.recordContainer}>
-<Text style={styles.recordCount}>5,000</Text>
-<Text style={styles.recordTitle}>Posts</Text>
+<Text style={styles.recordCount}>{numberWithCommas(sales.length)}</Text>
+<Text style={styles.recordTitle}>Sales</Text>
 </View>
 
 <View style={styles.recordContainer}>
-<Text style={styles.recordCount}>3,00</Text>
-<Text style={styles.recordTitle}>Posts</Text>
+<Text style={styles.recordCount}>{numberWithCommas(300)}</Text>
+<Text style={styles.recordTitle}>Followers</Text>
 </View>
 </View>
 
             </View>
             <Text style={styles.userName}>{user.name}</Text>
-<Text style={styles.desc}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt #hashtag</Text>
+<Text style={styles.desc}>{user.description}</Text>
 
-<TouchableOpacity style={styles.loginBtn}>
-            <Text style={styles.login}>Follow</Text>
-            </TouchableOpacity>
+{followSubmit?(
+    <TouchableOpacity style={styles.loginBtn}>
+        <ActivityIndicator size={'small'} color='white' />
+</TouchableOpacity>
+):(
+    decode._id==user._id ?(
+        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>navigation.navigate('Profile')}>
+            <Text style={[styles.login,{color:'black'}]}>Edit Profile</Text><EvilIcons name='user' size={20} color={'black'}/>
+        </TouchableOpacity>
+    ):!isFollowing?(
+<TouchableOpacity style={styles.loginBtn} onPress={()=>followUser()}>
+            <Text style={styles.login}>Follow</Text><SimpleLineIcons name='user-follow' size={14} color={'white'}/>
+</TouchableOpacity>
+    ):(
+        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>unFollowUser()}>
+            <Text style={[styles.login,{color:'black'}]}>Following</Text><SimpleLineIcons name='user-following' size={14} color={'black'}/>
+        </TouchableOpacity>
+    )
+)}
             </View>
 
 
@@ -96,10 +289,10 @@ export default function Closet(props) {
 </View>
 <View style={styles.closetView}>
     <View style={styles.closetTab}>
-        <TouchableWithoutFeedback onPress={()=>setActiveTab('listing')}>
+        <TouchableWithoutFeedback onPress={()=>toggleTab('listing')}>
             <Text style={activeTab=="listing" ? styles.listingActive : styles.listing}>Listing</Text>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={()=>setActiveTab('sold')}>
+        <TouchableWithoutFeedback onPress={()=>toggleTab('sold')}>
             <Text style={activeTab=="sold" ? styles.listingActive : styles.listing}>Sold</Text>
         </TouchableWithoutFeedback>
     </View>
@@ -107,16 +300,25 @@ export default function Closet(props) {
 
 
 <View style={styles.productWrapper}>
-{products.map(product=>{
+{activeTab=="listing" ?(
+products.map(product=>{
     return(
         <View style={styles.productImage} key={product._id}>
     <Image source={{uri:imageLink+product.image}} style={styles.closetImage}></Image>
     </View>
     )
-})}
-
-
-
+})
+):(
+    sales.map(sale=>{
+        return(
+            sale.product_id?(
+                <View style={styles.productImage} key={sale._id}>
+                    <Image source={{uri:imageLink+sale.product_id.image}} style={styles.closetImage}></Image>
+                </View>
+            ):(null)
+        )
+    })
+)}
 </View>
 
 
@@ -124,20 +326,56 @@ export default function Closet(props) {
 
 
         </ScrollView>
+            </Animated.View>
+
 )}
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
+    cameraContainer:{
+      padding:25,
+        borderColor:'#C4C4C4BF',
+        borderWidth:0.5
+    },
+    cameraIcon:{
+        height:30,
+        width:30,
+    },
+    cameraIconWrapper: {
+    paddingVertical:10,
+    paddingHorizontal:10,
+    width:Dimensions.get('window').width-60,
+    backgroundColor:'#663399',
+    borderRadius:10,
+    marginTop:20,
+    marginBottom:20,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+    },
+    loginText:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
+    marginLeft: 5
+    },
     loginBtn:{
-
         paddingVertical:8,
         paddingHorizontal:50,
         backgroundColor:'#663399',
         borderRadius:5,
         marginTop:20,
-        marginBottom:30
+        marginBottom:30,
+        borderWidth:1,
+        borderColor: '#663399',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
        },
        login:{
         textAlign:'center',
@@ -145,6 +383,7 @@ const styles = StyleSheet.create({
         fontWeight:'700',
         fontSize:15,
         color:'white',
+        marginRight: 10
        },
        header:{
            flexDirection:'row',
@@ -166,7 +405,9 @@ const styles = StyleSheet.create({
            borderRadius:40,
            marginRight:30,
            borderWidth:2,
-           borderColor:'#663399'
+           borderColor:'#663399',
+           alignItems: 'center',
+           justifyContent: 'center'
        },
        records:{
            flexDirection:'row',

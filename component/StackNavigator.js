@@ -345,6 +345,22 @@ function profileNavigation({navigation}){
             headerTitleAlign: 'center',
             headerShadowVisible: false,
           }} name="Profile" component={Profile}/>
+          <Stack.Screen name="Change Password" options={{
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerShown:true,
+            headerStyle:{
+              backgroundColor:'#663399',
+              color:'white'
+            },
+            headerTintColor:'white',
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+              color:'white'
+            } 
+          }}
+           component={ChangePassword}/>
 
         <Stack.Screen name="Order History"options={{
             headerStyle:{
@@ -418,10 +434,25 @@ function profileNavigation({navigation}){
               fontSize:18,
               fontWeight:'700',
             } 
-          }} component={OrderDetail}/>   
+          }} component={OrderDetail}/>
+             
+          <Stack.Screen options={{
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerShown:true,
+            headerStyle:{
+              backgroundColor:'#663399',
+              color:'white'
+            },
+            headerTintColor:'white',
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+              color:'white'
+            } 
+              }} name="Track Order" component={OrderTrack}/>
         
         <Stack.Screen name="Redeem" options={{
-           headerShown: false,
             headerTitleAlign: 'center',
             headerShadowVisible: false,
             headerShown:true,

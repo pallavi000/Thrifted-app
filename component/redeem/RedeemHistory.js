@@ -1,12 +1,14 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
+import { StyleSheet,ActivityIndicator, Text, View, SafeAreaView, ScrollView } from 'react-native'
 import React,{useState,useEffect, useContext} from 'react'
 import {Feather, MaterialCommunityIcons, Ionicons} from '@expo/vector-icons'
 import { Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import axios from 'axios'
 import { AuthContext } from '../Context'
+import bbstyles from '../Styles'
 
 export default function RedeemHistory() {
     const[payments,setPayments] = useState([]) 
+    const[loader,setLoader] = useState(true)
 
     const data = useContext(AuthContext)
     const {token} = data
@@ -37,8 +39,8 @@ function timeConvert(requestTime){
 async function getHistory(){
     try {
         var response = await axios.get('/user/withdraw/all',config)
-        console.log(response.data)
         setPayments(response.data)
+        setLoader(false)
     } catch (error) {
         console.log(error.request.response)
     }
@@ -46,12 +48,17 @@ async function getHistory(){
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    {loader?(
+<View style={bbstyles.loaderContainer}>
+    <ActivityIndicator size={'large'} color='#663399'/>
+</View>
+):(
     <ScrollView>
         <View style={styles.container}>
         {payments.map(payment=>{
             return(
                 payment.status== 'pending'?(
-                    <View style={styles.pendingCard}>
+                <View style={styles.pendingCard} key={payment._id}>
                 <View>
                     <Text styles={styles.title}>{payment.payment_method} . {payment.account_detail}</Text>
                             <View style={styles.row}>
@@ -65,7 +72,7 @@ async function getHistory(){
                 </View>
            </View>
                 ):payment.status=='completed'?(
-                    <View style={styles.successCard}>
+                    <View style={styles.successCard} key={payment._id}>
                 <View>
                     <Text styles={styles.title}>Esewa . 9845534234</Text>
                             <View style={styles.row}>
@@ -79,7 +86,7 @@ async function getHistory(){
                 </View>
          </View>
                 ):(
-                    <View style={styles.cancelledCard}>
+                    <View style={styles.cancelledCard} key={payment._id}>
                 <View>
                     <Text styles={styles.title}>Esewa . 9845534234</Text>
                             <View style={styles.row}>
@@ -104,6 +111,7 @@ async function getHistory(){
 
             </View>
     </ScrollView>
+)}
     </SafeAreaView>
   )
 }

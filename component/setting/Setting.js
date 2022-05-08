@@ -1,31 +1,46 @@
-import { StyleSheet, Text, View,SafeAreaView,ScrollView, TouchableOpacity, Switch } from 'react-native'
+import { StyleSheet, Text, View,SafeAreaView,ScrollView, TouchableOpacity, Switch, ActivityIndicator } from 'react-native'
 import React,{useContext,useState,useLayoutEffect} from 'react'
 import {MaterialCommunityIcons,MaterialIcons,Feather,Ionicons,FontAwesome} from '@expo/vector-icons'
 import { Raleway_700Bold } from '@expo-google-fonts/raleway'
 import { AuthContext } from '../Context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import axios from 'axios'
 
 export default function Setting({navigation}) {
 const data = useContext(AuthContext)
-const {decode} = data
+const {decode, token} = data
 const[sales,setSales] = useState(false)
 const[newArrival,setNewArrival] = useState(false)
 const[dsc,setDsc] = useState(false)
+const [user, setUser] = useState()
+
+const config = {
+    headers: {
+        'access-token':token
+    }
+} 
 
 
 async function setSwitch(){
     var notifications = await AsyncStorage.getItem('notifications')
     if(notifications){
        notifications =  JSON.parse(notifications)
-       console.log(notifications)
        setSales(notifications.sales)
        setNewArrival(notifications.newArrival)
        setDsc(notifications.dsc)
     }
+}
 
+async function getCurrentUser() {
+    try {
+        const response = await axios.get('/user/currentuser',config)
+        setUser(response.data.user)
+    } catch (error) {   
+    }
 }
 
 useLayoutEffect(()=>{
+    getCurrentUser()
 setSwitch()
 },[])
 
@@ -107,7 +122,11 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                     <Text style={styles.pageName}>My Balance</Text>
                 </View>
                 <View style={{flexDirection:'row', alignItems:'center'}}>
-                    <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
+                {user ?(
+                    <Text>रु {user.balance}</Text>
+                ):(
+                    <ActivityIndicator size={'small'} color='#fa4a0c' />
+                )}
                 </View>  
                 </View>
 
@@ -119,7 +138,11 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                         <Text style={styles.pageName}>Pending Balance</Text>
                         </View>
                         <View style={{flexDirection:'row'}}>
-                        <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
+                        {user ?(
+                            <Text>रु 0</Text>
+                        ):(
+                            <ActivityIndicator size={'small'} color='#fa4a0c' />
+                        )}
                     </View>
                 </View>
 

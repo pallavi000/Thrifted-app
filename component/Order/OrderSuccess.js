@@ -11,12 +11,9 @@ export default function OrderSuccess({navigation}) {
        <Text style={styles.title}>Congratulations !!!</Text>
        <Text style={styles.subtitle}>Your order have been taken and is being attended to</Text>
        </View>
-       <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Track Order')} >
-            <Text style={styles.login}>Start Ordering</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.continueBtn} onPress={()=>navigation.navigate('Checkout')} >
+          <TouchableOpacity style={styles.continueBtn} onPress={()=>navigation.navigate('Cart Items')} >
             <Text style={styles.continue}>Continue Shopping</Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
 
        </View>
        </ScrollView>

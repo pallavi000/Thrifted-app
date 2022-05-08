@@ -1,14 +1,21 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView, TouchableOpacity} from 'react-native'
+import { StyleSheet, Text, View ,SafeAreaView,ScrollView, TouchableOpacity, Dimensions, ActivityIndicator} from 'react-native'
 import React,{useContext,useState,useEffect} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import { AuthContext } from '../Context'
 import axios from 'axios'
+import bbstyles from '../Styles'
+import OrderHistory from './OrderHistory'
 
 export default function MyOrder({navigation}) {
 
     const[items,setItems] = useState([])
     const data = useContext(AuthContext)
     const {token} = data
+    const[loader, setLoader] = useState(true)
+    const [tab,setTab] = useState('delivered')
+    const[delivered,setDelivered] = useState([])
+    const[processing, setProcessing] = useState([])
+    const[cancelled, setCancelled] = useState([])
 
     const config = {
         headers: {
@@ -21,13 +28,14 @@ export default function MyOrder({navigation}) {
     },[])
 
     async function getOrder(){
-    try {
-        var response = await axios.get('/order/transaction',config)
-        console.log(response.data)
-        setItems(response.data)
-    } catch (error) {
-        console.log(error.request.response)
-    }
+        try {
+            var response = await axios.get('/order/transaction',config)
+            setItems(response.data)
+            setDelivered(response.data)
+            setLoader(false)
+        } catch (error) {
+            console.log(error.request.response)
+        }
     }
 
     function changeDate(createdAt){
@@ -42,38 +50,56 @@ export default function MyOrder({navigation}) {
        return total
     }
 
+    function toggleTab(action) {
+        setTab(action)
+        if(action=="delivered") {
+            setItems(delivered)
+        } else if(action=="processing") {
+            setItems(processing)
+        } else {
+            setItems(cancelled)
+        }
+    }
 
     
 
 
   return (
-    <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    {loader?(
+        <View style={bbstyles.loaderContainer}>
+            <ActivityIndicator size={'large'} color='#663399'/>
+        </View>
+    ):delivered.length==0 && processing.length==0 && cancelled.length==0 ?(
+        <OrderHistory
+            navigation={navigation}
+        />
+    ):(
     <ScrollView >
     <View style={styles.container}>
     <Text style={styles.title}>My Orders</Text>
     <View style={[styles.row, {marginBottom:30}]}>
-        <View>
-            <Text  style={styles.processActive}>Delivered</Text>
-        </View>
-        <View>
-            <Text style={styles.process}>Processing</Text>
-        </View>
-        <View>
-            <Text  style={styles.process}>Cancelled</Text>
-        </View>
+        <TouchableOpacity onPress={()=>toggleTab('delivered')}>
+            <Text  style={tab=="delivered" ? styles.processActive : styles.process}>Delivered</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={()=>toggleTab('processing')}>
+            <Text style={tab=="processing" ? styles.processActive : styles.process}>Processing</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={()=>toggleTab('cancelled')}>
+            <Text  style={tab=="cancelled" ? styles.processActive : styles.process}>Cancelled</Text>
+        </TouchableOpacity>
     </View>
     {items.map(item=>{
         return(
-            <>
             <View style={styles.addressCard} key={item._id}>
             <View style={styles.row}>
-                <Text style={styles.orderNo}>Order No : {item._id}</Text>
+                <Text style={styles.orderNo} numberOfLines={1}>Order No: {item._id}</Text>
                 <Text style={styles.orderDate}>{changeDate(item.createdAt)}</Text>
             </View>
         <View style={styles.itemDetail}>
             <View>
                 <View style={styles.dFlex}>
-                <Text style={styles.orderDate}>Tracking number:</Text><Text style={styles.itemValue}>{item.transaction_id}</Text>
+                <Text style={styles.orderDate}>Tracking number:</Text><Text style={styles.transaction} numberOfLines={1}> {item.transaction_id}</Text>
                 </View>  
             </View>
             <View style={styles.row}>
@@ -92,7 +118,6 @@ export default function MyOrder({navigation}) {
             <Text style={styles.delivered}>Delivered</Text>
         </View>
     </View>
-            </>
         )
     })}
     
@@ -100,6 +125,7 @@ export default function MyOrder({navigation}) {
     
     </View>
     </ScrollView>
+    )}
     </SafeAreaView>
   )
 }
@@ -153,6 +179,7 @@ const styles = StyleSheet.create({
         fontSize:14,
         fontWeight:'400',
         fontFamily:'Raleway_400Regular',
+        color: 'black'
     },
     dFlex:{
         flexDirection:'row',
@@ -167,7 +194,8 @@ const styles = StyleSheet.create({
         fontSize:16,
         fontWeight:'600',
         fontFamily:'Raleway_600SemiBold',
-        marginRight:10
+        marginRight:10,
+        width: (Dimensions.get('window').width-40)*0.65
     },
     orderDate:{
         fontSize:14,
@@ -196,8 +224,13 @@ const styles = StyleSheet.create({
     itemValue:{
         fontSize:14,
         fontWeight:'500',
-        fontFamily:'Raleway_500Medium'
+        fontFamily:'Raleway_500Medium',
+    },
+    transaction: {
+        fontSize:14,
+        fontWeight:'500',
+        fontFamily:'Raleway_500Medium',
+        width: (Dimensions.get('window').width-40)/2
     }
-
     
 })

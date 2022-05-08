@@ -34,7 +34,6 @@ useEffect(() => {
     })
 
     axios.get('/user/currentuser',config).then(response=>{
-        console.log(response.data)
         setUser(response.data.user)
     })
 }, [])

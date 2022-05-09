@@ -1,25 +1,18 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView ,FlatList,Image ,TextInput,TouchableOpacity } from 'react-native'
 import React, { useEffect,useContext,useState } from 'react'
 import {Ionicons} from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
 import axios from 'axios'
-import { AuthContext } from '../Context'
-import { FlatList } from 'react-native-gesture-handler'
 import { imageLink } from '../ImageLink'
+import { AuthContext } from '../Context'
 
-export default function Messages({navigation}) {
 
-    navigation.setOptions({
-        headerRight:()=>(
-            <TouchableOpacity onPress={()=>navigation.navigate('New Chat')}>
-            <Ionicons name='add' size={20}></Ionicons>
-            </TouchableOpacity>
-        )
-    })
+
+export default function NewChat({navigation}) {
+    const[users,setUsers] = useState([])
 
     const data = useContext(AuthContext)
-    const {token,decode} = data
-    const[chats,setChats]= useState([])
+    const {token} = data
 
     const config = {
         headers: {
@@ -28,34 +21,36 @@ export default function Messages({navigation}) {
       } 
 
 useEffect(()=>{
-    getMessage()
+    getUser()
 },[])
 
-async function getMessage(){
+async function getUser(){
     try {
-        const response = await axios.get('/chat/conversation',config)
-        console.log(response)
-        setChats(response.data)
+        const response = await axios.get('/user/userall')
+        console.log(response.data)
+        setUsers(response.data)
     } catch (error) {
         console.log(error.request.response)
     }
 }
 
-
-async function startChat(conversation){
-   if(decode._id == conversation.sender_id._id){
-    const receiver = {
-        user: conversation.receiver_id,
-        conversation: conversation
+async function startChat(user){
+    try {
+        const data = {
+            receiver_id:user._id,
+        }
+    
+        const response = await axios.post('/chat/newchat',data,config)
+        const receiver = {
+            user,
+            conversation: response.data
+        }
+        navigation.navigate('chat',receiver)
+        console.log(response.data)
+    } catch (error) {
+        console.log(error.request.response)
+        
     }
-    navigation.navigate('chat',receiver)
-   }else{
-    const receiver = {
-        user: conversation.sender_id,
-        conversation: conversation
-    }
-    navigation.navigate('chat',receiver)
-   }
     
 }
 
@@ -71,17 +66,17 @@ async function startChat(conversation){
                 placeholder="Search"
                 ></TextInput>
             </View>
-            <FlatList data={chats}
+            <FlatList data={users}
             keyExtractor= {item=>item._id}
             renderItem={({item})=>(
             <TouchableOpacity style={[styles.dFlex, styles.marginTop]} onPress={()=>startChat(item)}>
                 <View style={styles.userWrapper}>
                     <View style={styles.ImageWrapper}>
-                        <Image source={{uri:imageLink+decode._id==item.sender_id._id?item.receiver_id.image:item.sender_id.image}} style={styles.image}></Image>
+                        <Image source={{uri:imageLink+ item.image }} style={styles.image}></Image>
                     </View>
                     <View style={styles.userDetailwrpper}>
-                        <Text style={styles.name}>{decode._id==item.sender_id._id?item.receiver_id.name:item.sender_id.name}</Text>
-                        <Text style={styles.userMessage}>Hi, I'm pallavi</Text>
+                        <Text style={styles.name}>{item.name}</Text>
+                        <Text style={styles.userMessage}>Hi, I'm {item.name}</Text>
                     </View>
                 </View>
                 <View style={styles.statusWrapper}>
@@ -182,5 +177,4 @@ const styles = StyleSheet.create({
         borderRadius:5,
         backgroundColor:'#FF2424' 
     }
-
 })

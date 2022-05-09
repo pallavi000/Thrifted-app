@@ -3,7 +3,7 @@ import React,{useState,useEffect,useLayoutEffect} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import {Fontisto} from '@expo/vector-icons'
 import BrandFilter from './BrandFilter'
-import MultiSlider from '@ptomasroos/react-native-multi-slider'
+// import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 export default function Filter(props) {
     const[showBrand,setShowBrand] = useState(false)
@@ -74,7 +74,7 @@ export default function Filter(props) {
         <View style={styles.container}>
             <View style={styles.filterSection}>
                 <Text style={styles.title}>Price Range</Text>
-                <MultiSlider
+                {/* <MultiSlider
                     values={[minprice[0],maxprice[0]]}
                     min={0}
                     max={20000}
@@ -85,7 +85,7 @@ export default function Filter(props) {
                     trackStyle={{height:4}}
                     onValuesChangeFinish={(values)=>priceFilter(values)}
                     onValuesChange={(values)=>priceFilter(values)}
-                />
+                /> */}
                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                     <Text style={styles.priceShow}>Rs. {minprice[0]}</Text>
                     <Text style={styles.priceShow}>Rs. {maxprice[0]}</Text>

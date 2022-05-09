@@ -37,6 +37,7 @@ import Messages from './message/Messages'
 import Chat from './message/Chat'
 import EditShipping from './address/EditShipping'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
+import NewChat from './message/NewChat'
 
 const Stack = createNativeStackNavigator()
 
@@ -63,6 +64,20 @@ function homeNavigation() {
                   fontWeight:'700',
                 } 
               }} component={Messages}/>
+
+<Stack.Screen name="New Chat" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={NewChat}/>
+
               
               <Stack.Screen options={{
             headerShown:false,
@@ -97,7 +112,7 @@ function homeNavigation() {
                 } 
               }} component={Setting}/>        
 
-        <Stack.Screen name="Pallavi" options={{
+        <Stack.Screen name="chat" options={{
                 headerStyle:{
                   backgroundColor:'#fff',
                   borderWidth:0,

@@ -4,7 +4,7 @@ import axios from 'axios'
 import {Ionicons,Feather } from '@expo/vector-icons'
 import bbstyles from '../Styles'
 import { imageLink } from '../ImageLink'
-import { SliderBox } from "react-native-image-slider-box";
+// import { SliderBox } from "react-native-image-slider-box";
 import { AuthContext } from '../Context'
 import { useIsFocused } from '@react-navigation/native'
 
@@ -156,13 +156,13 @@ export default function Home({navigation}) {
             <View style={styles.product}>
                 {/* <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image> */}
 
-                <SliderBox
+                {/* <SliderBox
                 images={parseImages(item.image, item.feature_image)}
                 ImageComponentStyle	= {styles.productImage}
                 dotColor="#663399"
                 imageLoadingColor="#663399"
                 onCurrentImagePressed={()=>navigation.navigate('Product Detail',item)}
-                />
+                /> */}
                 <View style={styles.productreview}>
                 <View>
                     <Image source={require('../../assets/icons/Like.png')} style={styles.smallIcon}/>

@@ -1,23 +1,67 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,Image, Dimensions, TextInput} from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View ,SafeAreaView,ScrollView,Image,FlatList, Dimensions, TextInput} from 'react-native'
+import React, { useContext, useEffect,useState } from 'react'
 import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
 import {Feather, Octicons, Ionicons ,Fontisto} from '@expo/vector-icons'
+import axios from 'axios'
+import { AuthContext } from '../Context'
 
-export default function Chat() {
+
+export default function Chat({route,navigation}) {
+    const[messages,setMessages] = useState([])
+    
+    const receiver = route.params
+    navigation.setOptions({
+        title:receiver.user.name
+    })
+
+    const data = useContext(AuthContext)
+    const {token} = data
+
+    const config = {
+        headers: {
+          'access-token':token
+        }
+      } 
+
+    useEffect(()=>{
+        getMessages()
+    },[])
+
+   async function getMessages(){
+    try {
+        const response = await axios.get('/chat/message/'+receiver.conversation._id,config)
+        console.log(response.data)
+        setMessages(response.data)
+    } catch (error) {
+        console.log(error.request.response)
+    }
+    }
+
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
         <View style={styles.container}>
         <ScrollView> 
             <View style={styles.messageContainer}>
+            <FlatList data = {messages}
+            keyExtractor={(item)=>item.id}
+            renderItem={({item})=>(
+             !item.fromMe?(
                 <View style={styles.dFlex}>
                     <Image source={require('../../assets/user.png')} style={styles.image}></Image>
                     <Text style={styles.message}>Are you still travelling?</Text>
                 </View>
-
+             ):(
                 <View style={[styles.dFlex, styles.sender]}>
                 <Text style={styles.senderMessage}>Are you still travelling?</Text>
                     {/* <Image source={require('../../assets/user.png')} style={styles.image}></Image> */}
                 </View>
+             )
+            )}
+            />
+               
+
+                
             </View>
             </ScrollView>
             <View style={styles.chatWrapper}>

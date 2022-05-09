@@ -1,15 +1,18 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView ,FlatList,Image ,TextInput,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView ,FlatList,Image ,TextInput,TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useEffect,useContext,useState } from 'react'
 import {Ionicons} from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
 import axios from 'axios'
 import { imageLink } from '../ImageLink'
 import { AuthContext } from '../Context'
+import bbstyles from '../Styles'
 
 
 
 export default function NewChat({navigation}) {
     const[users,setUsers] = useState([])
+    const[loader,setLoader] = useState(true)
+    const[originalUsers, setOriginalUsers] = useState([])
 
     const data = useContext(AuthContext)
     const {token} = data
@@ -27,8 +30,9 @@ useEffect(()=>{
 async function getUser(){
     try {
         const response = await axios.get('/user/userall')
-        console.log(response.data)
         setUsers(response.data)
+        setOriginalUsers(response.data)
+        setLoader(false)
     } catch (error) {
         console.log(error.request.response)
     }
@@ -55,17 +59,33 @@ async function startChat(user){
 }
 
 
+function searchUsers(text) {
+    if(text.trim().length>0) {
+        text = text.toLowerCase().trim()
+        let filterUsers = originalUsers.filter(user=>user.name.toLowerCase().includes(text))
+        setUsers(filterUsers)
+    } else {
+        setUsers(originalUsers)
+    }
+}
+
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-    <ScrollView>
         <View style={styles.container}>
             <View style={styles.searchContainer}>
                 <Ionicons  style={styles.searchIcon} name="search" size={20} color="#979797"></Ionicons>
                 <TextInput style={styles.searchText}
                 keyboardType="default"
                 placeholder="Search"
+                onChangeText={(text)=>searchUsers(text)}
                 ></TextInput>
             </View>
+            {loader ? (
+                <View style={bbstyles.loaderContainer}>
+                    <ActivityIndicator size={'large'} color='#663399'/>
+                </View>
+            ):(
             <FlatList data={users}
             keyExtractor= {item=>item._id}
             renderItem={({item})=>(
@@ -79,17 +99,14 @@ async function startChat(user){
                         <Text style={styles.userMessage}>Hi, I'm {item.name}</Text>
                     </View>
                 </View>
-                <View style={styles.statusWrapper}>
-                    <Text style={styles.activeIndicator}></Text>
-                    <Text style={styles.activeStatus}>now</Text>
-                </View>
+                
             </TouchableOpacity>
             )}
             ></FlatList>
+            )}
         </View>
         <View >
         </View>
-        </ScrollView>
         </SafeAreaView>
   )
 }

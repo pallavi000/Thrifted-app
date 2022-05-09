@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useEffect,useContext,useState } from 'react'
 import {Ionicons} from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
@@ -6,8 +6,32 @@ import axios from 'axios'
 import { AuthContext } from '../Context'
 import { FlatList } from 'react-native-gesture-handler'
 import { imageLink } from '../ImageLink'
+import {format} from 'timeago.js'
+import { useIsFocused } from '@react-navigation/native'
+import bbstyles from '../Styles'
 
 export default function Messages({navigation}) {
+
+    const isFocused = useIsFocused()
+    const [loader, setLoader] = useState(true)
+    const data = useContext(AuthContext)
+    const {token,titleShown,setTitleShown,decode} = data
+    const[chats,setChats]= useState([])
+    const[originalChats, setOriginalChats] = useState([])
+    
+    const config = {
+        headers: {
+            'access-token':token
+        }
+    } 
+    React.useLayoutEffect(()=>{
+        if(titleShown){
+            setTitleShown({...titleShown, display:'none'})
+        }
+        return () => {
+            setTitleShown({...titleShown,display:'flex'})
+        }
+    },[navigation])
 
     navigation.setOptions({
         headerRight:()=>(
@@ -17,25 +41,16 @@ export default function Messages({navigation}) {
         )
     })
 
-    const data = useContext(AuthContext)
-    const {token,decode} = data
-    const[chats,setChats]= useState([])
-
-    const config = {
-        headers: {
-          'access-token':token
-        }
-      } 
-
 useEffect(()=>{
     getMessage()
-},[])
+},[isFocused])
 
 async function getMessage(){
     try {
         const response = await axios.get('/chat/conversation',config)
-        console.log(response)
         setChats(response.data)
+        setOriginalChats(response.data)
+        setLoader(false)
     } catch (error) {
         console.log(error.request.response)
     }
@@ -59,42 +74,65 @@ async function startChat(conversation){
     
 }
 
+function getImage(item) {
+    return decode._id==item.sender_id._id?imageLink+item.receiver_id.image:imageLink+item.sender_id.image
+}
+
+function getName(item) {
+    return decode._id==item.sender_id._id?item.receiver_id.name:item.sender_id.name
+}
+
+function searchChats(text) {
+    if(text.trim().length>0) {
+        text = text.toLowerCase().trim()
+      let filterChats = originalChats.filter(chat=>getName(chat).toLowerCase().includes(text))
+      setChats(filterChats)
+    } else {
+      setChats(originalChats)
+    }
+}
+
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-    <ScrollView>
         <View style={styles.container}>
             <View style={styles.searchContainer}>
                 <Ionicons  style={styles.searchIcon} name="search" size={20} color="#979797"></Ionicons>
                 <TextInput style={styles.searchText}
                 keyboardType="default"
                 placeholder="Search"
+                onChangeText={(text)=>searchChats(text)}
                 ></TextInput>
             </View>
+            {loader ? (
+                <View style={bbstyles.loaderContainer}>
+                    <ActivityIndicator size={'large'} color='#663399'/>
+                </View>
+            ):(
             <FlatList data={chats}
             keyExtractor= {item=>item._id}
             renderItem={({item})=>(
             <TouchableOpacity style={[styles.dFlex, styles.marginTop]} onPress={()=>startChat(item)}>
                 <View style={styles.userWrapper}>
                     <View style={styles.ImageWrapper}>
-                        <Image source={{uri:imageLink+decode._id==item.sender_id._id?item.receiver_id.image:item.sender_id.image}} style={styles.image}></Image>
+                        <Image source={{uri:getImage(item)}} style={styles.image}></Image>
                     </View>
                     <View style={styles.userDetailwrpper}>
-                        <Text style={styles.name}>{decode._id==item.sender_id._id?item.receiver_id.name:item.sender_id.name}</Text>
-                        <Text style={styles.userMessage}>Hi, I'm pallavi</Text>
+                        <Text style={styles.name}>{getName(item)}</Text>
+                        <Text style={styles.userMessage}>{item.last_message}</Text>
                     </View>
                 </View>
                 <View style={styles.statusWrapper}>
                     <Text style={styles.activeIndicator}></Text>
-                    <Text style={styles.activeStatus}>now</Text>
+                    <Text style={styles.activeStatus}>{format(item.updatedAt)}</Text>
                 </View>
             </TouchableOpacity>
             )}
             ></FlatList>
+            )}
         </View>
         <View >
         </View>
-        </ScrollView>
         </SafeAreaView>
   )
 }
@@ -164,17 +202,18 @@ const styles = StyleSheet.create({
         fontSize:12,
         fontWeight:'400',
         fontFamily: 'Raleway_400Regular',
-        color:'rgba(0, 0, 0, 0.4)'
+        color:'rgba(0, 0, 0, 0.4)',
+        marginTop: 10
     },
     statusWrapper:{
         justifyContent:'center',
-        alignItems:'center'
+        alignItems:'flex-end'
     },
     activeIndicator:{
         height:10,
         width:10,
         borderRadius:5,
-        backgroundColor:'#4CD964'
+        backgroundColor:'#4CD964',
     },
     offlineIndicator:{
         height:10,

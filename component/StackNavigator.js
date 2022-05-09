@@ -114,15 +114,23 @@ function homeNavigation() {
 
         <Stack.Screen name="chat" options={{
                 headerStyle:{
-                  backgroundColor:'#fff',
-                  borderWidth:0,
-                },
-                headerTitleAlign: 'center',
-                headerShadowVisible: false,
-                headerTitleStyle:{
-                  fontSize:18,
-                  fontWeight:'700',
-                } 
+              backgroundColor:'#fff',
+              borderWidth:0,
+              shadowColor: "#000",
+              shadowOffset:{
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: true,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            },
               }} component={Chat}/> 
               <Stack.Screen options={{
             headerStyle:{

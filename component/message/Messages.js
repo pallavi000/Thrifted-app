@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useEffect,useContext,useState } from 'react'
-import {Ionicons} from '@expo/vector-icons'
-import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
+import {FontAwesome5, Ionicons} from '@expo/vector-icons'
+import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import { FlatList } from 'react-native-gesture-handler'
@@ -34,9 +34,10 @@ export default function Messages({navigation}) {
     },[navigation])
 
     navigation.setOptions({
+        title: decode.name,
         headerRight:()=>(
             <TouchableOpacity onPress={()=>navigation.navigate('New Chat')}>
-            <Ionicons name='add' size={20}></Ionicons>
+            <FontAwesome5 name='plus' size={20}/>
             </TouchableOpacity>
         )
     })
@@ -119,11 +120,11 @@ function searchChats(text) {
                     </View>
                     <View style={styles.userDetailwrpper}>
                         <Text style={styles.name}>{getName(item)}</Text>
-                        <Text style={styles.userMessage}>{item.last_message}</Text>
+                        <Text style={item.unread_count>0?styles.userMessageBold:styles.userMessage}>{item.last_message}</Text>
                     </View>
                 </View>
                 <View style={styles.statusWrapper}>
-                    <Text style={styles.activeIndicator}></Text>
+                    {item.unread_count>0?(<Text style={styles.activeIndicator}>{item.unread_count}</Text>):(null)}
                     <Text style={styles.activeStatus}>{format(item.updatedAt)}</Text>
                 </View>
             </TouchableOpacity>
@@ -198,6 +199,10 @@ const styles = StyleSheet.create({
         fontWeight:'400',
         fontFamily:"Raleway_400Regular"
     },
+    userMessageBold: {
+        fontSize: 12,
+        fontFamily: "Raleway_600SemiBold"
+    },
     activeStatus:{
         fontSize:12,
         fontWeight:'400',
@@ -210,10 +215,15 @@ const styles = StyleSheet.create({
         alignItems:'flex-end'
     },
     activeIndicator:{
-        height:10,
-        width:10,
+        height:16,
+        width:16,
         borderRadius:5,
-        backgroundColor:'#4CD964',
+        // backgroundColor:'#4CD964',
+        backgroundColor: '#FF2424',
+        fontSize: 12,
+        color: 'white',
+        textAlign: 'center',
+        lineHeight: 16,
     },
     offlineIndicator:{
         height:10,

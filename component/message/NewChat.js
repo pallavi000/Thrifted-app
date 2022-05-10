@@ -50,9 +50,8 @@ async function startChat(user){
             conversation: response.data
         }
         navigation.navigate('chat',receiver)
-        console.log(response.data)
     } catch (error) {
-        console.log(error.request.response)
+        Alert.alert('Error', error.request.response)
         
     }
     

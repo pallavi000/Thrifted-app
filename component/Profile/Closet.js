@@ -5,8 +5,8 @@ import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold } from '@expo-
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
-import { NavigationContainer } from '@react-navigation/native'
-import { EvilIcons, FontAwesome, SimpleLineIcons } from '@expo/vector-icons'
+import { NavigationContainer, useIsFocused } from '@react-navigation/native'
+import { EvilIcons, Feather, FontAwesome, SimpleLineIcons } from '@expo/vector-icons'
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import * as imagePicker from 'expo-image-picker'
@@ -29,6 +29,8 @@ export default function Closet(props) {
     const[followSubmit, setFollowSubmit] = useState(false)
     const[isFollowing, setIsFollowing] = useState(false)
     const[imageUploading, setImageUploading] = useState(false)
+    const isFocused = useIsFocused()
+    const[messageSubmit, setMessageSubmit] = useState(false)
     
     const config = {
         headers:{
@@ -39,13 +41,18 @@ export default function Closet(props) {
     useEffect(() => {
         getProducts()
         getSales()
-    }, [props])
+    }, [isFocused])
 
     async function getProducts() {
         try {
             const response = await axios.post('/frontend/closet/'+props.route.params._id)
             setProducts(response.data.product)
             setUser(response.data.user)
+            if(response.data.user.followers.includes(decode._id)) {
+                setIsFollowing(true)
+            } else {
+                setIsFollowing(false)
+            }
             navigation.setOptions({
                 title: response.data.user.name
             })
@@ -57,7 +64,7 @@ export default function Closet(props) {
 
     async function getSales() {
         try {
-            const response = await axios.get('/order/all',config)
+            const response = await axios.get('/order/sales/get/'+props.route.params._id,config)
             setSales(response.data)            
         } catch (error) {
         }        
@@ -73,18 +80,26 @@ export default function Closet(props) {
 
     async function followUser() {
         setFollowSubmit(true)
-        setTimeout(() => {
-            setIsFollowing(true)
+        try {
+            const response = await axios.post('/user/follow/'+user._id, {}, config)
             setFollowSubmit(false)
-        }, 2000);
+            setUser(response.data)
+            setIsFollowing(true)
+        } catch (error) {
+            Alert.alert('Error', error.request.response)
+        }
     }
 
     async function doUnfollow() {
         setFollowSubmit(true)
-        setTimeout(() => {
-            setIsFollowing(false)
+        try {
+            const response = await axios.post('/user/unfollow/'+user._id, {}, config)
             setFollowSubmit(false)
-        }, 2000);
+            setUser(response.data)
+            setIsFollowing(false)
+        } catch (error) {
+            Alert.alert('Error', error.request.response)
+        }
     }
 
     function unFollowUser() {
@@ -152,6 +167,46 @@ export default function Closet(props) {
         } catch (error) {
             Alert.alert(error.request.response)
             setImageUploading(false)
+        }
+    }
+
+    function getFollowersCount() {
+        if(user.followers && user.followers.length>0) {
+            return numberWithCommas(user.followers.length)
+        }
+        return 0;
+    }
+
+    function parseBio(bio) {
+        if(!bio) return bio
+        const bioArr = bio.split(' ')
+        let parsedBio = []
+        bioArr.forEach((b, index)=>{
+            if(b.includes('#')) {
+                parsedBio.push(<Text key={index} style={{color: '#663399'}}>{b+" "}</Text>)
+            } else {
+                parsedBio.push(b+" ")
+            }
+        })
+        return parsedBio
+    }
+
+    async function sendMessage() {
+        setMessageSubmit(true)
+        try {
+            const data = {
+                receiver_id:user._id,
+            }
+        
+            const response = await axios.post('/chat/newchat',data,config)
+            const receiver = {
+                user,
+                conversation: response.data
+            }
+            setMessageSubmit(false)
+            navigation.navigate('chat',receiver)
+        } catch (error) {
+            Alert.alert('Error', error.request.response)
         }
     }
 
@@ -253,22 +308,31 @@ export default function Closet(props) {
 </View>
 
 <View style={styles.recordContainer}>
-<Text style={styles.recordCount}>{numberWithCommas(300)}</Text>
+<Text style={styles.recordCount}>{getFollowersCount()}</Text>
 <Text style={styles.recordTitle}>Followers</Text>
 </View>
 </View>
 
             </View>
             <Text style={styles.userName}>{user.name}</Text>
-<Text style={styles.desc}>{user.description}</Text>
+<Text style={styles.desc}>{parseBio(user.bio)}</Text>
 
 {followSubmit?(
     <TouchableOpacity style={styles.loginBtn}>
         <ActivityIndicator size={'small'} color='white' />
 </TouchableOpacity>
+):messageSubmit?(
+    <View style={{flexDirection: 'row', alignItems:'center'}}>
+        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]}>
+            <Text style={[styles.login,{color:'black'}]}>Following</Text><SimpleLineIcons name='user-following' size={14} color={'black'}/>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]}>
+            <Text style={[styles.login,{color:'black'}]}>Message</Text><ActivityIndicator size={14} color='#663399' />
+        </TouchableOpacity>
+    </View>
 ):(
     decode._id==user._id ?(
-        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>navigation.navigate('Profile')}>
+        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>navigation.navigate('Edit Profile', user)}>
             <Text style={[styles.login,{color:'black'}]}>Edit Profile</Text><EvilIcons name='user' size={20} color={'black'}/>
         </TouchableOpacity>
     ):!isFollowing?(
@@ -276,9 +340,14 @@ export default function Closet(props) {
             <Text style={styles.login}>Follow</Text><SimpleLineIcons name='user-follow' size={14} color={'white'}/>
 </TouchableOpacity>
     ):(
+        <View style={{flexDirection: 'row', alignItems:'center'}}>
         <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>unFollowUser()}>
             <Text style={[styles.login,{color:'black'}]}>Following</Text><SimpleLineIcons name='user-following' size={14} color={'black'}/>
         </TouchableOpacity>
+        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>sendMessage()}>
+            <Text style={[styles.login,{color:'black'}]}>Message</Text><Feather name='message-square' size={14} color={'black'}/>
+        </TouchableOpacity>
+        </View>
     )
 )}
             </View>
@@ -366,7 +435,6 @@ const styles = StyleSheet.create({
     },
     loginBtn:{
         paddingVertical:8,
-        paddingHorizontal:50,
         backgroundColor:'#663399',
         borderRadius:5,
         marginTop:20,
@@ -375,7 +443,9 @@ const styles = StyleSheet.create({
         borderColor: '#663399',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginHorizontal: 5,
+        flexGrow: 1
        },
        login:{
         textAlign:'center',

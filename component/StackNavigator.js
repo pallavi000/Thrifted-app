@@ -38,6 +38,7 @@ import Chat from './message/Chat'
 import EditShipping from './address/EditShipping'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import NewChat from './message/NewChat'
+import ChangeProfile from './Profile/ChangeProfile'
 
 const Stack = createNativeStackNavigator()
 
@@ -368,6 +369,7 @@ function profileNavigation({navigation}){
             headerTitleAlign: 'center',
             headerShadowVisible: false,
           }} name="Profile" component={Profile}/>
+
           <Stack.Screen name="Change Password" options={{
             headerTitleAlign: 'center',
             headerShadowVisible: false,
@@ -406,6 +408,19 @@ function profileNavigation({navigation}){
                   fontWeight:'700',
                 } 
               }} component={Shipping}/> 
+
+            <Stack.Screen name="Edit Profile" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={ChangeProfile}/>
 
             <Stack.Screen name="Add Address" options={{
                 headerStyle:{

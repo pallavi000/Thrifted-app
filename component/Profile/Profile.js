@@ -6,10 +6,12 @@ import { AuthContext } from '../Context'
 import axios from 'axios'
 import bbstyles from '../Styles'
 import { imageLink } from '../ImageLink'
+import { useIsFocused } from '@react-navigation/native'
 
 export default function Profile({navigation}) {
     const[user,setUser] = useState()
     const[loader,setLoader] = useState(true)
+    const isFocused = useIsFocused()
     const data = useContext(AuthContext)
     const {token} = data
     const config = {
@@ -24,7 +26,7 @@ export default function Profile({navigation}) {
         }).catch(err=>{
             
         })
-    }, [])
+    }, [isFocused])
     
   return (
 <SafeAreaView style={{backgroundColor:'white',flex:1}} >
@@ -55,6 +57,13 @@ export default function Profile({navigation}) {
             </View>
            
             </View> */}
+
+            <TouchableOpacity style={styles.card} onPress={()=>navigation.navigate('Edit Profile', user)}>
+            <View style={styles.titleWrapper}>
+            <Text style={styles.userName}>Edit Profile</Text>
+            <FontAwesome5 name="angle-right" size={20}></FontAwesome5>
+            </View>
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.card} onPress={()=>navigation.navigate('Change Password')}>
             <View style={styles.titleWrapper}>

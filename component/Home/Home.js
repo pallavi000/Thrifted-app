@@ -7,6 +7,7 @@ import { imageLink } from '../ImageLink'
 // import { SliderBox } from "react-native-image-slider-box";
 import { AuthContext } from '../Context'
 import { useIsFocused } from '@react-navigation/native'
+import { Raleway_500Medium } from '@expo-google-fonts/raleway'
 
 export default function Home({navigation}) {
 
@@ -20,9 +21,15 @@ export default function Home({navigation}) {
     const[itemsCountPerPage,setItemsCountPerPage]= useState(10)
     const[loader,setLoader] = useState(true)
     const[nextPage,setNextPage] = useState(true)
+    const data = useContext(AuthContext)
+    const {unreadMessage, setUnreadMessage, token} = data
+    const config = {
+        headers: {
+            'access-token':token
+        }
+    } 
 
     async function getProducts(currentPage, countPerPage, productOnly) {
-        console.log('called')
         const data = {
             activePage: currentPage,
             itemsCountPerPage: countPerPage,
@@ -49,7 +56,6 @@ export default function Home({navigation}) {
     }
 
     function GetNextPage() {
-        console.log('next page')
         setActivePage(activePage + 1);
         if (!nextPage) {
             setNextPage(true)
@@ -57,8 +63,17 @@ export default function Home({navigation}) {
         }
     }
 
+    async function getUnreadMessageCount() {
+        try {
+            const response = await axios.get('/chat/message/unread-count', config)
+            setUnreadMessage(response.data)
+        } catch (error) {
+        }
+    }
+
     useEffect(() => {
         getProducts(activePage, itemsCountPerPage, false)
+        getUnreadMessageCount()
     }, [])
 
     function onRefresh() {
@@ -105,7 +120,7 @@ export default function Home({navigation}) {
                     <Image source={require('../../assets/icons/Like.png')} style={styles.icon}/>
                 </View>
                 <TouchableOpacity onPress={()=>navigation.navigate('Messages')} style={styles.icons}>
-                    <Image source={require('../../assets/icons/Messenger.png')} style={styles.icon}/>
+                    <Image source={require('../../assets/icons/Messenger.png')} style={styles.icon}/>{unreadMessage>0?(<Text style={styles.unreadMessage}>{unreadMessage}</Text>):(null)}
                 </TouchableOpacity>
             </View>
         </View>
@@ -221,7 +236,22 @@ const styles = StyleSheet.create({
         alignItems:'center',
     },
     icons:{
-        marginRight:10
+        marginRight:10,
+        position: 'relative'
+    },
+    unreadMessage: {
+        position: 'absolute',
+        top: 0,
+        right: -6,
+        backgroundColor: '#FF2424',
+        color: 'white',
+        height: 20,
+        width: 20,
+        fontSize: 10,
+        borderRadius: 10,
+        textAlign: 'center',
+        lineHeight: 20,
+        fontWeight: '600'
     },
     wrapper:{
         flexDirection:'row',

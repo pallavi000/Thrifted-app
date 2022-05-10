@@ -34,6 +34,7 @@ export default function App(props) {
   const[cartItems,setCartItems] = useState([])
   const[subtotal,setSubtotal] = useState([])
   const[loadingComplete, setLoadingComplete] = useState(false)
+  const[unreadMessage, setUnreadMessage] = useState(0)
   
   const[titleShown,setTitleShown] = useState(
     {
@@ -85,7 +86,7 @@ export default function App(props) {
   return (
     <>
       <NavigationContainer>
-      <AuthContext.Provider value={{isLoggedIn,getToken,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown}}>
+      <AuthContext.Provider value={{isLoggedIn,getToken,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage}}>
       {isLoggedIn ?( 
         
         <Tab.Navigator  screenOptions={{

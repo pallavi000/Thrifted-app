@@ -1,5 +1,5 @@
 import React,{useContext, useEffect,useState} from 'react'
-import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl, View,ScrollView, FlatList, ActivityIndicator } from 'react-native'
+import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl,TextInput, View,ScrollView, FlatList, ActivityIndicator } from 'react-native'
 import axios from 'axios'
 import {Ionicons,Feather } from '@expo/vector-icons'
 import bbstyles from '../Styles'
@@ -8,6 +8,7 @@ import { imageLink } from '../ImageLink'
 import { AuthContext } from '../Context'
 import { useIsFocused } from '@react-navigation/native'
 import { Raleway_500Medium } from '@expo-google-fonts/raleway'
+import Action from './Action'
 
 export default function Home({navigation}) {
 
@@ -21,6 +22,7 @@ export default function Home({navigation}) {
     const[itemsCountPerPage,setItemsCountPerPage]= useState(10)
     const[loader,setLoader] = useState(true)
     const[nextPage,setNextPage] = useState(true)
+    const[comment,setComment] = useState('')
     const data = useContext(AuthContext)
     const {unreadMessage, setUnreadMessage, token} = data
     const config = {
@@ -162,43 +164,9 @@ export default function Home({navigation}) {
 
         {products.map(item=>{
             return(
-                <TouchableOpacity key={item._id}  onPress={()=>navigation.navigate('Product Detail',item)}>
-          <View style={styles.productWrapper} key={item._id}>
-            <TouchableOpacity onPress={()=>navigation.navigate('My Closet',item.seller_id)} style={styles.userWrapper}>
-               <Image style={styles.userimage} source={{uri:imageLink+item.seller_id?.image}}></Image> 
-               <Text style={styles.username}>{item.seller_id?.name}</Text>   
-            </TouchableOpacity>
-            <View style={styles.product}>
-                {/* <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image> */}
-
-                {/* <SliderBox
-                images={parseImages(item.image, item.feature_image)}
-                ImageComponentStyle	= {styles.productImage}
-                dotColor="#663399"
-                imageLoadingColor="#663399"
-                onCurrentImagePressed={()=>navigation.navigate('Product Detail',item)}
-                /> */}
-                <View style={styles.productreview}>
-                <View>
-                    <Image source={require('../../assets/icons/Like.png')} style={styles.smallIcon}/>
-                </View>
-                <View>
-                <Image source={require('../../assets/icons/Shop.png')} style={styles.smallIcon}/>
-                </View>
-                <View>
-                <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
-                </View>
-                </View>
-                <View style={styles.typeWrapper}> 
-                    <View><Text style={styles.productname} numberOfLines={1}>{item.name}</Text></View> 
-                    <View><Text style={styles.type}>{item.type}</Text></View> 
-                </View>
-                <View style={styles.detailWrapper}>
-                    <Text style={styles.price}>Rs. {item.price}</Text><Text>|</Text><Text style={styles.size}>Size: {item.size_id?.name}</Text><Text>|</Text><Text style={styles.brand}>{item.brand_id?.name}</Text>
-                </View>   
-            </View>
-            </View>
-            </TouchableOpacity>
+                <>
+                <Action product={item}  navigation= {navigation}/>
+                </>
             )
         })}
         

@@ -39,6 +39,7 @@ import EditShipping from './address/EditShipping'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import NewChat from './message/NewChat'
 import ChangeProfile from './Profile/ChangeProfile'
+import Comment from './Home/Comment'
 
 const Stack = createNativeStackNavigator()
 
@@ -113,7 +114,7 @@ function homeNavigation() {
                 } 
               }} component={Setting}/>        
 
-        <Stack.Screen name="chat" options={{
+          <Stack.Screen name="chat" options={{
                 headerStyle:{
               backgroundColor:'#fff',
               borderWidth:0,
@@ -133,6 +134,27 @@ function homeNavigation() {
               fontWeight:'700',
             },
               }} component={Chat}/> 
+
+    <Stack.Screen name="Comments" options={{
+                headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+              shadowColor: "#000",
+              shadowOffset:{
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: true,
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+            },
+              }} component={Comment}/> 
               <Stack.Screen options={{
             headerStyle:{
               backgroundColor:'#f5f5ff',

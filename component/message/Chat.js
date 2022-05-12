@@ -7,8 +7,7 @@ import { AuthContext } from '../Context'
 import bbstyles from '../Styles'
 import {format} from 'timeago.js'
 import { imageLink } from '../ImageLink'
-import Emoticons from 'react-native-emoticons';
-import * as emoticons from 'react-native-emoticons';
+// import Emoticons from 'react-native-emoticons';
 
 
 export default function Chat({route,navigation}) {
@@ -90,7 +89,6 @@ export default function Chat({route,navigation}) {
                 message: message,
             }
             const response = await axios.post('/chat/message/'+receiver.conversation._id, data, config)
-            console.log(response.data)
             setMessages([...messages, response.data])
         } catch (error) {
             Alert.alert('Error', error.request.response)
@@ -110,15 +108,14 @@ export default function Chat({route,navigation}) {
   return (
       
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-    <Emoticons
+    {/* <Emoticons
      onEmoticonPress={(emoji)=>setMessage(message+emoji.code)}
      onBackspacePress={()=>setShowEmoji(false)}
      show={showEmoji}
      concise={true}
      showHistoryBar={true}
      showPlusBar={false}
- />
-    
+ /> */}
     <KeyboardAvoidingView
     keyboardVerticalOffset={-500}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -130,6 +127,7 @@ export default function Chat({route,navigation}) {
                     <ActivityIndicator size={'large'} color='#663399'/>
                 </View>
             ):(
+            
             <FlatList data = {messages}
             contentContainerStyle={{padding: 10}}
             keyExtractor={(item)=>item._id}
@@ -172,7 +170,7 @@ export default function Chat({route,navigation}) {
             placeholder='Start typing...'
             ref={messageInput}
             value={message}
-            onChangeText={(text)=>setMessage(text.trim())}
+            onChangeText={(text)=>setMessage(text)}
             ></TextInput>
         </View>
         <View style={styles.messageSend}>

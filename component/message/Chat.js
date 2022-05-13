@@ -89,6 +89,7 @@ export default function Chat({route,navigation}) {
                 message: message,
             }
             const response = await axios.post('/chat/message/'+receiver.conversation._id, data, config)
+            console.log(response.data)
             setMessages([...messages, response.data])
         } catch (error) {
             Alert.alert('Error', error.request.response)
@@ -116,6 +117,7 @@ export default function Chat({route,navigation}) {
      showHistoryBar={true}
      showPlusBar={false}
  /> */}
+    
     <KeyboardAvoidingView
     keyboardVerticalOffset={-500}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -127,7 +129,6 @@ export default function Chat({route,navigation}) {
                     <ActivityIndicator size={'large'} color='#663399'/>
                 </View>
             ):(
-            
             <FlatList data = {messages}
             contentContainerStyle={{padding: 10}}
             keyExtractor={(item)=>item._id}

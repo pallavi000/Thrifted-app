@@ -48,9 +48,7 @@ useEffect(()=>{
         } catch (error) {
             console.log(error.request.response)
         }
-    }
-
-    
+    }    
 
   return (
       <>
@@ -89,17 +87,9 @@ useEffect(()=>{
                 <Image source={require('../../assets/icons/Shop.png')} style={styles.smallIcon}/>
                 </View>
                 
-                <View>
+                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',item)}>
                     <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
-                </View>
-                
-                {/* <TextInput
-                 onChangeText={(text)=>setComment(text)}
-                value={comment}
-                style={{borderWidth:1}}
-                ></TextInput>
-                <Button title="submit" onPress={()=>addComment()}></Button>
-                 */}
+                </TouchableOpacity>
                 
                 </View>
                 <View  style={styles.typeWrapper}>

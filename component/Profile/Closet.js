@@ -10,6 +10,7 @@ import { EvilIcons, Feather, FontAwesome, SimpleLineIcons } from '@expo/vector-i
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import * as imagePicker from 'expo-image-picker'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Closet(props) {
 
@@ -19,8 +20,7 @@ export default function Closet(props) {
     const[user,setUser] = useState([])
     const navigation = props.navigation
     const data = useContext(AuthContext)
-    const {decode} = data
-    const {token} = data
+    const {decode,token,setUserImage} = data
     const[sorting,setSorting] = useState('-_id')
     const[modalVisible,setModalVisible] = useState(false)
     const[activeTab,setActiveTab] = useState('listing')
@@ -164,6 +164,8 @@ export default function Closet(props) {
             const response = await axios.post('/user/change/avatar', data, config)
             setUser({...user, image: response.data})
             setImageUploading(false)
+            setUserImage(response.data)
+            await AsyncStorage.setItem('userImage', response.data)
         } catch (error) {
             Alert.alert(error.request.response)
             setImageUploading(false)

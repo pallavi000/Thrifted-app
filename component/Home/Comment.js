@@ -1,18 +1,26 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View,Image, FlatList,TouchableOpacity,TextInput } from 'react-native'
-import React,{useContext, useState} from 'react'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View,Image, FlatList,TouchableOpacity,TextInput, Keyboard } from 'react-native'
+import React,{useContext, useRef, useState} from 'react'
 import { imageLink } from '../ImageLink'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
+import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import { format } from 'timeago.js'
 import { AuthContext } from '../Context'
 import axios from 'axios'
 
-export default function Comment({route}) {
+export default function Comment({navigation, route}) {
     const[newComment,setNewComment] = useState('')
     const[comments,setComments]= useState(route.params.comments)
     const data = useContext(AuthContext)
-    const {decode,token} = data
-    console.log(comments)
+    const {decode,token,titleShown,setTitleShown,userImage} = data
+
+    React.useEffect(()=>{
+        if(titleShown){
+            setTitleShown({...titleShown, display:'none'})
+        }
+        return () => {
+            setTitleShown({...titleShown,display:'flex'})
+        }
+    },[navigation])
 
     
 
@@ -54,14 +62,14 @@ export default function Comment({route}) {
     }
 
     async function addComment(){
-        
+        if(newComment.trim().length==0) return
+        Keyboard.dismiss()
+        setNewComment('')
         try {
             const data={
                 comment:newComment
             }
             const response = await axios.post('/post/comment/post/'+route.params._id,data,config)
-            setNewComment('')
-            console.log(response.data)
             setComments([...comments,response.data])
         } catch (error) {
             console.log(error.request.response)
@@ -69,19 +77,19 @@ export default function Comment({route}) {
     }
    
   return (
-    <SafeAreaView style={{backgroundColor:'white',flex:1,padding:20}} >
+    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    
      <FlatList data={comments}
+     contentContainerStyle={{padding: 20}}
      keyExtractor={item=>item._id}
      renderItem={({item})=>(
         <View style={styles.mainWrapper} >
             <View style={styles.wrapper}>
-                <View>
+                <View style={{alignSelf:'flex-start'}}>
                     <Image source={{uri:imageLink+item.user?.image}} style={styles.image}></Image>
                 </View>
-                <View style={{marginLeft:10}}>
-                    <View style={styles.row}>
-                        <Text style={styles.name}>{item.user?.name}</Text><Text style={styles.comment}>{item.comment}</Text>
-                    </View>
+                <View style={{flex:1,paddingHorizontal:10}}>
+                        <Text><Text style={styles.name}>{item.user?.name}</Text>  <Text  style={styles.comment}>{item.comment}</Text></Text>
                     <View style={styles.timeWrapper}>
                         <Text style={styles.time}>{format(item.createdAt)}</Text><Text style={styles.time}>{item.likes_count} likes</Text>
                     </View>
@@ -92,7 +100,7 @@ export default function Comment({route}) {
             {isLiked(item)?(
                 <MaterialCommunityIcons name='cards-heart' size={10} color='red'></MaterialCommunityIcons>
             ):(
-                <MaterialCommunityIcons name='heart-outline' size={10}></MaterialCommunityIcons>
+                <MaterialCommunityIcons name='heart-outline' color={'black'} size={10}></MaterialCommunityIcons>
             )}
             </TouchableOpacity>
          </View>
@@ -101,13 +109,17 @@ export default function Comment({route}) {
     />
     <View style={styles.addcomment}>
     <View>
-    <Image source={{uri:imageLink+comments[0].user?.image}} style={styles.image}></Image>
+    <Image source={{uri:imageLink+userImage}} style={styles.image}></Image>
     </View>
-    <View style={{flex: 1,}}>
+    <View style={{flex: 1}}>
         <TextInput
+        keyboardType='default'
         onChangeText={(text)=>setNewComment(text)}
         value={newComment}
         style={styles.input}
+        returnKeyLabel='Send'
+        placeholder="Write a comment..."
+        onSubmitEditing={()=>addComment()}
         ></TextInput>
     </View>
     {newComment.trim()?(
@@ -132,32 +144,33 @@ const styles = StyleSheet.create({
     wrapper:{
         flexDirection:'row',
         justifyContent:'space-between',
-        alignItems:'center'
-        
+        alignItems: 'center'
     },
     mainWrapper:{
         flexDirection:'row',
         justifyContent:'space-between',
         alignItems:'center',
-        marginBottom:10  
+        marginBottom:15,
     },
     image:{
         height:36,
         width:36,
         borderRadius:18,
-        resizeMode:'cover'
-
+        resizeMode:'cover',
+        marginTop:2
     },
     name:{
-        fontSize:13,
+        fontSize:14,
         fontWeight:'700',
         fontFamily:"Raleway_700Bold",
-        marginRight:10
+        marginRight:10,
     },
     comment:{
-        fontSize:12,
-        fontWeight:'400',
-        fontFamily:"Raleway_400Regular"
+        fontSize:14,
+        fontFamily:"Raleway_500Medium",
+        flexWrap: 'wrap',
+        flex:1,
+        lineHeight: 16
     },
     time:{
         fontSize:10,
@@ -169,7 +182,6 @@ const styles = StyleSheet.create({
     row:{
         flexDirection:'row',
         alignItems:'center',
-     
     },
     timeWrapper:{
         flexDirection:'row',
@@ -179,14 +191,19 @@ const styles = StyleSheet.create({
     addcomment:{
         flexDirection:'row',
         justifyContent:'space-between',
-        alignItems:'center'
+        alignItems:'center',
+        borderTopWidth: 1,
+        borderTopColor: '#E5E5EA',
+        paddingHorizontal: 10,
+        bottom: 0,
+        height: 60
     },
     input: {
         height:40,
         color:'#666668',
         fontFamily:"Raleway_400Regular",
         flex: 1,
-        marginHorizontal:8
+        marginHorizontal:10,
     },
     post:{
         fontSize:14,

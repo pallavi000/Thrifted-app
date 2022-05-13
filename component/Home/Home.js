@@ -80,7 +80,7 @@ export default function Home({navigation}) {
 
     function onRefresh() {
         setActivePage(1)
-        getProducts(1, itemsCountPerPage, true)
+        getProducts(1, itemsCountPerPage, false)
     }
 
     function parseImages(image, images){
@@ -165,7 +165,7 @@ export default function Home({navigation}) {
         {products.map(item=>{
             return(
                 <>
-                <Action product={item}  navigation= {navigation}/>
+                <Action product={item} products={products} setProducts={setProducts} navigation= {navigation}/>
                 </>
             )
         })}

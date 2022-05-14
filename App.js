@@ -31,6 +31,7 @@ import AddShipping from './component/address/AddShipping';
 import EditShipping from './component/address/EditShipping';
 import Search from './component/search/Search';
 import SearchResult from './component/search/SearchResult';
+import LoadingScreen from './component/Auth/LoadingScreen';
 
 //axios.defaults.baseURL="http://localhost:5000/api"
 axios.defaults.baseURL="http://167.86.77.80/api"
@@ -48,6 +49,7 @@ export default function App(props) {
   const[loadingComplete, setLoadingComplete] = useState(false)
   const[unreadMessage, setUnreadMessage] = useState(0)
   const[userImage, setUserImage] = useState()
+  const[appReady,setAppReady] = useState(false)
   
   const[titleShown,setTitleShown] = useState(
     {
@@ -71,7 +73,6 @@ export default function App(props) {
   }
   
   async function getToken(){
-    console.log('run')
     try {  
       const authConfig = await AsyncStorage.getItem('token')
       if(authConfig) {
@@ -93,10 +94,11 @@ export default function App(props) {
             'access-token':token
           }
         }
+        setIsLoggedIn(true)
         const response = await axios.get('/addtocart/cartcount',config)
         retotal(response.data)
-        setIsLoggedIn(true)
       }
+      setAppReady(true)
     } catch (error) { 
       console.log(error.message)
     }
@@ -108,6 +110,9 @@ export default function App(props) {
 }, [props,isLoggedIn])
 
   return (
+    !appReady?(
+      <LoadingScreen/>
+    ):(
     <>
       <NavigationContainer>
       
@@ -203,6 +208,7 @@ export default function App(props) {
         </AuthContext.Provider>
       </NavigationContainer>
       </>
+      )
   );
 }
 

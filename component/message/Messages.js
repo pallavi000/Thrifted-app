@@ -76,11 +76,13 @@ async function startChat(conversation){
 }
 
 function getUnreadCount(conversation) {
-    if(conversation.sender_id==decode._id) {
+    if(conversation.sender_id._id==decode._id) {
         return conversation.sender_id_unread_count
-    } else {
+    }
+    if(conversation.receiver_id._id==decode._id) {
         return conversation.receiver_id_unread_count
     }
+    return 0
 }
 
 

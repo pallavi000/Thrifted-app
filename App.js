@@ -33,8 +33,8 @@ import Search from './component/search/Search';
 import SearchResult from './component/search/SearchResult';
 import LoadingScreen from './component/Auth/LoadingScreen';
 
-//axios.defaults.baseURL="http://localhost:5000/api"
-axios.defaults.baseURL="http://167.86.77.80/api"
+axios.defaults.baseURL="http://localhost:5000/api"
+// axios.defaults.baseURL="http://167.86.77.80/api"
 
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator()

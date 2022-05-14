@@ -40,6 +40,7 @@
     "react-native": "0.64.2",
     "react-native-app-intro-slider": "^4.0.4",
     "react-native-banner-carousel": "^1.0.3",
+    "react-native-emoticons": "github:snlbaral/react-native-emoticons",
     "react-native-gesture-handler": "~1.10.2",
     "react-native-get-random-values": "^1.7.2",
     "react-native-image-crop-picker": "^0.37.2",
@@ -55,11 +56,11 @@
     "react-navigation-stack": "^2.10.4",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22",
     "rn-all-nepal-payment": "^1.0.2",
+    "socket.io-client": "^4.5.0",
     "timeago.js": "^4.0.2",
     "unimodules-permissions-interface": "^6.1.0",
     "uuid": "^8.3.2",
-    "yup": "^0.32.11",
-    "react-native-emoticons": "github:snlbaral/react-native-emoticons"
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

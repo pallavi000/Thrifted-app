@@ -9,6 +9,9 @@ import {format} from 'timeago.js'
 import { imageLink } from '../ImageLink'
 // import Emoticons from 'react-native-emoticons';
 
+import {io} from 'socket.io-client'
+
+
 
 export default function Chat({route,navigation}) {
     const[messages,setMessages] = useState([])
@@ -18,8 +21,48 @@ export default function Chat({route,navigation}) {
     const flatListRef = useRef(null)
     const[showTimer,setShowTimer] = useState(0)
     const[showEmoji,setShowEmoji] = useState(false)
+    const socket = useRef()
 
+    const data = useContext(AuthContext)
+    const {token,decode,unreadMessage, setUnreadMessage} = data
+
+    const config = {
+        headers: {
+          'access-token':token
+        }
+      } 
+
+    useEffect(() => {
+        socket.current = io('http://localhost:5000')
+        socket.current.emit('join',decode._id)
+
+        socket.current.on('receiveMessage',(message)=>{
+            setMessages(prevMessages => [...prevMessages, message])
+        })
+    }, [])
+
+    async function sendMessage() {
+        try {
+            Keyboard.dismiss()
+            messageInput.current.clear()
+            setMessage()
+            const data = {
+                sender_id: decode._id,
+                receiver_id: receiver.user._id,
+                fromMe: true,
+                message: message,
+            }
+            const response = await axios.post('/chat/message/'+receiver.conversation._id, data, config)
+            socket.current.emit('sendMessage', response.data)
+
+            setMessages([...messages, response.data])
+        } catch (error) {
+            Alert.alert('Error', error.request.response)
+        }
+    }
     
+
+
     
     const receiver = route.params
     navigation.setOptions({
@@ -53,14 +96,7 @@ export default function Chat({route,navigation}) {
         Alert.alert("Oops!!", "Feature not yet enabled.")
     }
 
-    const data = useContext(AuthContext)
-    const {token,decode,unreadMessage, setUnreadMessage} = data
-
-    const config = {
-        headers: {
-          'access-token':token
-        }
-      } 
+   
 
     useEffect(()=>{
         getMessages()
@@ -77,24 +113,7 @@ export default function Chat({route,navigation}) {
         }
     }
 
-    async function sendMessage() {
-        try {
-            Keyboard.dismiss()
-            messageInput.current.clear()
-            setMessage()
-            const data = {
-                sender_id: decode._id,
-                receiver_id: receiver.user._id,
-                fromMe: true,
-                message: message,
-            }
-            const response = await axios.post('/chat/message/'+receiver.conversation._id, data, config)
-            console.log(response.data)
-            setMessages([...messages, response.data])
-        } catch (error) {
-            Alert.alert('Error', error.request.response)
-        }
-    }
+    
 
     function changeShowTimer(id) {
         setShowTimer(id)

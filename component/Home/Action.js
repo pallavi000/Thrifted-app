@@ -6,9 +6,10 @@ import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { Raleway_500Medium } from '@expo-google-fonts/raleway'
+import { SliderBox } from "react-native-image-slider-box";
 
 
-export default function Action(props) {
+export default React.memo(function Action(props) {
     const[comment,setComment] = useState('')
     const[like,setLike]= useState(false)
     const {navigation} = props
@@ -20,12 +21,13 @@ export default function Action(props) {
         headers: {
             'access-token':token
         }
-    } 
-useEffect(()=>{
-    if(props.product?.likes.find(like=>like.user_id==decode._id)){
-        setLike(true)
     }
-},[])
+
+    useEffect(()=>{
+        if(props.product?.likes.find(like=>like.user_id==decode._id)){
+            setLike(true)
+        }
+    },[])
   
 
     async function addLike(){
@@ -48,7 +50,15 @@ useEffect(()=>{
         } catch (error) {
             console.log(error.request.response)
         }
-    }    
+    }   
+    
+    function parseImages(image, images){
+        var arr=[imageLink+image]
+        images.forEach(image => {
+            arr.push(imageLink+image)
+        });
+        return arr
+    }
 
   return (
       <>
@@ -63,7 +73,7 @@ useEffect(()=>{
             <View style={styles.productWrapper}>
 
             <View style={styles.product}>
-                {/* <Image style={styles.productImage} source={{uri:imageLink+product.image}}></Image> */}
+                <Image style={styles.productImage} source={{uri:imageLink+item.image}}></Image>
 
                 {/* <SliderBox
                 images={parseImages(item.image, item.feature_image)}
@@ -79,7 +89,7 @@ useEffect(()=>{
                     <MaterialCommunityIcons name='cards-heart' size={25} color='red'></MaterialCommunityIcons>
 
                 ):(
-                    <MaterialCommunityIcons name='heart-outline' size={25}></MaterialCommunityIcons>
+                    <MaterialCommunityIcons name='heart-outline' size={25} color='black'></MaterialCommunityIcons>
 
                 )}
                 </TouchableOpacity>
@@ -114,7 +124,7 @@ useEffect(()=>{
            
                 </>
   )
-}
+})
 
 const styles = StyleSheet.create({
     productreview:{

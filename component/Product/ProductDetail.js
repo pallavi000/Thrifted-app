@@ -1,8 +1,7 @@
 import axios from 'axios'
-import React, { useContext, useState,useRef,useEffect } from 'react'
+import React, { useContext, useState,useRef } from 'react'
 import { View,ActivityIndicator, Alert,Text, Image,SafeAreaView,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, TouchableOpacity} from 'react-native'
 import { AuthContext } from '../Context'
-import bbstyles from '../Styles'
 import { imageLink } from '../ImageLink'
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold, Raleway_700Bold_Italic } from '@expo-google-fonts/raleway'
 import { Feather, Ionicons } from '@expo/vector-icons'
@@ -21,15 +20,6 @@ export default function ProductDetail({navigation,route}) {
 
 
     
-
-    React.useLayoutEffect(()=>{
-        if(titleShown){
-            setTitleShown({...titleShown, display:'none'})
-        }
-        return () => {
-            setTitleShown({...titleShown,display:'flex'})
-        }
-    },[navigation])
 
 
     const product = route.params
@@ -111,7 +101,7 @@ export default function ProductDetail({navigation,route}) {
        <ScrollView>
        <Animated.View
             style={{
-            opacity: Animated.add(0.3, Animated.multiply(fall, 1.0))
+            opacity: Animated.add(0.3, Animated.multiply(fall, 1.0)),
         }}>
 
        
@@ -175,13 +165,17 @@ export default function ProductDetail({navigation,route}) {
             </Animated.View>
        </ScrollView>
        {isSubmitting ?(
-        <TouchableOpacity style={styles.loginBtn}>
-          <ActivityIndicator size={24} color='#fff'/>
-        </TouchableOpacity>
+           <View style={{borderTopWidth:1,borderTopColor:'#E3E3E3'}}>
+                <TouchableOpacity style={styles.loginBtn}>
+                <ActivityIndicator size={24} color='#fff'/>
+                </TouchableOpacity>
+           </View>
       ):(
-        <TouchableOpacity style={styles.loginBtn} onPress={()=>addtocart(product._id)}>
-                <Text style={styles.loginText}>Add to cart</Text>
-        </TouchableOpacity>
+        <View style={{borderTopWidth:1,borderTopColor:'#E3E3E3'}}>
+            <TouchableOpacity style={styles.loginBtn} onPress={()=>addtocart(product._id)}>
+                    <Text style={styles.loginText}>Add to cart</Text>
+            </TouchableOpacity>
+        </View>
       )}
    </SafeAreaView>
   )

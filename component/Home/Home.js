@@ -1,10 +1,9 @@
-import React,{useContext, useEffect,useState} from 'react'
+import React,{useCallback, useContext, useEffect,useState} from 'react'
 import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl,TextInput, View,ScrollView, FlatList, ActivityIndicator } from 'react-native'
 import axios from 'axios'
-import {Ionicons,Feather } from '@expo/vector-icons'
+import {Ionicons,Feather, MaterialIcons, Fontisto } from '@expo/vector-icons'
 import bbstyles from '../Styles'
 import { imageLink } from '../ImageLink'
-// import { SliderBox } from "react-native-image-slider-box";
 import { AuthContext } from '../Context'
 import { useIsFocused } from '@react-navigation/native'
 import { Raleway_500Medium } from '@expo-google-fonts/raleway'
@@ -40,6 +39,7 @@ export default function Home({navigation}) {
         try {
             const response = await axios.post('/frontend/app/home', data)
             if(!productOnly) {
+                console.log('starts fin')
                 setProducts(response.data.product)
                 setBanners(response.data.banner)
                 setRentProducts(response.data.rentProduct)
@@ -54,16 +54,17 @@ export default function Home({navigation}) {
         } catch (error) {
             setLoader(false)
         }
-        
     }
 
-    function GetNextPage() {
+
+    const GetNextPage = useCallback(()=>{
         setActivePage(activePage + 1);
         if (!nextPage) {
             setNextPage(true)
             getProducts(activePage+1,itemsCountPerPage, true)
         }
-    }
+    })
+    
 
     async function getUnreadMessageCount() {
         try {
@@ -78,24 +79,45 @@ export default function Home({navigation}) {
         getUnreadMessageCount()
     }, [])
 
+    
     function onRefresh() {
         setActivePage(1)
         getProducts(1, itemsCountPerPage, false)
     }
 
-    function parseImages(image, images){
-        var arr=[imageLink+image]
-        images.forEach(image => {
-            arr.push(imageLink+image)
-        });
-        return arr
-    }
 
+    // const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+    //     const paddingToBottom = 500;
+    //     return layoutMeasurement.height + contentOffset.y >=
+    //         contentSize.height - paddingToBottom;
+    // }
 
-    const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-    const paddingToBottom = contentSize.height/2;
-    return layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - paddingToBottom;
+    const renderItem = useCallback(({item, index}) => originalRenderItem({item, index}), [products,categories])
+
+    const originalRenderItem = ({item,index}) => {
+        return(
+            <View>
+            {index==0?(
+                <FlatList
+                contentContainerStyle={styles.wrapper}
+                keyExtractor={item=>item._id}
+                horizontal={true}
+                data={categories}
+                showsHorizontalScrollIndicator={false}
+                renderItem={({item})=>(
+                    <TouchableOpacity key={item._id} onPress={()=>navigation.navigate('Category Title',item)} style={styles.cateWrapper}>
+                        <Image style={styles.category} source={{uri:imageLink+item.image}}/>
+                        <Text numberOfLines={1} style={styles.cateText}>{item.name}</Text>
+                    </TouchableOpacity>
+                )}
+                />                
+            ):(null)}
+            <Action product={item} products={products} setProducts={setProducts} navigation= {navigation}/>
+            {index==products.length-1?(
+                <ActivityIndicator size={'large'} color="#663399" />
+            ):(null)}
+            </View>
+        )
     }
 
   return (
@@ -115,11 +137,11 @@ export default function Home({navigation}) {
                 <Feather name='instagram' size={30} color='black'/>
             </View>
             <View style={styles.navcontent}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Search')} style={styles.icons}>
+                    <Image source={require('../../assets/icons/Search.png')} style={styles.icon}/>
+                </TouchableOpacity>
                 <View style={styles.icons}>
-                <Image source={require('../../assets/icons/Search.png')} style={styles.icon}/>
-                </View>
-                <View style={styles.icons}>
-                    <Image source={require('../../assets/icons/Like.png')} style={styles.icon}/>
+                    <Fontisto name='bell' size={25} color='black' />
                 </View>
                 <TouchableOpacity onPress={()=>navigation.navigate('Messages')} style={styles.icons}>
                     <Image source={require('../../assets/icons/Messenger.png')} style={styles.icon}/>{unreadMessage>0?(<Text style={styles.unreadMessage}>{unreadMessage}</Text>):(null)}
@@ -129,51 +151,21 @@ export default function Home({navigation}) {
 
         <View style={{paddingBottom:50}}>
         
-        <ScrollView 
-        style={bbstyles.scrollHeight}
-        onScroll={({nativeEvent})=>{
-            if(isCloseToBottom(nativeEvent)) {
-                GetNextPage()
-            }
-        }}
-        refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        >
-        <View>
-            <ScrollView   horizontal={true} showsHorizontalScrollIndicator={false} >
-                <View style={styles.wrapper} >
-                    {categories.map(category=>{
-                        return(
-                            <TouchableOpacity key={category._id} onPress={()=>navigation.navigate('Category Title',category)} style={styles.cateWrapper}>
-                            <Image style={styles.category} source={{uri:imageLink+category.image}}/>
-                            <Text numberOfLines={1} style={styles.cateText}>{category.name}</Text>
-                        </TouchableOpacity>
-                        )
-                    })}
-                </View>
-          </ScrollView>
 
-         {/* <FlatList
+          <FlatList
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          removeClippedSubviews={true}
+          initialNumToRender={10}
+          contentContainerStyle={{paddingBottom:20}}
             data={products}
             keyExtractor={item => item._id}
-            renderItem={({ item })=>(
-                 
-            )}
-        /> */}
-
-        {products.map(item=>{
-            return(
-                <>
-                <Action product={item} products={products} setProducts={setProducts} navigation= {navigation}/>
-                </>
-            )
-        })}
+            renderItem={renderItem}
+            onEndReached={GetNextPage}
+        />
+        
         
         
         </View>
-    </ScrollView>
-    </View>
     </>
     )}
     </SafeAreaView>

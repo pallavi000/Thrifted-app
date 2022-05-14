@@ -29,6 +29,8 @@ import Checkout from './component/Cart/Checkout';
 import Shipping from './component/address/Shipping';
 import AddShipping from './component/address/AddShipping';
 import EditShipping from './component/address/EditShipping';
+import Search from './component/search/Search';
+import SearchResult from './component/search/SearchResult';
 
 //axios.defaults.baseURL="http://localhost:5000/api"
 axios.defaults.baseURL="http://167.86.77.80/api"
@@ -130,6 +132,20 @@ export default function App(props) {
             headerTitleAlign: 'center',
             headerShadowVisible: false,
           }} name="Checkout" component={Checkout}/>
+
+          <Stack.Screen name="Search" options={{
+        
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                
+              }} component={Search}/>
+
+          <Stack.Screen name="Search Result" options={{
+        
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                
+              }} component={SearchResult}/> 
 
           <Stack.Screen name="Addresses" options={{
         

@@ -75,6 +75,15 @@ async function startChat(conversation){
     
 }
 
+function getUnreadCount(conversation) {
+    if(conversation.sender_id==decode._id) {
+        return conversation.sender_id_unread_count
+    } else {
+        return conversation.receiver_id_unread_count
+    }
+}
+
+
 function getImage(item) {
     return decode._id==item.sender_id._id?imageLink+item.receiver_id.image:imageLink+item.sender_id.image
 }
@@ -120,11 +129,11 @@ function searchChats(text) {
                     </View>
                     <View style={styles.userDetailwrpper}>
                         <Text style={styles.name}>{getName(item)}</Text>
-                        <Text style={item.unread_count>0?styles.userMessageBold:styles.userMessage}>{item.last_message}</Text>
+                        <Text style={getUnreadCount(item)>0?styles.userMessageBold:styles.userMessage}>{item.last_message}</Text>
                     </View>
                 </View>
                 <View style={styles.statusWrapper}>
-                    {item.unread_count>0?(<Text style={styles.activeIndicator}>{item.unread_count}</Text>):(null)}
+                    {getUnreadCount(item)>0?(<Text style={styles.activeIndicator}>{getUnreadCount(item)}</Text>):(null)}
                     <Text style={styles.activeStatus}>{format(item.updatedAt)}</Text>
                 </View>
             </TouchableOpacity>

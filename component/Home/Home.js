@@ -67,6 +67,7 @@ export default function Home({navigation}) {
     
 
     async function getUnreadMessageCount() {
+        console.log(config)
         try {
             const response = await axios.get('/chat/message/unread-count', config)
             setUnreadMessage(response.data)
@@ -74,9 +75,14 @@ export default function Home({navigation}) {
         }
     }
 
+    useEffect(()=>{
+        if(token) {
+            getUnreadMessageCount()
+        }
+    },[token])
+
     useEffect(() => {
         getProducts(activePage, itemsCountPerPage, false)
-        getUnreadMessageCount()
     }, [])
 
     

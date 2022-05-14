@@ -6,7 +6,7 @@ import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { Raleway_500Medium } from '@expo-google-fonts/raleway'
-import { SliderBox } from "react-native-image-slider-box";
+// import { SliderBox } from "react-native-image-slider-box";
 
 
 export default React.memo(function Action(props) {

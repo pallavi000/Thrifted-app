@@ -1,7 +1,7 @@
 import { View,TouchableOpacity} from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import React,{useEffect} from 'react'
+import React,{useContext, useEffect} from 'react'
 import Address from './Address'
 import CartItem from './Cart/CartItem'
 import Category from './category/Category'
@@ -32,6 +32,7 @@ import EditShipping from './address/EditShipping'
 import { MaterialCommunityIcons} from '@expo/vector-icons'
 import NewChat from './message/NewChat'
 import ChangeProfile from './Profile/ChangeProfile'
+import { AuthContext } from './Context'
 
 
 const Stack = createNativeStackNavigator()
@@ -234,11 +235,21 @@ function homeNavigation(props) {
   }
   
 function profileNavigation({navigation}){
+  const data = useContext(AuthContext)
+  const {setIsLoggedIn} = data
+
+  
+  async function Logout(){
+    await AsyncStorage.removeItem('token')
+    setIsLoggedIn(false)
+  }
+  
+
     return(
       <Stack.Navigator>
       <Stack.Screen name="Setting" options={{
          headerRight: () => (
-                      <TouchableOpacity onPress={() => navigation.navigate('Logout')} style={{paddingRight:20}}>
+                      <TouchableOpacity onPress={() => Logout()} style={{paddingRight:20}}>
                         <MaterialCommunityIcons name='logout' size={20} ></MaterialCommunityIcons>
                       </TouchableOpacity>
                     ),
@@ -412,7 +423,6 @@ function profileNavigation({navigation}){
             headerShadowVisible: false,
           }} component={Closet}/>
 
-          <Stack.Screen name="Logout" component={Logout}/>
 
       </Stack.Navigator>
     )
@@ -428,18 +438,6 @@ function profileNavigation({navigation}){
 
 
 
-  function Logout(){
-    useEffect(async () => {
-      await AsyncStorage.removeItem('token')
-      // setIsLoggedIn(false)
-    }, [])
-    return(
-      <View>
-  
-      </View>
-    )
-  }
-  
 
   function accountNavigation(){
     return(

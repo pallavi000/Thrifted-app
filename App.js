@@ -56,6 +56,7 @@ export default function App(props) {
       display: 'flex',
     }
   )
+  
 
   const {navigation} = props
 

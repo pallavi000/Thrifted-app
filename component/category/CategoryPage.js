@@ -1,5 +1,5 @@
 import { StyleSheet, FlatList, ActivityIndicator, Text, View,SafeAreaView, ScrollView,Image ,Dimensions,TouchableOpacity} from 'react-native'
-import React,{useState,useEffect,useRef,useLayoutEffect} from 'react'
+import React,{useState,useEffect,useRef,useLayoutEffect, useCallback} from 'react'
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import Filter from '../Product/filters/Filter'
@@ -29,7 +29,9 @@ export default function CategoryPage({navigation,route}) {
    const[category_id,setCategory_id] = useState([])
    const[currentcatId,setCurrentcatId] = useState(null)
    const[itemsPerPage,setItemsPerPage] = useState(24)
+   const[nextPage,setNextPage] = useState(true)
    const fall = new Animated.Value(1)
+   const[nextPageProducts, setNextPageProducts] = useState(false)
 
  
 
@@ -50,7 +52,9 @@ export default function CategoryPage({navigation,route}) {
    }, [pageNo,sorting,brand_id,color_id,category_id,minprice])
    
    async function getProducts(){
-       setLoader(true)
+       if(!nextPageProducts) {
+           setLoader(true)
+       }
        try {
         const data = {
             category_slug:category.slug,
@@ -58,12 +62,17 @@ export default function CategoryPage({navigation,route}) {
             sorting
         }
         var response = await axios.post('/category/filter',data)
-        setProducts(response.data.products)
-        setBrands(response.data.brands)
-        setColors(response.data.colors)
-        setCurrentcatId(response.data.category._id)
-        setTotalProduct(response.data.count)
+        if(nextPageProducts) {
+            setProducts([...products, response.data.products])
+        } else {
+            setProducts(response.data.products)
+            setBrands(response.data.brands)
+            setColors(response.data.colors)
+            setCurrentcatId(response.data.category._id)
+            setTotalProduct(response.data.count)
+        }
         setLoader(false)
+        setNextPage(false)
        } catch (error) {
            setLoader(false)
            console.log(error.message)
@@ -72,7 +81,9 @@ export default function CategoryPage({navigation,route}) {
 
 
    async function filterProducts(){
-       setLoader(true)
+       if(!nextPageProducts) {
+           setLoader(true)
+       }
         var data={
             brand_id,
             color_id,
@@ -97,15 +108,21 @@ export default function CategoryPage({navigation,route}) {
         try {
             var response= await axios.post('/category/checkfilter',data)
             var x = response.data.products.filter((v,i,a)=>a.findIndex(t=>(t._id === v._id))===i)
+            if(nextPageProducts) {
+                setProducts([...products, x])
+            } else {
                 setProducts(x)
                 setTotalProduct(response.data.total)
+            }
+                
+            // var currentPageNo = response.data.total/itemsPerPage
+            // currentPageNo=  Math.ceil(currentPageNo)
+            // if(currentPageNo<pageNo){
+            //     setPageNo(currentPageNo)
+            // }
 
-                var currentPageNo = response.data.total/itemsPerPage
-                currentPageNo=  Math.ceil(currentPageNo)
-                if(currentPageNo<pageNo){
-                    setPageNo(currentPageNo)
-                }
-                setLoader(false)
+            setLoader(false)
+            setNextPage(false)
         } catch (error) {
             setLoader(false)
         }
@@ -124,6 +141,15 @@ export default function CategoryPage({navigation,route}) {
            return 'Newest'
        }
    }
+
+   const GetNextPage = useCallback(()=>{
+       if (!nextPage) {
+            setNextPageProducts(true)
+            setNextPage(true)
+            setPageNo(pageNo+1)
+        }
+    })
+   
 
   return (
       filter?(
@@ -172,6 +198,7 @@ export default function CategoryPage({navigation,route}) {
         data={products}
         numColumns={2}
         keyExtractor={item => item._id}
+        onEndReached={GetNextPage}
         renderItem={({ item })=>(
             <TouchableOpacity onPress={()=>navigation.navigate('Product Detail',item)} key={item._id} style={styles.productWrapper}>
             <Image source={{uri:imageLink+item.image}} style={styles.productImage}></Image>

@@ -21,10 +21,9 @@ export default function Chat({route,navigation}) {
     const flatListRef = useRef(null)
     const[showTimer,setShowTimer] = useState(0)
     const[showEmoji,setShowEmoji] = useState(false)
-    const socket = useRef()
 
     const data = useContext(AuthContext)
-    const {token,decode,unreadMessage, setUnreadMessage} = data
+    const {token,decode,unreadMessage, setUnreadMessage,socket} = data
 
     const config = {
         headers: {
@@ -33,8 +32,7 @@ export default function Chat({route,navigation}) {
       } 
 
     useEffect(() => {
-        socket.current = io('http://localhost:5000')
-        socket.current.emit('join',decode._id)
+        
 
         socket.current.on('receiveMessage',(message)=>{
             setMessages(prevMessages => [...prevMessages, message])

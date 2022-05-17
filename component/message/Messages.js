@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useEffect,useContext,useState } from 'react'
+import React, { useEffect,useContext,useState, useRef } from 'react'
 import {FontAwesome5, Ionicons} from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import axios from 'axios'
@@ -9,29 +9,40 @@ import { imageLink } from '../ImageLink'
 import {format} from 'timeago.js'
 import { useIsFocused } from '@react-navigation/native'
 import bbstyles from '../Styles'
+import { io } from 'socket.io-client'
+
 
 export default function Messages({navigation}) {
 
     const isFocused = useIsFocused()
     const [loader, setLoader] = useState(true)
     const data = useContext(AuthContext)
-    const {token,titleShown,setTitleShown,decode} = data
+    const {token,titleShown,setTitleShown,decode,socket} = data
     const[chats,setChats]= useState([])
     const[originalChats, setOriginalChats] = useState([])
+ 
     
     const config = {
         headers: {
             'access-token':token
         }
     } 
-    React.useLayoutEffect(()=>{
-        if(titleShown){
-            setTitleShown({...titleShown, display:'none'})
-        }
-        return () => {
-            setTitleShown({...titleShown,display:'flex'})
-        }
-    },[navigation])
+    useEffect(()=>{
+        
+        socket.current.on('conversation',(conversation)=>{
+            setChats(prevMessages => {
+                var index = prevMessages.findIndex(message=>message._id==conversation._id)
+                if(index!=-1){
+                    var copy = [...prevMessages]
+                    copy[index]= conversation
+                    return copy
+                } else {
+                    return [...prevMessages, conversation]
+                }
+            })
+
+        })
+    },[])
 
     navigation.setOptions({
         title: decode.name,

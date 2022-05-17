@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View,Image, FlatList,TouchableOpacity,TextInput, Keyboard } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View,Image, FlatList,TouchableOpacity,TextInput, Keyboard, Alert } from 'react-native'
 import React,{useContext, useRef, useState} from 'react'
 import { imageLink } from '../ImageLink'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -9,26 +9,35 @@ import axios from 'axios'
 
 export default function Comment({navigation, route}) {
     const[newComment,setNewComment] = useState('')
-    const[comments,setComments]= useState(route.params.comments)
+    
+    const[comments,setComments]= useState([])
+    const post_id = route.params
+    
     const data = useContext(AuthContext)
     const {decode,token,titleShown,setTitleShown,userImage} = data
-
-    React.useEffect(()=>{
-        if(titleShown){
-            setTitleShown({...titleShown, display:'none'})
-        }
-        return () => {
-            setTitleShown({...titleShown,display:'flex'})
-        }
-    },[navigation])
-
-    
-
     const config = {
         headers: {
             'access-token':token
         }
     }
+
+    async function getComments() {
+        try {
+            const response = await axios.get('/post/comment/post/'+post_id, config)
+            setComments(response.data)
+        } catch (error) {
+            Alert.alert('Error', error.request.response)
+        }
+    }
+
+    React.useEffect(()=>{
+        getComments()
+        
+    },[navigation])
+
+    
+
+    
 
     async function addLike(comment){
         try {
@@ -69,7 +78,7 @@ export default function Comment({navigation, route}) {
             const data={
                 comment:newComment
             }
-            const response = await axios.post('/post/comment/post/'+route.params._id,data,config)
+            const response = await axios.post('/post/comment/post/'+post_id,data,config)
             setComments([...comments,response.data])
         } catch (error) {
             console.log(error.request.response)

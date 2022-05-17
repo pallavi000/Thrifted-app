@@ -6,8 +6,8 @@ import bbstyles from '../Styles'
 import { imageLink } from '../ImageLink'
 import { AuthContext } from '../Context'
 import { useIsFocused } from '@react-navigation/native'
-import { Raleway_500Medium } from '@expo-google-fonts/raleway'
 import Action from './Action'
+
 
 export default function Home({navigation}) {
 
@@ -23,7 +23,7 @@ export default function Home({navigation}) {
     const[nextPage,setNextPage] = useState(true)
     const[comment,setComment] = useState('')
     const data = useContext(AuthContext)
-    const {unreadMessage, setUnreadMessage, token} = data
+    const {unreadMessage, setUnreadMessage, token,unreadNotification,setUnreadNotification,socket} = data
     const config = {
         headers: {
             'access-token':token
@@ -78,13 +78,27 @@ export default function Home({navigation}) {
     useEffect(()=>{
         if(token) {
             getUnreadMessageCount()
+            getUnreadNotificationCount()
         }
     },[token])
 
     useEffect(() => {
         getProducts(activePage, itemsCountPerPage, false)
+        socket.current.on('notification',(notification)=>{
+            setUnreadNotification(prev=>prev+1)
+            console.log(notification)
+        })
     }, [])
 
+
+   async function getUnreadNotificationCount(){
+        try {
+            var response = await axios.get('/notification/count',config)
+            setUnreadNotification(response.data) 
+        } catch (error) {
+            
+        }
+    }
     
     function onRefresh() {
         setActivePage(1)
@@ -146,9 +160,10 @@ export default function Home({navigation}) {
                 <TouchableOpacity onPress={()=>navigation.navigate('Search')} style={styles.icons}>
                     <Image source={require('../../assets/icons/Search.png')} style={styles.icon}/>
                 </TouchableOpacity>
-                <View style={styles.icons}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Notification')} style={styles.icons}>
                     <Fontisto name='bell' size={25} color='black' />
-                </View>
+                    {unreadNotification>0?(<Text style={styles.unreadNotification}>{unreadNotification}</Text>):(null)}
+                </TouchableOpacity>
                 <TouchableOpacity onPress={()=>navigation.navigate('Messages')} style={styles.icons}>
                     <Image source={require('../../assets/icons/Messenger.png')} style={styles.icon}/>{unreadMessage>0?(<Text style={styles.unreadMessage}>{unreadMessage}</Text>):(null)}
                 </TouchableOpacity>
@@ -204,6 +219,20 @@ const styles = StyleSheet.create({
     icons:{
         marginRight:10,
         position: 'relative'
+    },
+    unreadNotification:{
+        position: 'absolute',
+        top: -3,
+        right: -5,
+        backgroundColor: '#FF2424',
+        color: 'white',
+        height: 20,
+        width: 20,
+        fontSize: 10,
+        borderRadius: 10,
+        textAlign: 'center',
+        lineHeight: 20,
+        fontWeight: '600'
     },
     unreadMessage: {
         position: 'absolute',

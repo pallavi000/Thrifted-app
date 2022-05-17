@@ -62,6 +62,7 @@ export default React.memo(function Action(props) {
 
   return (
       <>
+    
     <TouchableOpacity  onPress={()=>navigation.navigate('Product Detail',item)}>
           <View style={styles.productWrapper} key={item._id}>
             <TouchableOpacity onPress={()=>navigation.navigate('My Closet',item.seller_id)} style={styles.userWrapper}>
@@ -73,7 +74,7 @@ export default React.memo(function Action(props) {
             <View style={styles.productWrapper}>
 
             <View style={styles.product}>
-                <Image style={styles.productImage} source={{uri:imageLink+item.image}}></Image>
+                {/* <Image style={styles.productImage} source={{uri:imageLink+item.image}}></Image> */}
 
                 {/* <SliderBox
                 images={parseImages(item.image, item.feature_image)}
@@ -97,7 +98,7 @@ export default React.memo(function Action(props) {
                 <Image source={require('../../assets/icons/Shop.png')} style={styles.smallIcon}/>
                 </View>
                 
-                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',item)}>
+                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',item._id)}>
                     <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
                 </TouchableOpacity>
                 
@@ -115,7 +116,7 @@ export default React.memo(function Action(props) {
                     <Text style={styles.price}>Rs. {item.price}</Text><Text>|</Text><Text style={styles.size}>Size: {item.size_id?.name}</Text><Text>|</Text><Text style={styles.brand}>{item.brand_id?.name}</Text>
                 </View>  
                 </TouchableOpacity> 
-                <TouchableOpacity onPress={()=>navigation.navigate('Comments',item)} style={styles.typeWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Comments',item._id)} style={styles.typeWrapper}>
                     <Text style={styles.viewComment}>View All {item.comments_count} Comments</Text>
                 </TouchableOpacity>
             </View>

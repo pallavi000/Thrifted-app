@@ -33,6 +33,7 @@ import { MaterialCommunityIcons} from '@expo/vector-icons'
 import NewChat from './message/NewChat'
 import ChangeProfile from './Profile/ChangeProfile'
 import { AuthContext } from './Context'
+import Notification from './notification/Notification'
 
 
 const Stack = createNativeStackNavigator()
@@ -111,6 +112,16 @@ function homeNavigation(props) {
             headerTitleAlign: 'center',
             headerShadowVisible: false,
           }} component={Closet}/>
+
+        <Stack.Screen name="Notification" options={{
+            headerStyle:{
+              backgroundColor:'#fff',
+              borderWidth:0,
+            },
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+          }} component={Notification}/>
+
       <Stack.Screen name="Category Title" options={{
             headerStyle:{
               backgroundColor:'#fff',

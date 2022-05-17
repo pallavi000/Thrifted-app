@@ -103,10 +103,11 @@ export default function Closet(props) {
     }
 
     function unFollowUser() {
-        Alert.alert("Unfollow User", "Are you sure you want to unfollow?", [
-            {text: 'Yes', onPress: doUnfollow},
-            {text: 'Cancel'}
-        ])
+        doUnfollow()
+        // Alert.alert("Unfollow User", "Are you sure you want to unfollow?", [
+        //     {text: 'Yes', onPress: doUnfollow},
+        //     {text: 'Cancel'}
+        // ])
     }
 
     async function selectImage() {

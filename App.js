@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState,useEffect, useContext } from 'react';
+import React, { useState,useEffect, useContext, useRef } from 'react';
 import { Alert, StyleSheet, Image, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import {createNativeStackNavigator }  from '@react-navigation/native-stack'
@@ -32,6 +32,7 @@ import EditShipping from './component/address/EditShipping';
 import Search from './component/search/Search';
 import SearchResult from './component/search/SearchResult';
 import LoadingScreen from './component/Auth/LoadingScreen';
+import { io } from 'socket.io-client';
 
 axios.defaults.baseURL="http://localhost:5000/api"
 // axios.defaults.baseURL="http://167.86.77.80/api"
@@ -48,8 +49,10 @@ export default function App(props) {
   const[subtotal,setSubtotal] = useState([])
   const[loadingComplete, setLoadingComplete] = useState(false)
   const[unreadMessage, setUnreadMessage] = useState(0)
+  const[unreadNotification,setUnreadNotification]=useState(0)
   const[userImage, setUserImage] = useState()
   const[appReady,setAppReady] = useState(false)
+  const socket = useRef()
   
   const[titleShown,setTitleShown] = useState(
     {
@@ -57,6 +60,8 @@ export default function App(props) {
     }
   )
   
+
+
 
   const {navigation} = props
 
@@ -73,6 +78,9 @@ export default function App(props) {
      setCartItems(cartitems)
   }
   
+
+
+
   async function getToken(){
     try {  
       const authConfig = await AsyncStorage.getItem('token')
@@ -81,11 +89,14 @@ export default function App(props) {
         var token = authConfig;
         var decoded = jwt_decode(token);
         setDecode(decoded)
+        socket.current= io('http://localhost:5000')
+        socket.current.emit('join',decoded._id)
+        console.log(socket.current)
         
         const userImg = await AsyncStorage.getItem('userImage')
         if(!userImg) {
-          await AsyncStorage.setItem('userImage', decode.image)
-          setUserImage(decode.image)
+          await AsyncStorage.setItem('userImage', decoded.image)
+          setUserImage(decoded.image)
         } else {
           setUserImage(userImg)
         }
@@ -108,6 +119,7 @@ export default function App(props) {
 
   useEffect(() => {
     getToken()
+    
 }, [props,isLoggedIn])
 
   return (
@@ -117,7 +129,7 @@ export default function App(props) {
     <>
       <NavigationContainer>
       
-      <AuthContext.Provider value={{isLoggedIn,getToken,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage,userImage,setUserImage}}>
+      <AuthContext.Provider value={{isLoggedIn,getToken,unreadNotification,setUnreadNotification, socket,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage,userImage,setUserImage}}>
       {isLoggedIn ?(
         <Stack.Navigator>
           <Stack.Screen name='main'

@@ -34,8 +34,8 @@ import SearchResult from './component/search/SearchResult';
 import LoadingScreen from './component/Auth/LoadingScreen';
 import { io } from 'socket.io-client';
 
-axios.defaults.baseURL="http://localhost:5000/api"
-// axios.defaults.baseURL="http://167.86.77.80/api"
+// axios.defaults.baseURL="http://localhost:5000/api"
+axios.defaults.baseURL="http://167.86.77.80/api"
 
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -89,7 +89,7 @@ export default function App(props) {
         var token = authConfig;
         var decoded = jwt_decode(token);
         setDecode(decoded)
-        socket.current= io('http://localhost:5000')
+        socket.current= io('http://167.86.77.80')
         socket.current.emit('join',decoded._id)
         console.log(socket.current)
         

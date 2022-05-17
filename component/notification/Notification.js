@@ -72,7 +72,23 @@ const config = {
             <TouchableWithoutFeedback onPress={()=>setTab('order')}><View><Text style={tab=='order'?styles.normal:styles.order} >Orders</Text></View></TouchableWithoutFeedback>
         </View>
        {tab=='normal'?(
-        <FlatList data={notifications}
+           <>
+           {notifications.map(item=>{
+               return(
+                   item.type=='like'?(
+                    <LikeNotification item={item} navigation={navigation}/>
+                ):item.type=='comment'?(
+                    <>
+                        <CommentNotification item={item} navigation={navigation}/>
+                    </>
+                ):item.type=='follow'?(
+                    <>
+                        <FollowNotification item={item} navigation={navigation}/>
+                    </>
+                ):(null)
+               )
+           })}
+        {/* <FlatList data={notifications}
        keyExtractor={(item)=>item._id}
        renderItem={({item})=>(
            item.type=='like'?(
@@ -87,14 +103,23 @@ const config = {
                </>
            ):(null)
        )}
-       />
+       /> */}
+           </>
        ):(
-            <FlatList data={orderNotifications}
+           <>
+           {orderNotifications.map(item=>{
+               return(
+                   <OrderNotification item={item} navigation={navigation}/>
+               )
+           })}
+            {/* <FlatList data={orderNotifications}
             keyExtractor={item=>item._id}
             renderItem={({item})=>(
                 <OrderNotification item={item} navigation={navigation}/>
             )}
-            />
+            /> */}
+
+           </>
        )}
        
         </ScrollView>

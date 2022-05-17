@@ -29,6 +29,7 @@ export default function Home({navigation}) {
             'access-token':token
         }
     } 
+    const isFocused = useIsFocused()
 
     async function getProducts(currentPage, countPerPage, productOnly) {
         const data = {
@@ -80,7 +81,7 @@ export default function Home({navigation}) {
             getUnreadMessageCount()
             getUnreadNotificationCount()
         }
-    },[token])
+    },[token, isFocused])
 
     useEffect(() => {
         getProducts(activePage, itemsCountPerPage, false)

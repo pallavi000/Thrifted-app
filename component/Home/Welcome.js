@@ -1,16 +1,8 @@
 import { StyleSheet, StatusBar, Text, View,Image,Dimensions,TouchableOpacity,SafeAreaView } from 'react-native'
 import React from 'react'
-import { useFonts, Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway';
 
 
 export default function Welcome({navigation}) {
-
-    let [fontsLoaded] = useFonts({
-        Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular,Raleway_500Medium
-    });
-    if (!fontsLoaded) {
-        return null;
-    }
 
   return (
     <SafeAreaView style={{backgroundColor:'#663399',flex:1}}>

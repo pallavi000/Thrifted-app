@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View ,TextInput,Image,TouchableOpacity,Button, FlatList} from 'react-native'
 import React,{useContext, useEffect, useState} from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
@@ -74,7 +73,7 @@ export default React.memo(function Action(props) {
             <View style={styles.productWrapper}>
 
             <View style={styles.product}>
-                {/* <Image style={styles.productImage} source={{uri:imageLink+item.image}}></Image> */}
+                <Image style={styles.productImage} source={{uri:imageLink+item.image}}></Image>
 
                 {/* <SliderBox
                 images={parseImages(item.image, item.feature_image)}
@@ -84,23 +83,25 @@ export default React.memo(function Action(props) {
                 onCurrentImagePressed={()=>navigation.navigate('Product Detail',item)}
                 /> */}
                 <View style={styles.productreview}>
-                <TouchableOpacity onPress={()=>addLike()}>
+                <TouchableOpacity onPress={()=>addLike()} style={{marginRight:5}}>
                 {like?(
-                 
                     <MaterialCommunityIcons name='cards-heart' size={25} color='red'></MaterialCommunityIcons>
-
                 ):(
                     <MaterialCommunityIcons name='heart-outline' size={25} color='black'></MaterialCommunityIcons>
-
                 )}
                 </TouchableOpacity>
-                <View>
+                
+                {/* <View>
                 <Image source={require('../../assets/icons/Shop.png')} style={styles.smallIcon}/>
-                </View>
+                </View> */}
                 
                 <TouchableOpacity  onPress={()=>navigation.navigate('Comments',item._id)}>
                     <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
                 </TouchableOpacity>
+
+                <View>
+                    <Image source={require('../../assets/icons/Share.png')} style={styles.smallIcon}/>
+                </View>
                 
                 </View>
                 <View  style={styles.typeWrapper}>

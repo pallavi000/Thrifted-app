@@ -1,4 +1,4 @@
-import { StyleSheet, Text,ActivityIndicator, View ,SafeAreaView,ScrollView,TextInput,TouchableOpacity,Alert} from 'react-native'
+import { StyleSheet, Text,ActivityIndicator, Dimensions, View ,SafeAreaView,ScrollView,TextInput,TouchableOpacity,Alert} from 'react-native'
 import React,{useContext,useState} from 'react'
 import { Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import {Formik} from 'formik'
@@ -174,18 +174,19 @@ const styles = StyleSheet.create({
        borderBottomWidth:1
     },
     loginBtn:{
-        paddingVertical:15,
-        paddingHorizontal:10,
-        backgroundColor:'#663399',
-        borderRadius:10,
-        marginTop:50,
-        marginHorizontal:20,
-       },
-       login:{
-        textAlign:'center',
-        fontFamily:'Raleway_700Bold',
-        fontWeight:'700',
-        fontSize:18,
-        color:'white',
-       },
+    paddingVertical:10,
+    paddingHorizontal:10,
+    width:Dimensions.get('window').width-40,
+    backgroundColor:'#663399',
+    borderRadius:10,
+    marginTop:30,
+    marginBottom:30
+    },
+    login:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
+    },
 })

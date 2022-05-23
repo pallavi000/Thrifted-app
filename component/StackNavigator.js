@@ -34,6 +34,7 @@ import NewChat from './message/NewChat'
 import ChangeProfile from './Profile/ChangeProfile'
 import { AuthContext } from './Context'
 import Notification from './notification/Notification'
+import EditPost from './post/EditPost'
 
 
 const Stack = createNativeStackNavigator()
@@ -252,6 +253,7 @@ function profileNavigation({navigation}){
   
   async function Logout(){
     await AsyncStorage.removeItem('token')
+    await AsyncStorage.removeItem('userImage')
     setIsLoggedIn(false)
   }
   
@@ -276,23 +278,6 @@ function profileNavigation({navigation}){
             headerShadowVisible: false,
           }} name="Profile" component={Profile}/>
 
-          <Stack.Screen name="Change Password" options={{
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerShown:true,
-            headerStyle:{
-              backgroundColor:'#663399',
-              color:'white'
-            },
-            headerTintColor:'white',
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-              color:'white'
-            } 
-          }}
-           component={ChangePassword}/>
-
         <Stack.Screen name="Order History"options={{
             headerStyle:{
               backgroundColor:'#fff',
@@ -315,44 +300,9 @@ function profileNavigation({navigation}){
                 } 
               }} component={Shipping}/> 
 
-            <Stack.Screen name="Edit Profile" options={{
-                headerStyle:{
-                  backgroundColor:'#fff',
-                  borderWidth:0,
-                },
-                headerTitleAlign: 'center',
-                headerShadowVisible: false,
-                headerTitleStyle:{
-                  fontSize:18,
-                  fontWeight:'700',
-                } 
-              }} component={ChangeProfile}/>
+            
 
-            <Stack.Screen name="Add Address" options={{
-                headerStyle:{
-                  backgroundColor:'#fff',
-                  borderWidth:0,
-                },
-                headerTitleAlign: 'center',
-                headerShadowVisible: false,
-                headerTitleStyle:{
-                  fontSize:18,
-                  fontWeight:'700',
-                } 
-              }} component={AddShipping}/>
-
-              <Stack.Screen name="Edit Address" options={{
-                headerStyle:{
-                  backgroundColor:'#fff',
-                  borderWidth:0,
-                },
-                headerTitleAlign: 'center',
-                headerShadowVisible: false,
-                headerTitleStyle:{
-                  fontSize:18,
-                  fontWeight:'700',
-                } 
-              }} component={EditShipping}/>
+            
         
         <Stack.Screen name="My Orders" options={{
             headerStyle:{
@@ -396,21 +346,7 @@ function profileNavigation({navigation}){
             } 
               }} name="Track Order" component={OrderTrack}/>
         
-        <Stack.Screen name="Redeem" options={{
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerShown:true,
-            headerStyle:{
-              backgroundColor:'#663399',
-              color:'white'
-            },
-            headerTintColor:'white',
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-              color:'white'
-            } 
-          }} component={Redeem}/> 
+        
 
         <Stack.Screen name="Redeemption History" options={{
             headerStyle:{

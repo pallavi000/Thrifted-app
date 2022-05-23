@@ -15,22 +15,20 @@ export default function OrderNotification(props) {
       props.item.type=='order'?(
           props.item.user_id._id==decode._id?(
             <View>
-            <Text style={styles.heading}>Today</Text>
             <TouchableOpacity onPress={()=>navigation.navigate('Order Track',item.order_id)} style={styles.wrapper}>
                 <Image source={{uri:imageLink+item.user_id.image}} style={styles.userImage}></Image>
                 <View style={styles.detailView}><Text style={styles.detail}><Text style={styles.userName}>{item.post_id.name}</Text> has been ordered.</Text>
-                <Text style={styles.time}>{format(item.updatedAt)}</Text>
+                <Text style={styles.time}>{format(item.createdAt)}</Text>
                 </View>
                 <View><Image source={{uri:imageLink+item.post_id.image}} style={styles.postImage}></Image></View>
             </TouchableOpacity>
             </View>
           ):(
             <View>
-                <Text style={styles.heading}>Today</Text>
                 <TouchableOpacity onPress={()=>navigation.navigate('Product Detail',item.post_id)} style={styles.wrapper}>
                     <TouchableOpacity  onPress={()=>navigation.navigate('My Closet',item.user_id)}><Image source={{uri:imageLink+item.user_id.image}} style={styles.userImage}></Image></TouchableOpacity>
                     <View style={styles.detailView}><Text style={styles.detail}><Text style={styles.userName}>{item.user_id.name}</Text> has order {item.post_id.name}.</Text>
-                    <Text style={styles.time}>{format(item.updatedAt)}</Text>
+                    <Text style={styles.time}>{format(item.createdAt)}</Text>
                     </View>
                     <View><Image source={{uri:imageLink+item.post_id.image}} style={styles.postImage}></Image></View>
                 </TouchableOpacity>
@@ -40,11 +38,10 @@ export default function OrderNotification(props) {
       ):props.item.type=="shipped"?(
           item.user_id._id==decode._id?(
             <View>
-            <Text style={styles.heading}>Today</Text>
             <TouchableOpacity onPress={()=>navigation.navigate('Order Track',item.order_id)} style={styles.wrapper}>
                 <Image source={{uri:imageLink+item.user_id.image}} style={styles.userImage}></Image>
                 <View style={styles.detailView}><Text style={styles.detail}><Text style={styles.userName}>{item.post_id.name}</Text> has shipped.</Text>
-                <Text style={styles.time}>{format(item.updatedAt)}</Text>
+                <Text style={styles.time}>{format(item.createdAt)}</Text>
                 </View>
                 <View><Image source={{uri:imageLink+item.post_id.image}} style={styles.postImage}></Image></View>
             </TouchableOpacity>
@@ -52,7 +49,6 @@ export default function OrderNotification(props) {
           ):(null)
       ):(
         <View>
-            <Text style={styles.heading}>Today</Text>
             
             <TouchableOpacity onPress={()=>navigation.navigate('Order Track',item.order_id)} style={styles.wrapper}>
             {item.user_id._id==decode._id?(
@@ -63,7 +59,7 @@ export default function OrderNotification(props) {
             )}
                 
                 <View style={styles.detailView}><Text style={styles.detail}>Your order is complete. (<Text style={styles.userName}>{item.post_id.name}</Text>)</Text>
-                <Text style={styles.time}>{format(item.updatedAt)}</Text>
+                <Text style={styles.time}>{format(item.createdAt)}</Text>
                 </View>
                 <View><Image source={{uri:imageLink+item.post_id.image}} style={styles.postImage}></Image></View>
             </TouchableOpacity>

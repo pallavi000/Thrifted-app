@@ -9,29 +9,36 @@ const Khalti = (props) => {
 
   useEffect(()=>{
     setIsVisible(props.visible)
-    console.log(props.pid)
   },[props])
 
   const _onPaymentComplete = async(data) => {
+    props.setIsSubmitting(true)
     props.setVisible(false);
     const str = data.nativeEvent.data;
     const resp = JSON.parse(str);
     if (resp.event === 'CLOSED') {
       // handle closed action
+      props.setIsSubmitting(false)
     } else if (resp.event === 'SUCCESS') {
       try {
-        const data= {
-          token:resp.data.token,
-          amount:resp.data.amount
+        const data = {
+          total:props.subtotal+props.shippingFee,
+          shipping:props.shippingFee,
+          note: '',
+          transaction_id:props.pid,
+          payment_method:'khalti',
+          amount: resp.data.amount,
+          token: resp.data.token
         }
-        var response = await axios.post('/order/khalti/verify',data)
-        Alert.alert('Success','Payment Success')
+        await axios.post('/order',data, props.config)
+        props.setIsSubmitting(false)
         props.orderSuccess()
       } catch (error) {
-
-        Alert.alert('Error','Payment Failed')
+        props.setIsSubmitting(false)
+        Alert.alert('Error', error.request.response)
       }
     } else if (resp.event === 'ERROR') {
+      props.setIsSubmitting(false)
       Alert.alert('Error','Payment Failed')
     }
     return;

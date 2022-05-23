@@ -146,7 +146,7 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
                     </View>
                 </View>
 
-                <TouchableOpacity onPress={()=>navigation.navigate('Redeem')} style={styles.pagesWrapper}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Redeem',user)} style={styles.pagesWrapper}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                 <MaterialCommunityIcons name='briefcase' size={20}></MaterialCommunityIcons>
                     <Text style={styles.pageName}>Redeem</Text>

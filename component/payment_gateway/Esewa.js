@@ -13,27 +13,30 @@ const Esewa = (props) => {
   const _onPaymentComplete = async (response) => {
     setResponse(response);
     props.setVisible(false)
-    console.log(response)
+    props.setIsSubmitting(true)
     if(response.token) {
       const data = {
+        total:props.subtotal+props.shippingFee,
+        shipping:props.shippingFee,
+        note: '',
+        transaction_id:props.pid,
+        payment_method:'esewa',
         amt:response.amount,
         rid: response.token,
         pid: props.pid
       }
       try {
-        var response = await axios.post('/order/esewa/verify',data)
+        await axios.post('/order',data, props.config)
         Alert.alert('Success','Payment Success')
+        props.setIsSubmitting(false)
         props.orderSuccess()
-        console.log(response.data)
       } catch (error) {
-        console.log(error.message)
-        Alert.alert('Error', 'Payment Failed')
-
+        props.setIsSubmitting(false)
+        Alert.alert('Error', error.request.response)
       }
     } else {
-      console.log('error')
-      Alert.alert('Error','Payment Failed')
-      
+      props.setIsSubmitting(false)
+      Alert.alert('Error', response.message)
     }
     return
   }

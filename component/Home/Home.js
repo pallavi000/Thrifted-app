@@ -23,7 +23,7 @@ export default function Home({navigation}) {
     const[nextPage,setNextPage] = useState(true)
     const[comment,setComment] = useState('')
     const data = useContext(AuthContext)
-    const {unreadMessage, setUnreadMessage, token,unreadNotification,setUnreadNotification,socket} = data
+    const {unreadMessage, setUnreadMessage, token,unreadNotification,setUnreadNotification,socket,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount} = data
     const config = {
         headers: {
             'access-token':token
@@ -68,7 +68,6 @@ export default function Home({navigation}) {
     
 
     async function getUnreadMessageCount() {
-        console.log(config)
         try {
             const response = await axios.get('/chat/message/unread-count', config)
             setUnreadMessage(response.data)
@@ -85,17 +84,15 @@ export default function Home({navigation}) {
 
     useEffect(() => {
         getProducts(activePage, itemsCountPerPage, false)
-        socket.current.on('notification',(notification)=>{
-            setUnreadNotification(prev=>prev+1)
-            console.log(notification)
-        })
     }, [])
 
 
    async function getUnreadNotificationCount(){
         try {
             var response = await axios.get('/notification/count',config)
-            setUnreadNotification(response.data) 
+            setUnreadNotification(response.data.total)
+            setUnreadNormalNotificationCount(response.data.normalNotificationCount)
+            setUnreadOrderNotificationCount(response.data.orderNotificationCount) 
         } catch (error) {
             
         }
@@ -134,9 +131,6 @@ export default function Home({navigation}) {
                 />                
             ):(null)}
             <Action product={item} products={products} setProducts={setProducts} navigation= {navigation}/>
-            {index==products.length-1?(
-                <ActivityIndicator size={'large'} color="#663399" />
-            ):(null)}
             </View>
         )
     }
@@ -183,6 +177,9 @@ export default function Home({navigation}) {
             keyExtractor={item => item._id}
             renderItem={renderItem}
             onEndReached={GetNextPage}
+            ListFooterComponent={()=>(
+                <ActivityIndicator size={'large'} color="#663399" />
+            )}
         />
         
         

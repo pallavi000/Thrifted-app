@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
      color:'white',
      fontFamily:'Raleway_800ExtraBold', 
      padding:20 ,
-     paddingTop:50  
+     paddingVertical:30  
  },
  loginForm:{
    backgroundColor:'white',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     width:Dimensions.get('window').width-60,
     backgroundColor:'#663399',
     borderRadius:10,
-    marginTop:50,
+    marginTop:30,
     marginBottom:30
     },
     loginText:{

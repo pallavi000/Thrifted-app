@@ -32,6 +32,7 @@ export default function CategoryPage({navigation,route}) {
    const[nextPage,setNextPage] = useState(true)
    const fall = new Animated.Value(1)
    const[nextPageProducts, setNextPageProducts] = useState(false)
+   const[hasNextPage, setHasNextPage] = useState(true)
 
  
 
@@ -62,6 +63,13 @@ export default function CategoryPage({navigation,route}) {
             sorting
         }
         var response = await axios.post('/category/filter',data)
+        
+        var currentPageNo = response.data.total/itemsPerPage
+        currentPageNo=  Math.ceil(currentPageNo)
+        if(currentPageNo==pageNo){
+            setHasNextPage(false)
+        }
+
         if(nextPageProducts) {
             setProducts([...products, response.data.products])
         } else {
@@ -75,7 +83,6 @@ export default function CategoryPage({navigation,route}) {
         setNextPage(false)
        } catch (error) {
            setLoader(false)
-           console.log(error.message)
        }
    }
 
@@ -115,11 +122,11 @@ export default function CategoryPage({navigation,route}) {
                 setTotalProduct(response.data.total)
             }
                 
-            // var currentPageNo = response.data.total/itemsPerPage
-            // currentPageNo=  Math.ceil(currentPageNo)
-            // if(currentPageNo<pageNo){
-            //     setPageNo(currentPageNo)
-            // }
+            var currentPageNo = response.data.total/itemsPerPage
+            currentPageNo=  Math.ceil(currentPageNo)
+            if(currentPageNo==pageNo){
+                setHasNextPage(false)
+            }
 
             setLoader(false)
             setNextPage(false)
@@ -143,7 +150,7 @@ export default function CategoryPage({navigation,route}) {
    }
 
    const GetNextPage = useCallback(()=>{
-       if (!nextPage) {
+       if (!nextPage && hasNextPage) {
             setNextPageProducts(true)
             setNextPage(true)
             setPageNo(pageNo+1)
@@ -165,6 +172,8 @@ export default function CategoryPage({navigation,route}) {
               setMinprice = {setMinprice}
               colors= {colors}
               brands = {brands}
+              title = {category.name}
+              navigation = {navigation}
           />
       ):(
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
@@ -192,14 +201,15 @@ export default function CategoryPage({navigation,route}) {
         <Text style={styles.filter}>{getSortingInfo()}</Text>
     </TouchableOpacity>
     </View>
-    
+    {products.length>0?(
     <FlatList
         contentContainerStyle={styles.container}
         data={products}
         numColumns={2}
         keyExtractor={item => item._id}
         onEndReached={GetNextPage}
-        renderItem={({ item })=>(
+        renderItem={({ item,index })=>(
+            <>
             <TouchableOpacity onPress={()=>navigation.navigate('Product Detail',item)} key={item._id} style={styles.productWrapper}>
             <Image source={{uri:imageLink+item.image}} style={styles.productImage}></Image>
             <View style={styles.detailWrapper}>
@@ -214,8 +224,27 @@ export default function CategoryPage({navigation,route}) {
             </View>
             </View>
         </TouchableOpacity>
+            </>
         )}
+        ListFooterComponent={(
+            hasNextPage ?(
+            <View style={{flex:1/2}} >
+                <ActivityIndicator size={'large'} color="#663399"/>
+            </View>
+            ):(null)
+        )}
+        ListFooterComponentStyle={{padding: 40,flex:1,alignSelf:'center'}}
     />
+    ):(
+        <View style={{alignItems:'center',justifyContent:'center',paddingTop:90}}>
+            <View>
+                <Image source={require('../../assets/empty-search.png')} style={styles.image} />
+            </View>
+            <Text style={styles.header}>No Result Found</Text>
+        </View>
+    )}
+
+
     </Animated.View>
     )}
     </SafeAreaView>
@@ -224,6 +253,18 @@ export default function CategoryPage({navigation,route}) {
 }
 
 const styles = StyleSheet.create({
+    image: {
+        width: Dimensions.get('window').width-40,
+        height: 200,
+        resizeMode: 'contain',
+    },
+    header: {
+        fontWeight:'700',
+        fontSize:28,
+        fontFamily:"Raleway_700Bold",
+        color: '#262626',
+        textAlign: 'center'
+    },
     row:{
         flexDirection:'row',
         justifyContent:'space-between',
@@ -245,9 +286,10 @@ const styles = StyleSheet.create({
         textTransform: 'capitalize'
     },
     container:{
-        alignItems: 'center',
+        alignItems: 'flex-start',
         paddingTop: 15,
         paddingBottom: 50,
+        paddingHorizontal: 5
     },
     productImage:{
         height:210,

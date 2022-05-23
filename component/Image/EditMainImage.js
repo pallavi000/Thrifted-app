@@ -8,11 +8,19 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 
 
-
-
-const MainImage = (props) => {
+const EditMainImage = (props) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [imageIndex,setImageIndex] = useState('')
+    const[mainImage, setMainImage] = useState(imageLink+props.mainImage)
+    const[featureImages,setFeatureImages] = useState([])
+
+    useEffect(()=>{
+        var arr = []
+        props.featureImages.forEach(fi=>{
+            arr.push(imageLink+fi)
+        })
+        setFeatureImages(arr)
+    },[])
 
 async function getRequestPermission(){
     const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
@@ -51,6 +59,13 @@ async function selectImage(){
     })
     if(!result.cancelled){
         setFieldValue(`image${imageIndex}`,result.uri)
+        if(imageIndex==1) {
+            setMainImage(result.uri)
+        } else {
+            var newFeatureImages = [...featureImages]
+            newFeatureImages[imageIndex-2] = result.uri
+            setFeatureImages(newFeatureImages)
+        }
         setModalVisible(false)
         props.sheetRef.current.snapTo(1)
     }
@@ -60,6 +75,13 @@ async function openCamera(){
     const result = await imagePicker.launchCameraAsync()
     if(!result.cancelled){
         setFieldValue(`image${imageIndex}`,result.uri)
+        if(imageIndex==1) {
+            setMainImage(result.uri)
+        } else {
+            var newFeatureImages = [...featureImages]
+            newFeatureImages[imageIndex-2] = result.uri
+            setFeatureImages(newFeatureImages)
+        }
         setModalVisible(false)
         props.sheetRef.current.snapTo(1)
     }
@@ -88,8 +110,8 @@ function multiImage(){
         <View>
     <View style={styles.uploadImageWrapper}>
       <TouchableOpacity onPress={()=>toggleImage(1)}>
-        {values.image1?(
-          <Image source={{uri:values.image1}} style={styles.userImage} ></Image>
+        {mainImage?(
+          <Image source={{uri:mainImage}} style={styles.userImage} ></Image>
         ):(
           <View style={[styles.cameraContainer, {height:150, width:170}]}>
             <Feather name='camera' size={40} color="#C4C4C4BF"></Feather>
@@ -100,8 +122,8 @@ function multiImage(){
 
                <View style={styles.row}>
                <TouchableOpacity onPress={()=>toggleImage(2)}>
-               {values.image2?(
-                <Image source={{uri:values.image2}} style={styles.upload} ></Image>
+               {featureImages[0]?(
+                <Image source={{uri:featureImages[0]}} style={styles.upload} ></Image>
               ):(
                 <View style={styles.cameraContainer}>
                   <Feather name='camera' size={40} color="#C4C4C4BF"></Feather>
@@ -109,8 +131,8 @@ function multiImage(){
               )}
                </TouchableOpacity>
                <TouchableOpacity onPress={()=>toggleImage(3)}>
-               {values.image3?(
-                  <Image source={{uri:values.image3}} style={styles.upload} ></Image>
+               {featureImages[1]?(
+                  <Image source={{uri:featureImages[1]}} style={styles.upload} ></Image>
                 ):(
                   <View style={styles.cameraContainer}>
                     <Feather name='camera' size={40} color="#C4C4C4BF"></Feather>
@@ -118,8 +140,8 @@ function multiImage(){
                 )}
                </TouchableOpacity>
                <TouchableOpacity onPress={()=>toggleImage(4)}>
-               {values.image4?(
-                    <Image source={{uri:values.image4}} style={styles.upload} ></Image>
+               {featureImages[2]?(
+                    <Image source={{uri:featureImages[2]}} style={styles.upload} ></Image>
                   ):(
                     <View style={styles.cameraContainer}>
                       <Feather name='camera' size={40} color="#C4C4C4BF"></Feather>
@@ -299,4 +321,4 @@ textSecondary:{
       },
 })
 
-export default MainImage
+export default EditMainImage

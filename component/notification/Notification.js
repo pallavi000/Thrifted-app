@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View,Image ,ScrollView,SafeAreaView, FlatList,TouchableWithoutFeedback} from 'react-native'
+import { StyleSheet, Text, View,Image ,ScrollView,SafeAreaView, FlatList,TouchableWithoutFeedback, ActivityIndicator, Alert, TouchableOpacity} from 'react-native'
 import React,{useEffect,useState,useContext} from 'react'
 import axios from 'axios'
 import { AuthContext } from '../Context'
@@ -10,36 +10,82 @@ import LikeNotification from './LikeNotification'
 import CommentNotification from './CommentNotification'
 import FollowNotification from './FollowNotification'
 import OrderNotification from './OrderNotification'
+import bbstyles from '../Styles'
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
+import EmptyNotification from './EmptyNotification'
+
 
 export default function Notification({navigation}) {
-const data = useContext(AuthContext)
-const[notifications,setNotifications] =useState([])
-const {token,setUnreadNotification,socket} = data
-const[orderNotifications,setOrderNotifications] = useState([])
-const[tab,setTab] = useState('normal')
-const config = {
-    headers:{
-        'access-token':token
+    const data = useContext(AuthContext)
+    const[notificationLoader,setNotificationLoader] = useState(true)
+    const[orderNotificationLoader, setOrderNotificationLoader] = useState(true)
+    const[notifications,setNotifications] =useState([])
+    const[originalNotifications, setOriginalNotifications] = useState([])
+    const {token,unreadNotification, setUnreadNotification,socket,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount} = data
+    const[orderNotifications,setOrderNotifications] = useState([])
+    const[originalOrderNotifications, setOriginalOrderNotifications] = useState([])
+    const[tab,setTab] = useState('normal')
+    const config = {
+        headers:{
+            'access-token':token
+        }
     }
-}
 
     useEffect(() => {
      getNotification()
      getOrderNotification()
      readNotification()
-
-     socket.current.on('notification',(notification)=>{
-        setUnreadNotification(prev=>prev+1)
-        setNotifications(prevNotification => [notification, ...prevNotification])
-        console.log(notification)
-    })
     }, [])
+
+    useEffect(()=>{
+        if(tab=='order' && unreadOrderNotificationCount>0) {
+            readOrderNotification()
+        }
+    },[tab])
+
+    useEffect(()=>{
+        if(socket.current) {
+            socket.current.on('notification',(notification)=>{
+                setNotifications(groupNotification([...originalNotifications, notification]))
+                setOriginalNotifications([...originalNotifications, notification])
+            })
+        }
+    },[socket, originalNotifications])
+
+    function groupNotification(data) {
+        // this gives an object with dates as keys
+        const items = data.reduce((items, item) => {
+            if(item) {
+                let date = item.createdAt ? item.createdAt : new Date().toJSON()
+                date = date.split('T')[0];
+                if (!items[date]) {
+                    items[date] = [];
+                }
+                items[date].push(item);
+                return items;
+            }
+        }, {});
+        // Edit: to add it in the array format instead
+        let itemsArray = Object.keys(items).map((date) => {
+            return {
+                id: uuidv4(),
+                date,
+                items: items[date]
+            };
+        });
+        itemsArray = itemsArray.sort((a,b) =>  new Date(b.date) - new Date(a.date));
+        return itemsArray
+    }
 
 
    async function getNotification(){
        try {   
         const response = await axios.get('/notification',config)
-        setNotifications(response.data)
+        setOriginalNotifications(response.data)
+        const noti = groupNotification(response.data)
+        setNotifications(noti)
+        setNotificationLoader(false)        
        } catch (error) {
            console.log(error.message)
        }
@@ -48,8 +94,10 @@ const config = {
     async function getOrderNotification(){
         try {
             var response = await axios.get('/order-notification/order',config)
-            console.log(response.data)
-            setOrderNotifications(response.data)
+            setOriginalOrderNotifications(response.data)
+            const notif = groupNotification(response.data)
+            setOrderNotifications(notif)
+            setOrderNotificationLoader(false)
         } catch (error) {
             
         }
@@ -58,76 +106,126 @@ const config = {
    async function readNotification(){
         try {
             var response = await axios.get('/notification/read',config)
-            setUnreadNotification(0)
+            setUnreadNotification(unreadNotification-unreadNormalNotificationCount)
+            setUnreadNormalNotificationCount(0)
         } catch (error) {
             console.log(error.request.response)
+        }
+    }
+
+    async function readOrderNotification() {
+        try {
+            await axios.get('/order-notification/read',config)
+            setUnreadNotification(unreadNotification-unreadOrderNotificationCount)
+            setUnreadOrderNotificationCount(0)
+        } catch (error) {
+            console.log(error.request.response)
+        }
+    }
+
+    function getDisplayDate(date) {
+        const dateArr = date.split('-')
+        const year = dateArr[0]
+        const month = dateArr[1]
+        const day = dateArr[2]
+        const today = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        const compDate = new Date(year,month-1,day); // month - 1 because January == 0
+        const diff = today.getTime() - compDate.getTime(); // get the difference between today(at 00:00:00) and the date
+        if (compDate.getTime() == today.getTime()) {
+            return "Today";
+        } else if (diff <= (24 * 60 * 60 *1000)) {
+            return "Yesterday";
+        } else { 
+            return compDate.toDateString(); // or format it what ever way you want
         }
     }
     
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-        <ScrollView>
         <View style={styles.category}>
-            <TouchableWithoutFeedback onPress={()=>setTab('normal')}><View><Text style={tab=='normal'?styles.normal:styles.order}>Normal</Text></View></TouchableWithoutFeedback>
-            <TouchableWithoutFeedback onPress={()=>setTab('order')}><View><Text style={tab=='order'?styles.normal:styles.order} >Orders</Text></View></TouchableWithoutFeedback>
+            <TouchableOpacity onPress={()=>setTab('normal')}>
+                <View>
+                    <Text style={tab=='normal'?styles.normal:styles.order}>
+                        Normal {unreadNormalNotificationCount>0?(<Text style={styles.unread}>({unreadNormalNotificationCount})</Text>):(null)}
+                    </Text>
+                </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>setTab('order')}>
+                <View>
+                    <Text style={tab=='order'?styles.normal:styles.order}>
+                        Orders {unreadOrderNotificationCount>0?(<Text style={styles.unread}>({unreadOrderNotificationCount})</Text>):(null)}
+                    </Text>
+                </View>
+            </TouchableOpacity>
         </View>
-       {tab=='normal'?(
-           <>
-           {notifications.map(item=>{
-               return(
-                   item.type=='like'?(
-                    <LikeNotification item={item} navigation={navigation}/>
-                ):item.type=='comment'?(
-                    <>
-                        <CommentNotification item={item} navigation={navigation}/>
-                    </>
-                ):item.type=='follow'?(
-                    <>
-                        <FollowNotification item={item} navigation={navigation}/>
-                    </>
-                ):(null)
-               )
-           })}
-        {/* <FlatList data={notifications}
-       keyExtractor={(item)=>item._id}
-       renderItem={({item})=>(
-           item.type=='like'?(
-            <LikeNotification item={item} navigation={navigation}/>
-           ):item.type=='comment'?(
-            <>
-                <CommentNotification item={item} navigation={navigation}/>
-            </>
-           ):item.type=='follow'?(
-               <>
-                <FollowNotification item={item} navigation={navigation}/>
-               </>
-           ):(null)
-       )}
-       /> */}
-           </>
-       ):(
-           <>
-           {orderNotifications.map(item=>{
-               return(
-                   <OrderNotification item={item} navigation={navigation}/>
-               )
-           })}
-            {/* <FlatList data={orderNotifications}
-            keyExtractor={item=>item._id}
-            renderItem={({item})=>(
-                <OrderNotification item={item} navigation={navigation}/>
+        {notificationLoader && orderNotificationLoader ? (
+            <View style={bbstyles.loaderContainer}>
+                <ActivityIndicator size={'large'} color='#663399'/>
+            </View>
+        ):(
+        (notifications && notifications.length>0) || (orderNotifications && orderNotifications.length>0) ? (
+                <>
+                {tab==='normal'?(
+                    <FlatList
+                    data={notifications}
+                    keyExtractor={item=>item.id}
+                    renderItem={({item})=>(
+                        <>
+                        <Text style={styles.heading}>{getDisplayDate(item.date)}</Text>
+                        <FlatList
+                            data={item.items}
+                            keyExtractor={item=>uuidv4()}
+                            renderItem={({item})=>(
+                                item.type=='like'?(
+                                    <LikeNotification key={item.id} item={item} navigation={navigation}/>
+                                ):item.type=='comment'?(
+                                    <CommentNotification key={item.id} item={item} navigation={navigation}/>
+                                ):item.type=='follow'?(
+                                    <FollowNotification key={item.id} item={item} navigation={navigation}/>
+                                ):(null)
+                            )}
+                            />
+                            </>
+                    )}
+                    />
+                ):(
+                    <FlatList
+                    data={orderNotifications}
+                    keyExtractor={item=>item.id}
+                    renderItem={({item})=>(
+                        <>
+                        <Text style={styles.heading}>{getDisplayDate(item.date)}</Text>
+                        <FlatList
+                        data={item.items}
+                        keyExtractor={item=>item._id}
+                        renderItem={({item})=>(
+                            <OrderNotification key={item._id} item={item} navigation={navigation}/>
+                        )}
+                        />
+                        </>
+                    )}
+                    />
             )}
-            /> */}
-
-           </>
-       )}
-       
-        </ScrollView>
+            </>
+        ):(
+            <EmptyNotification
+                navigation={navigation}
+            />
+        )
+        )}
     </SafeAreaView>
+   
   )
 }
 
 const styles = StyleSheet.create({
+    unread: {
+        color: '#FF2424'
+    },
     heading:{
         fontSize:15,
         fontWeight:'600',
@@ -187,7 +285,8 @@ const styles = StyleSheet.create({
     normal:{
         fontSize:16,
         fontWeight:'600',
-        fontFamily:"Raleway_600SemiBold"
+        fontFamily:"Raleway_600SemiBold",
+        color: 'black'
     },
     order:{
         fontFamily:"Raleway_600SemiBold",

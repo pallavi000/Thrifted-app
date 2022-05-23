@@ -1,12 +1,13 @@
-import { StyleSheet,ActivityIndicator, Text, View, SafeAreaView, ScrollView } from 'react-native'
+import { StyleSheet,ActivityIndicator, Text, View, SafeAreaView, ScrollView, FlatList } from 'react-native'
 import React,{useState,useEffect, useContext} from 'react'
 import {Feather, MaterialCommunityIcons, Ionicons} from '@expo/vector-icons'
 import { Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import bbstyles from '../Styles'
+import EmptyRedeem from './EmptyRedeem'
 
-export default function RedeemHistory() {
+export default function RedeemHistory({navigation}) {
     const[payments,setPayments] = useState([]) 
     const[loader,setLoader] = useState(true)
 
@@ -53,26 +54,31 @@ async function getHistory(){
     <ActivityIndicator size={'large'} color='#663399'/>
 </View>
 ):(
-    <ScrollView>
+    payments && payments.length>0 ?
+    (
         <View style={styles.container}>
-        {payments.map(payment=>{
-            return(
-                payment.status== 'pending'?(
-                <View style={styles.pendingCard} key={payment._id}>
+        <FlatList
+        data={payments}
+        keyExtractor={item=>item._id}
+        initialNumToRender={6}
+        renderItem={({item})=>(
+            <View>
+            {item.status== 'pending'?(
+                <View style={styles.pendingCard} key={item._id}>
                 <View>
-                    <Text styles={styles.title}>{payment.payment_method} . {payment.account_detail}</Text>
+                    <Text styles={styles.title}>{item.payment_method} . {item.account_detail}</Text>
                             <View style={styles.row}>
-                                <Text style={styles.subtitle}>{dateConvert(payment.createdAt)}</Text>
-                                <Text style={styles.subtitle}>{timeConvert(payment.createdAt)}</Text>
+                                <Text style={styles.subtitle}>{dateConvert(item.createdAt)}</Text>
+                                <Text style={styles.subtitle}>{timeConvert(item.createdAt)}</Text>
                             </View>
                         </View>
 
                 <View style={styles.pendingAction}>
                 <MaterialCommunityIcons style={styles.icon} name='timer-sand-empty' size={20}></MaterialCommunityIcons>
                 </View>
-           </View>
-                ):payment.status=='completed'?(
-                    <View style={styles.successCard} key={payment._id}>
+                </View>
+                ):item.status=='completed'?(
+                    <View style={styles.successCard} key={item._id}>
                 <View>
                     <Text styles={styles.title}>Esewa . 9845534234</Text>
                             <View style={styles.row}>
@@ -86,7 +92,7 @@ async function getHistory(){
                 </View>
          </View>
                 ):(
-                    <View style={styles.cancelledCard} key={payment._id}>
+                    <View style={styles.cancelledCard} key={item._id}>
                 <View>
                     <Text styles={styles.title}>Esewa . 9845534234</Text>
                             <View style={styles.row}>
@@ -99,18 +105,17 @@ async function getHistory(){
                 <Ionicons name='close' style={styles.icon} size={20}></Ionicons>
                 </View>
             </View>
-                )
-            )
-        })}
-            
 
-            
-
-         
-
-
-            </View>
-    </ScrollView>
+        )}
+        </View>
+        )}
+        />
+        </View>
+    ):(
+        <EmptyRedeem
+        navigation={navigation}
+        />
+    )
 )}
     </SafeAreaView>
   )

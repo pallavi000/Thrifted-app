@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View ,SafeAreaView,ScrollView,Image,FlatList, Dimensions, TextInput, Alert, Platform, KeyboardAvoidingView, ActivityIndicator,TouchableWithoutFeedback, Pressable, Keyboard, TouchableOpacity} from 'react-native'
-import React, { useContext, useEffect,useRef,useState } from 'react'
+import React, { useContext, useEffect,useLayoutEffect,useRef,useState } from 'react'
 import { Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway'
 import {Feather, Octicons, Ionicons ,Fontisto, FontAwesome} from '@expo/vector-icons'
 import axios from 'axios'
@@ -32,12 +32,12 @@ export default function Chat({route,navigation}) {
       } 
 
     useEffect(() => {
-        
-
-        socket.current.on('receiveMessage',(message)=>{
-            setMessages(prevMessages => [...prevMessages, message])
-        })
-    }, [])
+        if(socket.current) {
+            socket.current.on('receiveMessage',(message)=>{
+                setMessages([...messages, message])
+            })
+        }
+    }, [socket, messages])
 
     async function sendMessage() {
         try {
@@ -63,29 +63,32 @@ export default function Chat({route,navigation}) {
 
     
     const receiver = route.params
-    navigation.setOptions({
-        title:receiver.user.name,
-        headerTitle: () => (
-            <View style={{flexDirection: 'row',alignItems:'center',marginLeft:-30}}>
-                <Image source={{uri: imageLink+receiver.user.image}} style={{height: 30,width:30,borderRadius:15}}></Image>
-                <Text style={{marginLeft: 10,fontSize:18,fontWeight:'700',}}>{receiver.user.name}</Text>
-            </View>
-        ),
-        headerRight: () => (
-            <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: 60
-            }}>
-                <TouchableOpacity onPress={()=>videoCall()}>
-                    <FontAwesome name='video-camera' size={20}/>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>call()}>
-                    <Ionicons name='call' size={20}/>
-                </TouchableOpacity>
-            </View>
-        )
-    })
+    
+    useLayoutEffect(() => {
+      navigation.setOptions({
+            title:receiver.user.name,
+            headerTitle: () => (
+                <View style={{flexDirection: 'row',alignItems:'center',marginLeft:-30}}>
+                    <Image source={{uri: imageLink+receiver.user.image}} style={{height: 30,width:30,borderRadius:15}}></Image>
+                    <Text style={{marginLeft: 10,fontSize:18,fontWeight:'700',}}>{receiver.user.name}</Text>
+                </View>
+            ),
+            headerRight: () => (
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    width: 60
+                }}>
+                    <TouchableOpacity onPress={()=>videoCall()}>
+                        <FontAwesome name='video-camera' size={20}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>call()}>
+                        <Ionicons name='call' size={20}/>
+                    </TouchableOpacity>
+                </View>
+            )
+        })
+    }, [])
 
     function videoCall() {
         Alert.alert("Oops!!", "Feature not yet enabled.")

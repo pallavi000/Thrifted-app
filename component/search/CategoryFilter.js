@@ -1,38 +1,54 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableWithoutFeedback, TouchableOpacity, ScrollView, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import bbstyles from '../../Styles'
 import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 
-const CategorySelect = (props) => {
+const CategoryFilter = (props) => {
     const [parentCategories, setParentCategories] = useState(props.categories)
     const [childCategories, setChildCategories] = useState([])
     const [grandChildCategories, setGrandChildCategories] = useState([])
     const [selectedParentId, setSelectedParentId] = useState(null)
     const [selectedChildId, setSelectedChildId] = useState(null)
     const [selectedGrandChildId, setSelectedGrandChildId] = useState(null)
-    const [selectedCategory, setSelectedCategory] = useState(props.selectedCategory)
+    const [selectedCategory, setSelectedCategory] = useState(selectedCategory)
 
-    useEffect(()=>{
+    React.useEffect(()=>{
         props.navigation.setOptions({
-        headerShown:true,
-        headerRight:()=>(
+            headerShown:true,
+            headerRight:()=>(
                 <TouchableOpacity onPress={()=>doneSelect()}>
                     <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Done <MaterialCommunityIcons name='check-bold' size={16} color='#663399'/></Text>
                 </TouchableOpacity>
+            ),
+            title:'Select Category',
+            headerLeft:()=>(
+                <TouchableOpacity onPress={()=>props.setOpenSelectField(false)}>
+                    <Ionicons name='arrow-back' size={24}/>
+                </TouchableOpacity>
             )
         })
+        return() => {
+            props.navigation.setOptions({
+                headerRight: () => (<></>),
+                title: 'Filter',
+                headerLeft:()=>(
+                    <TouchableOpacity onPress={()=>props.setFilter(false)}>
+                        <Ionicons name='arrow-back' size={24}/>
+                    </TouchableOpacity>
+                )
+            })
+        }
     },[selectedCategory])
 
     function doneSelect() {
         props.setSelectedCategory(selectedCategory)
-        props.setOpenSelectField(null)
+        props.setOpenSelectField(false)
     }
-    
 
     function selectParentCategory(catId) {
         const filterCat = props.categories.filter(cate=>cate._id==catId)
         if(filterCat && filterCat.length>0) {
+            console.log(filterCat[0]._id)
             setParentCategories(filterCat)
             setSelectedParentId(filterCat[0]._id)
             setSelectedCategory(filterCat[0])
@@ -106,7 +122,7 @@ const CategorySelect = (props) => {
   )
 }
 
-export default CategorySelect
+export default CategoryFilter
 
 const styles = StyleSheet.create({
     container: {

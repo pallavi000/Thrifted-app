@@ -19,7 +19,7 @@ export default function ChildCat({navigation,route}) {
     <View style={styles.categoryWrapper}>
     {category.childrens.map(child=>{
       return(
-      <TouchableOpacity key={child._id} onPress={()=>navigation.navigate('Category Title',child)}><Text style={styles.name}>{child.name}</Text></TouchableOpacity>
+      <TouchableOpacity key={child._id} onPress={()=>navigation.navigate('Category Title',child)}><Text style={styles.name}>{child.name} ({child.productcount})</Text></TouchableOpacity>
       )
     })}
     </View>

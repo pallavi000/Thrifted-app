@@ -6,6 +6,7 @@ import bbstyles from '../Styles'
 import axios from 'axios'
 import { AuthContext } from '../Context';
 import { imageLink } from '../ImageLink';
+import EmptyCart from './EmptyCart';
 
 
 
@@ -86,7 +87,9 @@ export default function CartItem({navigation}) {
         </View>
     </>
      ):(
-         <Text>No Items.</Text>
+         <EmptyCart
+             navigation={navigation}
+         />
      )}
 </SafeAreaView>
   )

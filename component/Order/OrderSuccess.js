@@ -11,10 +11,9 @@ export default function OrderSuccess({navigation}) {
        <Text style={styles.title}>Congratulations !!!</Text>
        <Text style={styles.subtitle}>Your order have been taken and is being attended to</Text>
        </View>
-          <TouchableOpacity style={styles.continueBtn} onPress={()=>navigation.navigate('Cart Items')} >
-            <Text style={styles.continue}>Continue Shopping</Text>
+          <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Cart Items')} >
+            <Text style={styles.loginText}>Continue Shopping</Text>
           </TouchableOpacity>
-
        </View>
        </ScrollView>
 </SafeAreaView>
@@ -28,7 +27,7 @@ const styles = StyleSheet.create({
     display:'flex',
     justifyContent:'center',
     alignItems:'center',
-    height: Dimensions.get('window').height
+    height: Dimensions.get('window').height-90
   },
   image:{
     width:Dimensions.get('window').width,
@@ -36,8 +35,6 @@ const styles = StyleSheet.create({
  resizeMode:'contain',
     marginBottom:30,
     marginTop:20,
-    textAlign:'center',
-
 },
 successwrapper:{
   width:Dimensions.get('window').width-100,
@@ -52,7 +49,6 @@ title:{
     lineHeight:33,
     marginBottom:20,
     textAlign:'center'
-
 },
 subtitle:{
     fontSize:17,
@@ -65,35 +61,29 @@ subtitle:{
 },
 
 loginBtn:{
-
-    paddingVertical:10,
-    paddingHorizontal:10,
-    backgroundColor:'#663399',
-    borderRadius:10,
-    marginTop:50,
-    marginHorizontal:30,
-    width:Dimensions.get('window').width-60,
-   },
+        paddingVertical:10,
+        paddingHorizontal:70,
+        backgroundColor:'#663399',
+        borderRadius:10,
+        marginTop:20,
+    },
+    loginText:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
+    },
    continueBtn:{
     width:Dimensions.get('window').width-60,
-    paddingVertical:10,
+    paddingVertical:8,
     paddingHorizontal:10,
     backgroundColor:'white',
     borderRadius:10,
     marginTop:20,
     marginHorizontal:30,
-    borderWidth:1,
+    borderWidth:2,
     borderColor:'#663399',
-    shadowColor: "#663399",
-   
-shadowOffset: {
-	width: 0,
-	height: 10,
-},
-shadowOpacity: 0.2,
-shadowRadius: 16.00,
-
-elevation: 24,
    },
    continue:{
     textAlign:'center',

@@ -63,12 +63,12 @@ export default function FollowNotification(props) {
     }
   return (
     <View>
-    <Text style={styles.heading}>This week</Text>
+    
     <View style={styles.wrapper}>
-    <TouchableOpacity  onPress={()=>navigation.navigate('My Closet',item.follower)}><Image source={{uri:item.follower.image}} style={styles.userImage}></Image></TouchableOpacity> 
+    <TouchableOpacity  onPress={()=>navigation.navigate('My Closet',item.follower)}><Image source={{uri: imageLink+item.follower.image}} style={styles.userImage}></Image></TouchableOpacity> 
     
     <View style={styles.detailView}><Text style={styles.detail}><Text style={styles.userName}>{item.follower.name}</Text>  started following you.</Text>
-    <Text style={styles.time}>{format(item.updatedAt)}</Text>
+    <Text style={styles.time}>{format(item.createdAt)}</Text>
     
     </View>
     {isReady?(

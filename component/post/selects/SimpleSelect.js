@@ -1,19 +1,21 @@
 import { StyleSheet, Text,ScrollView, TouchableOpacity, View, Dimensions } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 const SimpleSelect = (props) => {
     const[selects, setSelects] = useState(props.selects)
     const [selectedSelect, setSelectedSelect] = useState(props.selectedSelect)
 
-    props.navigation.setOptions({
+    useEffect(()=>{
+        props.navigation.setOptions({
         headerShown:true,
         headerRight:()=>(
-            <TouchableOpacity onPress={()=>doneSelect()}>
-                <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Done <MaterialCommunityIcons name='check-bold' size={16} color='#663399'/></Text>
-            </TouchableOpacity>
-        )
-    })
+                <TouchableOpacity onPress={()=>doneSelect()}>
+                    <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Done <MaterialCommunityIcons name='check-bold' size={16} color='#663399'/></Text>
+                </TouchableOpacity>
+            )
+        })
+    },[selectedSelect])
 
     function doneSelect() {
         if(!selectedSelect) return

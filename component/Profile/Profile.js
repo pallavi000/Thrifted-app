@@ -37,7 +37,6 @@ export default function Profile({navigation}) {
 ):(
      <ScrollView style={{position:'relative'}} >
         <View style={styles.cardWrapper}>
-        <Text style={styles.MainHeader}>My Profile</Text>
             <View style={styles.card}>
             <Image style={styles.userImg} source={{uri:imageLink+user.image}}></Image>
             <Text style={[styles.userName,{marginTop:30,marginBottom:10}]}>{user.name}</Text>
@@ -107,8 +106,7 @@ const styles = StyleSheet.create({
     cardWrapper:{
         padding:20,
         paddingHorizontal:30,
-       
-    
+        paddingTop: 60
     },
     
     card:{

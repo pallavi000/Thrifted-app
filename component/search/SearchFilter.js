@@ -2,15 +2,20 @@ import { StyleSheet, Text, View,SafeAreaView,ScrollView ,TouchableOpacity} from 
 import React,{useState,useEffect,useLayoutEffect} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import {Fontisto, Ionicons} from '@expo/vector-icons'
-import BrandFilter from './BrandFilter'
+import BrandFilter from '../Product/filters/BrandFilter'
 // import MultiSlider from '@ptomasroos/react-native-multi-slider'
+import CategoryFilter from './CategoryFilter'
+import { useIsFocused } from '@react-navigation/native'
 
-export default function Filter(props) {
+export default function SearchFilter(props) {
     const[showBrand,setShowBrand] = useState(false)
+    const[showCategory,setShowCategory] = useState(false)
     const[color_id,setColor_id] = useState([])
     const[brand_id,setBrand_id] = useState([])
     const[minprice,setMinprice] = useState([0])
     const[maxprice,setMaxprice]= useState([20000])
+    const[category_id, setCategory_id] = useState(props.category_id)
+    const[selectedCategory, setSelectedCategory] = useState(props.selectedCategory)
 
     const {navigation} = props
 
@@ -22,7 +27,7 @@ export default function Filter(props) {
             setMinprice(props.minprice)
         }
     },[])
-
+    
     useEffect(()=>{
         props.navigation.setOptions({
             title:'Filter',
@@ -34,7 +39,7 @@ export default function Filter(props) {
         })
         return() => {
            props.navigation.setOptions({
-            title: props.title,
+            title:'Search Result',
             headerLeft:()=>(
                     <TouchableOpacity onPress={()=>props.navigation.goBack()}>
                         <Ionicons name='arrow-back' size={24}/>
@@ -43,6 +48,12 @@ export default function Filter(props) {
             }) 
         }
     },[])
+
+    useEffect(()=>{
+        if(selectedCategory) {
+            setCategory_id([selectedCategory._id])
+        }
+    },[selectedCategory])
     
     function color_filter(id){
         if(color_id.includes(id)){
@@ -57,8 +68,15 @@ export default function Filter(props) {
     function apply() {
         props.setColor_id(color_id)
         props.setBrand_id(brand_id)
-        props.setMinprice(minprice)
-        props.setMaxprice(maxprice)
+        if(minprice[0]!=0 || maxprice[0]!=20000) {
+            props.setMinprice(minprice)
+            props.setMaxprice(maxprice)
+        } else{
+            props.setMinprice([])
+            props.setMaxprice([])
+        }
+        props.setCategory_id(category_id)
+        props.setSelectedCategory(selectedCategory)
         props.setFilter(false)
     }
 
@@ -76,6 +94,8 @@ export default function Filter(props) {
         })
         return brandNames.join(", ")
     }
+    
+
 
   
 
@@ -87,9 +107,17 @@ export default function Filter(props) {
               brand_id = {brand_id}
               setBrand_id = {setBrand_id}
           />
+      ):showCategory ? (
+          <CategoryFilter
+            categories={props.categories}
+            navigation={navigation}
+            setOpenSelectField={setShowCategory}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            setFilter = {props.setFilter}
+          />
       ):(
-
-      
+    
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
     <ScrollView>
         <View style={styles.container}>
@@ -152,6 +180,20 @@ export default function Filter(props) {
                                     <Text style={styles.category}>Girls</Text>
                                 </View>
                             </View> */}
+
+                    <TouchableOpacity style={styles.filterSection} onPress={()=>setShowCategory(true)}>
+                        <Text style={styles.title}>Category</Text>
+                        <View style={styles.BrandFilter}>
+                        {selectedCategory ? (
+                            <Text style={styles.subtitle}>{selectedCategory.name}</Text>
+                        ): (
+                            <Text style={styles.subtitle}>Select category from the list.</Text>
+                        )}
+                        
+                            <Fontisto name='angle-right' size={20}></Fontisto>
+                           
+                        </View>
+                    </TouchableOpacity>
 
                     <TouchableOpacity style={styles.filterSection} onPress={()=>setShowBrand(true)}>
                         <Text style={styles.title}>Brand</Text>
@@ -374,10 +416,4 @@ const styles = StyleSheet.create({
         marginVertical:10,
         borderRadius:25
     }
-
-
-    
-
-
-   
 })

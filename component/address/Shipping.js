@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TouchableOpacity,Alert, ActivityIndicator} from 'react-native'
+import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TouchableOpacity,Alert, ActivityIndicator, FlatList, Image, Dimensions} from 'react-native'
 import React,{useState,useEffect,useContext} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
-import {Ionicons} from '@expo/vector-icons'
+import {Fontisto, Ionicons} from '@expo/vector-icons'
 import CheckBox from 'expo-checkbox'
 import axios from 'axios'
 import { AuthContext } from '../Context'
@@ -23,13 +23,12 @@ export default function Shipping(props) {
     async function loadSelectedCheckBox() {
         var addressId = await AsyncStorage.getItem('shippingId')
         setSelection(addressId)
-
     }
     
 
     useEffect(()=>{
         loadSelectedCheckBox()
-    },[])
+    },[isSelected])
 
    
 
@@ -84,25 +83,26 @@ async function removeAddress(id){
 }
 
   return (
-    <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+    <SafeAreaView style={{backgroundColor:'white',flex:1,padding:10}} >
     {loader ? (
         <View style={bbstyles.loaderContainer}>
             <ActivityIndicator size={'large'} color='#663399'/>
         </View>
     ):(
-    <ScrollView >
-    {addresses && addresses.length !=0?(
-        addresses.map(address=>{
-        return(
-            <View key={address._id} style={styles.addressCard}>
+    addresses && addresses.length !=0?(
+        <FlatList
+        data={addresses}
+        keyExtractor={item=>item._id}
+        renderItem={({item})=>(
+            <View key={item._id} style={styles.addressCard}>
             <View style={styles.address}>
-            <Text style={styles.userName}>{address.name}</Text>
-            <Text style={styles.street}> {address.street} </Text>
-            <Text style={styles.street}>{address.city}, {address.district}, {address.zipcode}, Nepal</Text>
+            <Text style={styles.userName}>{item.name}</Text>
+            <Text style={styles.street}> {item.street} </Text>
+            <Text style={styles.street}>{item.city}, {item.district}, {item.zipcode}, Nepal</Text>
             <View style={styles.addressCheck}>
            
             <CustomCheckBox
-                id={address._id}
+                id={item._id}
                 loadSelectedCheckBox={loadSelectedCheckBox}
                 isSelected={isSelected}
                 setSelection={setSelection}
@@ -111,36 +111,69 @@ async function removeAddress(id){
             <Text style={styles.street}>Use as the shipping address</Text>
             </View>
         </View>
-        <View style={styles.action}>
-        <TouchableOpacity onPress={()=>navigation.navigate('Edit Address',address)}>
-            <Text style={styles.edit}>Edit</Text>
-            </TouchableOpacity>
-            {isSubmitting==address._id?(
-                <TouchableOpacity style={[styles.edit,{color:'red',marginBottom:10}]}>
-                    <ActivityIndicator size={'small'} color='#fa4a0c' />
+            <View style={styles.action}>
+            <TouchableOpacity onPress={()=>navigation.navigate('Edit Address',item)}>
+                <Text style={styles.edit}>Edit</Text>
                 </TouchableOpacity>
-            ):(
-            <TouchableOpacity onPress={()=>removeAddress(address._id)}>
-                <Text style={[styles.edit,{color:'red',marginBottom:10}]}>Delete</Text>
-            </TouchableOpacity>
-            )}
+                {isSubmitting==item._id?(
+                    <TouchableOpacity style={[styles.edit,{color:'red',marginBottom:10}]}>
+                        <ActivityIndicator size={'small'} color='#fa4a0c' />
+                    </TouchableOpacity>
+                ):(
+                <TouchableOpacity onPress={()=>removeAddress(item._id)}>
+                    <Text style={[styles.edit,{color:'red',marginBottom:10}]}>Delete</Text>
+                </TouchableOpacity>
+                )}
+            </View>
         </View>
-    </View>
-        )
-    })
-    ):(null)}
-    
- 
-    <TouchableOpacity onPress={()=>navigation.navigate('Add Address')} style={styles.add}>
-        <Ionicons name="add" size={20} style={styles.addIcon}></Ionicons>
-    </TouchableOpacity>
-    </ScrollView>
+        )}
+        ListFooterComponent={()=>(
+            <TouchableOpacity onPress={()=>navigation.navigate('Add Address')} style={styles.add}>
+                <Fontisto name="plus-a" size={24} style={styles.addIcon} />
+            </TouchableOpacity>
+        )}
+        />
+    ):(
+        <>
+        <View style={{flex:1, alignItems:'center',justifyContent:'center',paddingBottom:50}}>
+            <View>
+                <Image source={require('../../assets/empty-address.png')} style={styles.image} />
+            </View>
+            <Text style={styles.header}>No Address Added Yet</Text>
+            <Text style={styles.subtitle}>Click the button below to add</Text>
+        </View>
+        <TouchableOpacity onPress={()=>navigation.navigate('Add Address')} style={[styles.add,{marginBottom:30}]}>
+            <Fontisto name="plus-a" size={24} style={styles.addIcon} />
+        </TouchableOpacity>
+        </>
+    )
     )}
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
+    image: {
+        width: Dimensions.get('window').width-40,
+        height: 200,
+        resizeMode: 'contain',
+        marginBottom: 20
+    },
+    header: {
+        fontWeight:'700',
+        fontSize:28,
+        fontFamily:"Raleway_700Bold",
+        color: '#262626',
+        textAlign: 'center'
+    },
+    subtitle: {
+        fontSize:12,
+        fontWeight:'600',
+        fontFamily:"Raleway_600SemiBold",
+        color:'#868686',
+        marginTop: 10,
+        textAlign:'center',
+    },
     action:{
             justifyContent:'space-between'
     },
@@ -190,27 +223,25 @@ const styles = StyleSheet.create({
     },
 
 add:{
-    shadowColor: "rgba(0, 0, 0, 0.3)",
-            shadowOffset: {
-                width: 0,
-                height: 5,
-            },
-            shadowOpacity: 0.6,
-            shadowRadius: 20,
-            elevation: 14,
-            margin:10,  
-            height:40,
-            width:40,
-            borderRadius:20 ,
-          
-            justifyContent:'center',
-            alignItems:'center',
-            backgroundColor:'#f5f5ff',
-           
-
-            },
-            addIcon:{
-                textAlign:'center'
-            }
+    shadowColor: "#663399",
+shadowOffset:{
+width: 0,
+height: 2,
+},
+shadowOpacity: 0.25,
+shadowRadius: 3.84,
+elevation: 5,
+    margin:10,  
+    height:50,
+    width:50,
+    borderRadius:25 ,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:'#f5f5ff',
+    },
+    addIcon:{
+        textAlign:'center',
+        color: '#663399'
+    }
   
 })

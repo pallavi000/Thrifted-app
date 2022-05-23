@@ -8,11 +8,10 @@ export default function CommentNotification(props) {
     const navigation = props.navigation
   return (
     <View >
-            <Text style={styles.heading}>This week</Text>
             <TouchableOpacity onPress={()=>navigation.navigate('Comments',item.post._id)} style={styles.wrapper}>
                 <TouchableOpacity  onPress={()=>navigation.navigate('My Closet',item.follower)} ><Image source={{uri:imageLink+item.follower.image}} style={styles.userImage}></Image></TouchableOpacity >  
                 <View style={styles.detailView}><Text style={styles.detail}><Text style={styles.mention}>{item.follower.name}</Text> and {item.count} others commented on your post.</Text>
-                <Text style={styles.time}>{format(item.updatedAt)}</Text>
+                <Text style={styles.time}>{format(item.createdAt)}</Text>
                 </View>
                 <View><Image source={{uri:imageLink+item.post.image}} style={styles.postImage}></Image></View>
             </TouchableOpacity>
@@ -44,7 +43,6 @@ const styles = StyleSheet.create({
         resizeMode:'cover',
         borderWidth:1,
         borderColor:'#c4c4c4'
-        
     },
     postImage:{
         height:50,
@@ -56,8 +54,6 @@ const styles = StyleSheet.create({
         fontWeight:'400',
         fontFamily:"Raleway_400Regular",
         color:'#262626'
-
-
     },
     userName:{
         fontSize:13,

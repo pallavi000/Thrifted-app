@@ -1,5 +1,4 @@
-import { View, ActivityIndicator,Text,SafeAreaView, Image,Dimensions,TouchableOpacity, StyleSheet,Alert, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent} from 'react-native'
-
+import { View, ActivityIndicator,Text,SafeAreaView, StatusBar, Image,Dimensions,TouchableOpacity, StyleSheet,Alert, Button,ScrollView,TouchableWithoutFeedback} from 'react-native'
 import React,{useState,useEffect,useContext} from 'react'
 import { Raleway_400Regular, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import { Feather, Ionicons } from '@expo/vector-icons'
@@ -12,7 +11,9 @@ import Checkbox from 'expo-checkbox';
 import {Picker} from '@react-native-picker/picker';
 import Esewa from '../payment_gateway/Esewa';
 import Khalti from '../payment_gateway/Khalti';
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
+import bbstyles from '../Styles';
 
 
 export default function Checkout({navigation}) {
@@ -26,6 +27,7 @@ const[pid,setPid] = useState(uuidv4())
 const[shippingFee,setShippingFee] = useState(0)
 const[esewaVisible,setEsewaVisible] = useState(false)
 const[khaltiVisible,setKhaltiVisible] = useState(false)
+const[isSubmitting,setIsSubmitting] = useState(false)
 
 const[loader,setLoader] = useState(true)
 
@@ -54,7 +56,7 @@ if(addresses && addresses.length>0 && selectedId){
 
 
 const data = useContext(AuthContext)
-const {token,subtotal} = data
+const {token,subtotal,getToken} = data
 const config = {
     headers:{
         'access-token': token
@@ -65,6 +67,30 @@ useEffect(() => {
     getaddress()
     loadSelectedCheckBox()
 }, [IsFocused])
+
+useEffect(()=>{
+    if(!isSubmitting) {
+       navigation.setOptions({
+            headerStyle:{
+              backgroundColor:'#fff',
+            },
+            headerTitleStyle:{
+                color: '#000'
+            },
+            headerTintColor:'black',
+        }) 
+    } else {
+        navigation.setOptions({
+            headerStyle:{
+              backgroundColor:'#663399',
+            },
+            headerTitleStyle:{
+                color: '#fff'
+            },
+            headerTintColor:'white',
+        })
+    }
+},[isSubmitting])
     
 async function getaddress(){
     try {
@@ -86,8 +112,8 @@ function changeBillingAddress(id){
 }
 
 function orderSuccess() {
+    getToken()
     navigation.navigate('Order Success')
-
 }
 
 
@@ -96,27 +122,32 @@ function payment(){
         Alert.alert('Please Select Payment Method')
         return
     }
-    const data={
-        total:subtotal+shippingFee,
-        shipping:shippingFee,
-        note: '',
-        transaction_id:pid,
-        payment_method:paymentMethod
-      }
-    axios.post('/order',data,config).then(res=>{
-        if(paymentMethod=='khalti'){
-            setKhaltiVisible(true)
-        }else{
-            setEsewaVisible(true)
-        }
-
-    }).catch(err=>{
-        Alert.alert('Error',err.request.response)
-    })
+    if(paymentMethod=='khalti'){
+        setKhaltiVisible(true)
+    }else{
+        setEsewaVisible(true)
+    }
 }
 
-  return (
-    <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+  return ( 
+    isSubmitting ? (
+        <SafeAreaView style={{backgroundColor:'#663399',flex:1}}>
+        <StatusBar
+            backgroundColor="#663399"
+            barStyle="light-content"
+        />
+        <View style={bbstyles.loaderContainer}>
+            <ActivityIndicator size={100} color='#fff'/>
+            <Text style={styles.payProcessing}>Payment Processing</Text>
+            <Text style={styles.subtitle}>Please wait...</Text>
+        </View>
+        </SafeAreaView>
+    ):(
+    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
+    <StatusBar
+        backgroundColor="#fff"
+        barStyle="dark-content"
+    />
     <ScrollView >
     <Esewa
         orderSuccess={orderSuccess}
@@ -124,6 +155,10 @@ function payment(){
         pid={pid}
         visible={esewaVisible}
         setVisible={setEsewaVisible}
+        shippingFee={shippingFee}
+        config={config}
+        subtotal={subtotal}
+        setIsSubmitting={setIsSubmitting}
     />
     <Khalti
         orderSuccess={orderSuccess}
@@ -131,6 +166,10 @@ function payment(){
         pid={pid}
         visible={khaltiVisible}
         setVisible = {setKhaltiVisible}
+        shippingFee={shippingFee}
+        config={config}
+        subtotal={subtotal}
+        setIsSubmitting={setIsSubmitting}
     />
        <View style={styles.cardWrapper}>
        <View style={styles.headerWrapper}>
@@ -268,12 +307,13 @@ function payment(){
             </TouchableOpacity>
         ):(
             <TouchableOpacity style={styles.loginBtnDisabled} >
-                <Text style={styles.login}>Confirm to Pay</Text>
+                <Text style={styles.login}>{paymentMethod ? 'Choose Shipping Address' : 'Choose Payment Method'}</Text>
             </TouchableOpacity>
         )}
     </View>
 
     </SafeAreaView>
+    )
   )
 }
 
@@ -281,7 +321,22 @@ const styles = StyleSheet.create({
     cardWrapper:{
         padding:20,
         paddingHorizontal:30
-    
+    },
+    payProcessing: {
+        fontWeight:'700',
+        fontSize:24,
+        fontFamily:"Raleway_700Bold",
+        color: '#fff',
+        textAlign: 'center',
+        marginTop:20
+    },
+    subtitle: {
+        fontSize:14,
+        fontWeight:'600',
+        fontFamily:"Raleway_600SemiBold",
+        color:'#e5e5e5',
+        marginTop: 10,
+        textAlign:'center',
     },
     formcontrol: {
         fontSize: 16,

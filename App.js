@@ -33,6 +33,11 @@ import Search from './component/search/Search';
 import SearchResult from './component/search/SearchResult';
 import LoadingScreen from './component/Auth/LoadingScreen';
 import { io } from 'socket.io-client';
+import { useFonts, Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular, Raleway_500Medium } from '@expo-google-fonts/raleway';
+import ChangePassword from './component/Auth/ChangePassword';
+import ChangeProfile from './component/Profile/ChangeProfile';
+import Redeem from './component/redeem/Redeem';
+import EditPost from './component/post/EditPost';
 
 // axios.defaults.baseURL="http://localhost:5000/api"
 axios.defaults.baseURL="http://167.86.77.80/api"
@@ -50,6 +55,8 @@ export default function App(props) {
   const[loadingComplete, setLoadingComplete] = useState(false)
   const[unreadMessage, setUnreadMessage] = useState(0)
   const[unreadNotification,setUnreadNotification]=useState(0)
+  const[unreadNormalNotificationCount,setUnreadNormalNotificationCount] = useState(0)
+  const[unreadOrderNotificationCount, setUnreadOrderNotificationCount] = useState(0)
   const[userImage, setUserImage] = useState()
   const[appReady,setAppReady] = useState(false)
   const socket = useRef()
@@ -79,6 +86,17 @@ export default function App(props) {
   }
   
 
+  useEffect(()=>{
+    if(socket.current) {
+      socket.current.on('receiveMessage',(message)=>{
+        setUnreadMessage(unreadMessage+1)
+      })
+      socket.current.on('notification',(notification)=>{
+        setUnreadNotification(unreadNotification+1)
+        setUnreadNormalNotificationCount(unreadNormalNotificationCount+1)
+      })
+    }
+  },[socket,unreadMessage,unreadNotification,unreadNormalNotificationCount])
 
 
   async function getToken(){
@@ -89,13 +107,15 @@ export default function App(props) {
         var token = authConfig;
         var decoded = jwt_decode(token);
         setDecode(decoded)
-        socket.current= io('http://167.86.77.80')
-        socket.current.emit('join',decoded._id)
-        console.log(socket.current)
-        
+        socket.current= io('http://167.86.77.80')   
+        socket.current.on('connect', () => {
+            socket.current.emit('join',decoded._id)
+        })
         const userImg = await AsyncStorage.getItem('userImage')
         if(!userImg) {
-          await AsyncStorage.setItem('userImage', decoded.image)
+          if(decoded.image) {
+            await AsyncStorage.setItem('userImage', decoded.image)
+          }
           setUserImage(decoded.image)
         } else {
           setUserImage(userImg)
@@ -117,10 +137,16 @@ export default function App(props) {
   }
 
 
-  useEffect(() => {
+useEffect(() => {
     getToken()
-    
 }, [props,isLoggedIn])
+
+    let [fontsLoaded] = useFonts({
+        Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular,Raleway_500Medium
+    });
+    if (!fontsLoaded) {
+        return null;
+    }
 
   return (
     !appReady?(
@@ -129,7 +155,10 @@ export default function App(props) {
     <>
       <NavigationContainer>
       
-      <AuthContext.Provider value={{isLoggedIn,getToken,unreadNotification,setUnreadNotification, socket,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage,userImage,setUserImage}}>
+      <AuthContext.Provider
+      value={{
+        isLoggedIn,getToken,unreadNotification,setUnreadNotification, socket,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage,userImage,setUserImage,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount
+      }}>
       {isLoggedIn ?(
         <Stack.Navigator>
           <Stack.Screen name='main'
@@ -165,6 +194,19 @@ export default function App(props) {
                 
               }} component={SearchResult}/> 
 
+              <Stack.Screen name="Edit Post" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={EditPost}/>
+
           <Stack.Screen name="Addresses" options={{
         
                 headerTitleAlign: 'center',
@@ -182,6 +224,23 @@ export default function App(props) {
                 headerTitleAlign: 'center',
                 headerShadowVisible: false,
               }} component={EditShipping}/>
+
+              <Stack.Screen name="Redeem" options={{
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerShown:true,
+            headerStyle:{
+              backgroundColor:'#663399',
+              color:'white'
+            },
+            headerTintColor:'white',
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+              color:'white'
+            } 
+          }} component={Redeem}/> 
+
           <Stack.Screen name='Comments' component={Comment}/>
           <Stack.Screen name="Messages" options={{
               headerTitleAlign: 'center',
@@ -192,6 +251,34 @@ export default function App(props) {
                 headerShadowVisible: false,
               }} component={NewChat}/>
           <Stack.Screen name="chat" component={Chat}/> 
+          <Stack.Screen name="Change Password" options={{
+            headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerShown:true,
+            headerStyle:{
+              backgroundColor:'#663399',
+              color:'white'
+            },
+            headerTintColor:'white',
+            headerTitleStyle:{
+              fontSize:18,
+              fontWeight:'700',
+              color:'white'
+            } 
+          }}
+           component={ChangePassword}/>
+           <Stack.Screen name="Edit Profile" options={{
+                headerStyle:{
+                  backgroundColor:'#fff',
+                  borderWidth:0,
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                } 
+              }} component={ChangeProfile}/>
         </Stack.Navigator>
       ):(<Stack.Navigator screenOptions={{
         headerShown:false

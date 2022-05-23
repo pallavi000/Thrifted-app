@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView, TouchableOpacity, Dimensions, ActivityIndicator} from 'react-native'
+import { StyleSheet, Text, View ,SafeAreaView,ScrollView, TouchableOpacity, Dimensions, ActivityIndicator, FlatList} from 'react-native'
 import React,{useContext,useState,useEffect} from 'react'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import { AuthContext } from '../Context'
@@ -75,10 +75,12 @@ export default function MyOrder({navigation}) {
             navigation={navigation}
         />
     ):(
-    <ScrollView >
     <View style={styles.container}>
-    <Text style={styles.title}>My Orders</Text>
-    <View style={[styles.row, {marginBottom:30}]}>
+    <FlatList
+    data={items}
+    keyExtractor={item=>item._id}
+    ListHeaderComponent={()=>(
+        <View style={[styles.row, {marginBottom:30}]}>
         <TouchableOpacity onPress={()=>toggleTab('delivered')}>
             <Text  style={tab=="delivered" ? styles.processActive : styles.process}>Delivered</Text>
         </TouchableOpacity>
@@ -89,9 +91,10 @@ export default function MyOrder({navigation}) {
             <Text  style={tab=="cancelled" ? styles.processActive : styles.process}>Cancelled</Text>
         </TouchableOpacity>
     </View>
-    {items.map(item=>{
-        return(
-            <View style={styles.addressCard} key={item._id}>
+    )}
+    initialNumToRender={6}
+    renderItem={({item})=>(
+        <View style={styles.addressCard} key={item._id}>
             <View style={styles.row}>
                 <Text style={styles.orderNo} numberOfLines={1}>Order No: {item._id}</Text>
                 <Text style={styles.orderDate}>{changeDate(item.createdAt)}</Text>
@@ -118,13 +121,12 @@ export default function MyOrder({navigation}) {
             <Text style={styles.delivered}>Delivered</Text>
         </View>
     </View>
-        )
-    })}
+    )}
+    />
     
 
     
     </View>
-    </ScrollView>
     )}
     </SafeAreaView>
   )
@@ -132,7 +134,7 @@ export default function MyOrder({navigation}) {
 
 const styles = StyleSheet.create({
     container:{
-        padding:20
+        padding:20,
     },
     addressCard:{
         backgroundColor:'#f5f5ff',

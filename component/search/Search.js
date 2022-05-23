@@ -25,7 +25,7 @@ const Search = ({navigation}) => {
       try {
         const response = await axios.post('/frontend/search-request', data)
         setLoading(false)
-        navigation.navigate('Search Result', response.data)
+        navigation.navigate('Search Result', {search:query, products: response.data})
       } catch (error) {
         Alert.alert(error.request.response)
       }

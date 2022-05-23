@@ -1,4 +1,4 @@
-import { StyleSheet, ActivityIndicator, Text, TouchableWithoutFeedback, View,Dimensions,SafeAreaView,ScrollView,Image,TouchableOpacity, Alert } from 'react-native'
+import { StyleSheet, ActivityIndicator, Text, TouchableWithoutFeedback, View,Dimensions,SafeAreaView,ScrollView,Image,TouchableOpacity, Alert, FlatList } from 'react-native'
 import React,{useState,useEffect,useContext, useRef} from 'react'
 import bbstyles from '../Styles'
 import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
@@ -11,6 +11,8 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import * as imagePicker from 'expo-image-picker'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Closet(props) {
 
@@ -31,6 +33,13 @@ export default function Closet(props) {
     const[imageUploading, setImageUploading] = useState(false)
     const isFocused = useIsFocused()
     const[messageSubmit, setMessageSubmit] = useState(false)
+    const[pageNo, setPageNo] = useState(1)
+    const[totalProducts, setTotalProducts] = useState(0)
+    const[hasNextPage, setHasNextPage] = useState(true)
+
+    const[salePageNo, setSalesPageNo] = useState(1)
+    const[totalSales, setTotalSales] = useState(0)
+    const[salesHasNextPage, setSalesHasNextPage] = useState(true)
     
     const config = {
         headers:{
@@ -48,6 +57,7 @@ export default function Closet(props) {
             const response = await axios.post('/frontend/closet/'+props.route.params._id)
             setProducts(response.data.product)
             setUser(response.data.user)
+            setTotalProducts(response.data.total)
             if(response.data.user.followers.includes(decode._id)) {
                 setIsFollowing(true)
             } else {
@@ -62,12 +72,54 @@ export default function Closet(props) {
         }
     }
 
+    async function nextPageCloset() {
+        if(!hasNextPage) return
+        try {
+            const data = {
+                pageno: pageNo+1,
+                productOnly: true
+            }
+            setPageNo(pageNo+1)
+            const response = await axios.post('/frontend/closet/'+props.route.params._id,data)
+            console.log(totalProducts, products.length, response.data.length)
+            if(products.length+response.data.length>=totalProducts) {
+                setHasNextPage(false)
+            }
+            setProducts([...products, ...response.data])
+        } catch (error) {
+            
+        }
+    }
+
     async function getSales() {
         try {
-            const response = await axios.get('/order/sales/get/'+props.route.params._id,config)
-            setSales(response.data)            
+            const data = {
+                pageno: salePageNo,
+            }
+            const response = await axios.post('/order/sales/get/'+props.route.params._id,data,config)
+            setSales(response.data.orders)
+            setTotalSales(response.data.total)
         } catch (error) {
+            console.log(error.request.response)
         }        
+    }
+
+    async function nextPageSalesCloset() {
+        if(!salesHasNextPage) return
+        try {
+            const data = {
+                pageno: salePageNo+1,
+                orderOnly: true
+            }
+            setSalesPageNo(salePageNo+1)
+            const response = await axios.post('/order/sales/get/'+props.route.params._id,data)
+            if(sales.length+response.data.length>=totalSales) {
+                setSalesHasNextPage(false)
+            }
+            setSales([...sales, ...response.data])
+        } catch (error) {
+            
+        }
     }
 
     function toggleTab(action) {
@@ -103,11 +155,11 @@ export default function Closet(props) {
     }
 
     function unFollowUser() {
-        doUnfollow()
-        // Alert.alert("Unfollow User", "Are you sure you want to unfollow?", [
-        //     {text: 'Yes', onPress: doUnfollow},
-        //     {text: 'Cancel'}
-        // ])
+        // doUnfollow()
+        Alert.alert("Unfollow User", "Are you sure you want to unfollow?", [
+            {text: 'Yes', onPress: doUnfollow},
+            {text: 'Cancel'}
+        ])
     }
 
     async function selectImage() {
@@ -256,6 +308,96 @@ export default function Closet(props) {
         )
     }
 
+    function closetHeader() {
+        return(
+            <>
+            <View style={{paddingHorizontal:20}}>
+                <View style={styles.header}>
+                {imageUploading?(
+                <TouchableOpacity style={styles.imageWrapper}>
+                <ActivityIndicator size={'large'} color='#663399'/>
+                </TouchableOpacity>
+                    ): decode._id==user._id ?(
+                    <TouchableOpacity style={styles.imageWrapper} onPress={()=>sheetRef.current.snapTo(0)}>
+                    <Image source ={{uri: imageLink+user.image}} style={styles.image}></Image>
+                    </TouchableOpacity>
+                    ):(
+                        <TouchableOpacity style={styles.imageWrapper}>
+                    <Image source ={{uri: imageLink+user.image}} style={styles.image}></Image>
+                    </TouchableOpacity>
+                    )}
+
+                    <View style={styles.records}>
+                    <View style={styles.recordContainer}>
+                    <Text style={styles.recordCount}>{numberWithCommas(products.length)}</Text>
+                    <Text style={styles.recordTitle}>Products</Text>
+                    </View>
+                    <View style={styles.recordContainer}>
+                    <Text style={styles.recordCount}>{numberWithCommas(sales.length)}</Text>
+                    <Text style={styles.recordTitle}>Sales</Text>
+                    </View>
+
+                    <View style={styles.recordContainer}>
+                    <Text style={styles.recordCount}>{getFollowersCount()}</Text>
+                    <Text style={styles.recordTitle}>Followers</Text>
+                    </View>
+                    </View>
+
+                                </View>
+                                <Text style={styles.userName}>{user.name}</Text>
+                    <Text style={styles.desc}>{parseBio(user.bio)}</Text>
+
+                    {followSubmit?(
+                        <TouchableOpacity style={styles.loginBtn}>
+                            <ActivityIndicator size={'small'} color='white' />
+                    </TouchableOpacity>
+                    ):messageSubmit?(
+                        <View style={{flexDirection: 'row', alignItems:'center'}}>
+                            <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]}>
+                                <Text style={[styles.login,{color:'black'}]}>Following</Text><SimpleLineIcons name='user-following' size={14} color={'black'}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]}>
+                                <Text style={[styles.login,{color:'black'}]}>Message</Text><ActivityIndicator size={14} color='#663399' />
+                            </TouchableOpacity>
+                        </View>
+                    ):(
+                        decode._id==user._id ?(
+                            <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>navigation.navigate('Edit Profile', user)}>
+                                <Text style={[styles.login,{color:'black'}]}>Edit Profile</Text><EvilIcons name='user' size={20} color={'black'}/>
+                            </TouchableOpacity>
+                        ):!isFollowing?(
+                    <TouchableOpacity style={styles.loginBtn} onPress={()=>followUser()}>
+                                <Text style={styles.login}>Follow</Text><SimpleLineIcons name='user-follow' size={14} color={'white'}/>
+                    </TouchableOpacity>
+                        ):(
+                            <View style={{flexDirection: 'row', alignItems:'center'}}>
+                            <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>unFollowUser()}>
+                                <Text style={[styles.login,{color:'black'}]}>Following</Text><SimpleLineIcons name='user-following' size={14} color={'black'}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>sendMessage()}>
+                                <Text style={[styles.login,{color:'black'}]}>Message</Text><Feather name='message-square' size={14} color={'black'}/>
+                            </TouchableOpacity>
+                            </View>
+                        )
+                    )}
+                    </View>
+                <View style={{ overflow: 'hidden', paddingBottom: 5 }}>
+                    <View style={styles.shadowShow}/>
+                </View>
+                <View style={styles.closetView}>
+                    <View style={styles.closetTab}>
+                        <TouchableWithoutFeedback onPress={()=>toggleTab('listing')}>
+                            <Text style={activeTab=="listing" ? styles.listingActive : styles.listing}>Listing</Text>
+                        </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback onPress={()=>toggleTab('sold')}>
+                            <Text style={activeTab=="sold" ? styles.listingActive : styles.listing}>Sold</Text>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </View>
+            </>
+        )
+    }
+
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
@@ -277,128 +419,56 @@ export default function Closet(props) {
     <ActivityIndicator size={'large'} color='#663399'/>
 </View>
 ):(
-    <Animated.View  style={[styles.container,{
-            opacity: Animated.add(0.3, Animated.multiply(fill, 1.0))
-        }]}>
+<Animated.View  style={[styles.container,{
+        opacity: Animated.add(0.3, Animated.multiply(fill, 1.0))
+}]}>
 
-       <ScrollView style={[bbstyles.scrollHeight]}>
-       <View style={{paddingHorizontal:20}}>
-       <View style={styles.header}>
-
-
-{imageUploading?(
-    <TouchableOpacity style={styles.imageWrapper}>
-    <ActivityIndicator size={'large'} color='#663399'/>
-    </TouchableOpacity>
-): decode._id==user._id ?(
-<TouchableOpacity style={styles.imageWrapper} onPress={()=>sheetRef.current.snapTo(0)}>
-<Image source ={{uri: imageLink+user.image}} style={styles.image}></Image>
-</TouchableOpacity>
-):(
-    <TouchableOpacity style={styles.imageWrapper}>
-<Image source ={{uri: imageLink+user.image}} style={styles.image}></Image>
-</TouchableOpacity>
-)}
-
-<View style={styles.records}>
-<View style={styles.recordContainer}>
-<Text style={styles.recordCount}>{numberWithCommas(products.length)}</Text>
-<Text style={styles.recordTitle}>Products</Text>
-</View>
-<View style={styles.recordContainer}>
-<Text style={styles.recordCount}>{numberWithCommas(sales.length)}</Text>
-<Text style={styles.recordTitle}>Sales</Text>
-</View>
-
-<View style={styles.recordContainer}>
-<Text style={styles.recordCount}>{getFollowersCount()}</Text>
-<Text style={styles.recordTitle}>Followers</Text>
-</View>
-</View>
-
-            </View>
-            <Text style={styles.userName}>{user.name}</Text>
-<Text style={styles.desc}>{parseBio(user.bio)}</Text>
-
-{followSubmit?(
-    <TouchableOpacity style={styles.loginBtn}>
-        <ActivityIndicator size={'small'} color='white' />
-</TouchableOpacity>
-):messageSubmit?(
-    <View style={{flexDirection: 'row', alignItems:'center'}}>
-        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]}>
-            <Text style={[styles.login,{color:'black'}]}>Following</Text><SimpleLineIcons name='user-following' size={14} color={'black'}/>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]}>
-            <Text style={[styles.login,{color:'black'}]}>Message</Text><ActivityIndicator size={14} color='#663399' />
-        </TouchableOpacity>
-    </View>
-):(
-    decode._id==user._id ?(
-        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>navigation.navigate('Edit Profile', user)}>
-            <Text style={[styles.login,{color:'black'}]}>Edit Profile</Text><EvilIcons name='user' size={20} color={'black'}/>
-        </TouchableOpacity>
-    ):!isFollowing?(
-<TouchableOpacity style={styles.loginBtn} onPress={()=>followUser()}>
-            <Text style={styles.login}>Follow</Text><SimpleLineIcons name='user-follow' size={14} color={'white'}/>
-</TouchableOpacity>
-    ):(
-        <View style={{flexDirection: 'row', alignItems:'center'}}>
-        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>unFollowUser()}>
-            <Text style={[styles.login,{color:'black'}]}>Following</Text><SimpleLineIcons name='user-following' size={14} color={'black'}/>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.loginBtn,{backgroundColor:'white',borderWidth:1,borderColor:'#ddd'}]} onPress={()=>sendMessage()}>
-            <Text style={[styles.login,{color:'black'}]}>Message</Text><Feather name='message-square' size={14} color={'black'}/>
-        </TouchableOpacity>
-        </View>
-    )
-)}
-            </View>
-
-
-<View style={{ overflow: 'hidden', paddingBottom: 5 }}>
-    <View style={styles.shadowShow}/>
-</View>
-<View style={styles.closetView}>
-    <View style={styles.closetTab}>
-        <TouchableWithoutFeedback onPress={()=>toggleTab('listing')}>
-            <Text style={activeTab=="listing" ? styles.listingActive : styles.listing}>Listing</Text>
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={()=>toggleTab('sold')}>
-            <Text style={activeTab=="sold" ? styles.listingActive : styles.listing}>Sold</Text>
-        </TouchableWithoutFeedback>
-    </View>
-</View>
-
-
-<View style={styles.productWrapper}>
 {activeTab=="listing" ?(
-products.map(product=>{
-    return(
-        <View style={styles.productImage} key={product._id}>
-    <Image source={{uri:imageLink+product.image}} style={styles.closetImage}></Image>
-    </View>
-    )
-})
+    <FlatList
+    ListHeaderComponent={closetHeader}
+    data={products}
+    keyExtractor={item=>item._id}
+    numColumns={2}
+    onEndReached={nextPageCloset}
+    renderItem={({item})=>(
+        <TouchableOpacity onPress={()=>navigation.navigate('Product Detail', item)} style={styles.productImage} key={item._id}>
+            <Image source={{uri:imageLink+item.image}} style={styles.closetImage}></Image>
+        </TouchableOpacity>
+    )}
+    ListFooterComponent={()=>(
+        hasNextPage ?(
+            <View style={{padding:20}}>
+                <ActivityIndicator size={'large'} color="#663399" />
+            </View>
+        ):(null)
+    )}
+    />
 ):(
-    sales.map(sale=>{
-        return(
-            sale.product_id?(
-                <View style={styles.productImage} key={sale._id}>
-                    <Image source={{uri:imageLink+sale.product_id.image}} style={styles.closetImage}></Image>
-                </View>
-            ):(null)
-        )
-    })
+    <FlatList
+    ListHeaderComponent={closetHeader}
+    data={sales}
+    keyExtractor={item=>item._id}
+    numColumns={2}
+    onEndReached={nextPageSalesCloset}
+    renderItem={({item})=>(
+        item.product_id ?(
+            <TouchableOpacity onPress={()=>navigation.navigate('Product Detail', item.product_id)} style={styles.productImage}>
+                <Image source={{uri:imageLink+item.product_id.image}} style={styles.closetImage}></Image>
+            </TouchableOpacity>
+        ):(null)
+    )}
+    ListFooterComponent={()=>(
+        salesHasNextPage ?(
+            <View style={{padding:20}}>
+                <ActivityIndicator size={'large'} color="#663399" />
+            </View>
+        ):(null)
+    )}
+    />
 )}
-</View>
 
 
-
-
-
-        </ScrollView>
-            </Animated.View>
+</Animated.View>
 
 )}
     </SafeAreaView>
@@ -555,16 +625,13 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width/2,
         textAlign: 'center'
     },
-    productWrapper:{
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center',
-        flexWrap:'wrap'
-        
+    productImage:{
+        width:(Dimensions.get('window').width-8)/2,
+        marginHorizontal: 2  
     },
     closetImage:{
         height:200,
-        width:(Dimensions.get('window').width-5)/2,
+        width:(Dimensions.get('window').width-8)/2,
         resizeMode:'cover',
         marginBottom:5,
        

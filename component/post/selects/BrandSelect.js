@@ -1,19 +1,21 @@
 import { Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 
 const BrandSelect = (props) => {
     const[brands, setBrands] = useState(props.brands)
     const [selectedSelect, setSelectedSelect] = useState(props.selectedSelect)
 
-    props.navigation.setOptions({
-        headerShown:true,
-        headerRight:()=>(
-            <TouchableOpacity onPress={()=>doneSelect()}>
-                <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Done <MaterialCommunityIcons name='check-bold' size={16} color='#663399'/></Text>
-            </TouchableOpacity>
-        )
-    })
+    useEffect(()=>{
+        props.navigation.setOptions({
+            headerShown:true,
+            headerRight:()=>(
+                <TouchableOpacity onPress={()=>doneSelect()}>
+                    <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Done <MaterialCommunityIcons name='check-bold' size={16} color='#663399'/></Text>
+                </TouchableOpacity>
+            )
+        })
+    },[selectedSelect])
 
     function doneSelect() {
         if(!selectedSelect) return

@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useEffect,useContext,useState, useRef } from 'react'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native'
+import React, { useEffect,useContext,useState, useRef, useLayoutEffect } from 'react'
 import {FontAwesome5, Ionicons} from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import axios from 'axios'
@@ -28,30 +28,30 @@ export default function Messages({navigation}) {
         }
     } 
     useEffect(()=>{
-        
-        socket.current.on('conversation',(conversation)=>{
-            setChats(prevMessages => {
-                var index = prevMessages.findIndex(message=>message._id==conversation._id)
+        if(socket.current) {
+            socket.current.on('conversation',(conversation)=>{
+                var index = chats.findIndex(message=>message._id==conversation._id)
                 if(index!=-1){
-                    var copy = [...prevMessages]
+                    var copy = [...chats]
                     copy[index]= conversation
-                    return copy
+                    setChats(copy)
                 } else {
-                    return [...prevMessages, conversation]
-                }
+                    setChats([conversation, ...chats])
+                }    
             })
+        }
+    },[socket, chats])
 
+    useLayoutEffect(() => {
+      navigation.setOptions({
+            title: decode.name,
+            headerRight:()=>(
+                <TouchableOpacity onPress={()=>navigation.navigate('New Chat')}>
+                <FontAwesome5 name='plus' size={20}/>
+                </TouchableOpacity>
+            )
         })
-    },[])
-
-    navigation.setOptions({
-        title: decode.name,
-        headerRight:()=>(
-            <TouchableOpacity onPress={()=>navigation.navigate('New Chat')}>
-            <FontAwesome5 name='plus' size={20}/>
-            </TouchableOpacity>
-        )
-    })
+    }, [])
 
 useEffect(()=>{
     getMessage()
@@ -131,7 +131,7 @@ function searchChats(text) {
                 <View style={bbstyles.loaderContainer}>
                     <ActivityIndicator size={'large'} color='#663399'/>
                 </View>
-            ):(
+            ):chats && chats.length>0?(
             <FlatList data={chats}
             keyExtractor= {item=>item._id}
             renderItem={({item})=>(
@@ -152,6 +152,15 @@ function searchChats(text) {
             </TouchableOpacity>
             )}
             ></FlatList>
+            ):(
+                <View style={{alignItems:'center',justifyContent:'center',paddingTop:60}}>
+                    <View>
+                        <Image source={require('../../assets/empty-message.png')} style={styles.emptyImage} />
+                    </View>
+                    <Text style={styles.header}>No Messages</Text>
+                    <Text style={styles.subtitle}>When you have messages,</Text>
+                    <Text style={styles.subtitle}>you'll see them here</Text>
+                </View>
             )}
         </View>
         <View >
@@ -161,6 +170,26 @@ function searchChats(text) {
 }
 
 const styles = StyleSheet.create({
+    emptyImage: {
+        width: Dimensions.get('window').width-40,
+        height: 200,
+        resizeMode: 'contain',
+    },
+    header: {
+        fontWeight:'700',
+        fontSize:28,
+        fontFamily:"Raleway_700Bold",
+        color: '#262626',
+        textAlign: 'center'
+    },
+    subtitle: {
+        fontSize:12,
+        fontWeight:'600',
+        fontFamily:"Raleway_600SemiBold",
+        color:'#868686',
+        marginTop: 10,
+        textAlign:'center',
+    },
     container:{
         padding:20
     },

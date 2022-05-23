@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         color:'white',
         fontFamily:'Raleway_800ExtraBold', 
         padding:20 ,
-        paddingVertical:50
+        paddingVertical:10
     },
     loginForm:{
         backgroundColor:'white',

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useContext, useState,useRef } from 'react'
+import React, { useContext, useState,useRef,useEffect } from 'react'
 import { View,ActivityIndicator, Alert,Text, Image,SafeAreaView,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, TouchableOpacity} from 'react-native'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
@@ -9,24 +9,75 @@ import { Feather, Ionicons } from '@expo/vector-icons'
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import { useIsFocused } from '@react-navigation/native'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 
 export default function ProductDetail({navigation,route}) {
     const [showFullDesc, setShowFullDesc] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [alreadyOrdered, setAlreadyOrdered] = useState(false)
+    const[like,setLike] = useState(false)
     const sheetRef = useRef(null)
     const fall = new Animated.Value(1)
     const IsFocused = useIsFocused()
-
-
-    
-
-
-    const product = route.params
-
+    const [product,setProduct] = useState(route.params)
     const data = useContext(AuthContext)
-    const {cartCount,setCartCount,token,titleShown,setTitleShown} = data
+    const {cartCount,setCartCount,token,cartItems,decode} = data
     const {getToken} = data
+    const config = {
+        headers: {
+            'access-token':token
+        }
+    } 
+    useEffect(() => {
+      const isInCart = cartItems.find(item=>item.product_id._id==product._id)
+      if(isInCart) {
+          setProduct({...product, stock: product.stock-isInCart.quantity})
+      }
+    }, [])
+
+    async function checkIfInOrder() {
+        try {
+            const data = {
+                product_id: product._id
+            }
+            const response = await axios.post('/order/ongoing',data,config)
+            setAlreadyOrdered(true)
+            Alert.alert('Notification', 'This product has been already ordered. Please prepare the parcel and handover to our agent.')
+        } catch (error) {
+            // No Order Ongoing for this product
+        }
+    }
+
+    useEffect(()=>{
+        if(product.seller_id._id==decode._id) {
+            checkIfInOrder()
+        }
+    },[decode])
+
+    useEffect(()=>{
+        if(product?.likes.find(like=>like.user_id==decode._id)){
+            setLike(true)
+        }
+    },[])
+
+    async function addLike(){
+        try {
+            const data={
+                action:like?'unlike':'like'
+            }
+            const response = await axios.post('/post/like/post/'+product._id,data,config)
+            setLike(!like)
+            if(like){
+                setProduct({...product,likes_count:product.likes_count-1})
+            }else{
+                setProduct({...product,likes_count:product.likes_count+1})
+            }            
+        } catch (error) {
+            console.log(error.request.response)
+        }
+    } 
+    
   
     function addtocart(pid){
         setIsSubmitting(true)
@@ -34,18 +85,17 @@ export default function ProductDetail({navigation,route}) {
             pid,
             quantity:1
         }  
-
-        const config = {
-            headers: {
-              'access-token':token
-            }
-          } 
         axios.post('/addtocart/cart',data,config).then(response=>{
             setIsSubmitting(false)
             sheetRef.current.snapTo(0)
             getToken()
             setCartCount(cartCount+1)
+            setProduct({...product, stock: product.stock-1})
         }).catch(err=>{
+            if(err.request.status==410) {
+                // Out Of Stock
+                setProduct({...product, stock: 0})
+            }
             setIsSubmitting(false)
             Alert.alert('Error', err.request.response)
             console.log(err.request.response)
@@ -157,10 +207,38 @@ export default function ProductDetail({navigation,route}) {
                     </>
                     )}
                 </View>
-                <View style={styles.productPrice}>
+
+
+
+            <View style={styles.productreview}>
+                <TouchableOpacity onPress={()=>addLike()} style={{marginRight:5}}>
+                {like?(
+                    <MaterialCommunityIcons name='cards-heart' size={25} color='red'></MaterialCommunityIcons>
+                ):(
+                    <MaterialCommunityIcons name='heart-outline' size={25} color='black'></MaterialCommunityIcons>
+                )}
+                </TouchableOpacity>
+        
+                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',product._id)}>
+                    <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
+                </TouchableOpacity>
+
+                <View>
+                    <Image source={require('../../assets/icons/Share.png')} style={styles.smallIcon}/>
+                </View>
+                
+            </View>
+            <View  style={styles.typeWrapper}>
+                <Text style={styles.productname}>{product.likes_count} Likes</Text>
+            </View>
+            <TouchableOpacity onPress={()=>navigation.navigate('Comments',product._id)} style={styles.typeWrapper}>
+                <Text style={styles.viewComment}>View All {product.comments_count} Comments</Text>
+            </TouchableOpacity>
+
+                {/* <View style={styles.productPrice}>
                     <Text style={styles.priceTitle}>Total</Text>
                     <Text style={styles.priceValue}>Rs. {product.price}</Text>
-                </View>
+                </View> */}
             </View>
             </Animated.View>
        </ScrollView>
@@ -170,10 +248,28 @@ export default function ProductDetail({navigation,route}) {
                 <ActivityIndicator size={24} color='#fff'/>
                 </TouchableOpacity>
            </View>
+      ):alreadyOrdered?(
+          <View style={{borderTopWidth:1,borderTopColor:'#E3E3E3'}}>
+            <TouchableOpacity style={styles.loginBtnDisabled}>
+                <Text style={styles.loginText}>Order in Process (रु {product.price})</Text>
+            </TouchableOpacity>
+        </View>
+      ):product.seller_id._id==decode._id ?(
+          <View style={{borderTopWidth:1,borderTopColor:'#E3E3E3'}}>
+                <TouchableOpacity style={styles.loginBtn} onPress={()=>navigation.navigate('Edit Post', product)}>
+                    <Text style={styles.loginText}>Edit Product</Text>
+                </TouchableOpacity>
+            </View>
+      ):product.stock<=0?(
+          <View style={{borderTopWidth:1,borderTopColor:'#E3E3E3'}}>
+            <TouchableOpacity style={styles.loginBtnDisabled}>
+                <Text style={styles.loginText}>Out of Stock (रु {product.price})</Text>
+            </TouchableOpacity>
+        </View>
       ):(
         <View style={{borderTopWidth:1,borderTopColor:'#E3E3E3'}}>
             <TouchableOpacity style={styles.loginBtn} onPress={()=>addtocart(product._id)}>
-                    <Text style={styles.loginText}>Add to cart</Text>
+                <Text style={styles.loginText}>Add to cart (रु {product.price})</Text>
             </TouchableOpacity>
         </View>
       )}
@@ -182,6 +278,116 @@ export default function ProductDetail({navigation,route}) {
 }
 
 const styles = StyleSheet.create({
+    productreview:{
+    paddingVertical:10,
+    flexDirection:'row',
+    alignItems:'center',
+    paddingHorizontal:10
+},
+viewComment:{
+fontSize:13,
+fontWeight:'500',
+fontFamily:"Raleway_500Medium",
+color:'rgba(0, 0, 0, 0.5)'
+},
+    smallIcon: {
+        height: 25,
+        width: 25,
+        marginRight: 5
+    },
+    activeIcon:{
+        height: 25,
+        width: 25,
+        marginRight: 5,
+        color:'red'   
+    },
+    productWrapper:{
+        marginBottom:20
+        
+    },
+    userWrapper:{
+        display:'flex',
+        flexDirection:'row',
+        alignItems:'center',
+       paddingHorizontal:5,
+       paddingVertical:10,
+    },
+    userimage:{
+        height:34,
+        width:34,
+        borderWidth:2,
+        borderColor:'rebeccapurple',
+        padding:5,
+        borderRadius:17
+    },
+    username:{
+        fontSize:16,
+        textTransform:'capitalize',
+        marginLeft:6
+
+    },
+    product:{
+
+    },
+    productImage:{
+        height:400,
+        width:'100%',
+        resizeMode:'cover'
+        
+    },
+    typeWrapper:{
+        display:'flex',
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'space-between',       
+        marginBottom:5
+
+    },
+    detailWrapper:{
+        display:'flex',
+        alignItems:'center',
+        flexDirection:'row',
+        marginBottom:15,
+    },
+    productname:{
+        fontSize:16,
+        fontWeight:'600',
+        textTransform:'capitalize',
+        width:180
+    },
+    type:{
+        fontSize:14,
+        paddingHorizontal:9,
+        paddingVertical:1,
+        borderRadius:10,
+        borderWidth:1,
+        borderColor:'#ddd',
+        textTransform:'capitalize'
+      
+    },
+    price:{
+        fontSize:15,
+        fontWeight:'bold',
+        marginRight:5
+    },
+    size:{
+        fontSize:15,
+        marginHorizontal:5
+    },
+    brand:{
+        fontSize:15,
+        marginLeft:5
+    },
+    productreview:{
+        paddingVertical:10,
+        flexDirection:'row',
+        alignItems:'center',
+    },
+    reviewicon:{
+       
+        marginRight:10
+    },
+    
     detailImage:{
         backgroundColor:'#f5f5ff',
         paddingVertical:30,
@@ -222,26 +428,32 @@ const styles = StyleSheet.create({
         fontWeight:'700',
         fontFamily:'Raleway_700Bold',
         marginBottom:10,
-
+    },
+    loginBtnDisabled:{
+        paddingVertical:10,
+        borderRadius:10,
+        marginTop:20,
+        marginBottom:20,
+        width: Dimensions.get('window').width-60,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        backgroundColor: "#cccccc",
+        color: "#666666",
+        alignSelf: 'center'
     },
     featureValue:{
         fontSize:12,
         fontWeight:'700',
         fontFamily:'Raleway_700Bold',
-       
-      
-
+        textTransform: 'capitalize'
     },
     productFeatureWrapper:{
-       
         textAlign:'center',
         paddingVertical:10,
-        paddingHorizontal:35,
+        paddingHorizontal:10,
         borderWidth:1,
         borderColor:'#E3E3E3',
-      
         borderRadius:7,
-
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -250,6 +462,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3,
         elevation: 0.8,
+        width: (Dimensions.get('window').width-60)/3,
+        alignItems: 'center'
     },
     productDetailWrapper:{
         marginTop:25

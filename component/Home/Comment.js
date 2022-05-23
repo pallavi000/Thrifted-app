@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View,Image, FlatList,TouchableOpacity,TextInput, Keyboard, Alert } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View,Image, FlatList,TouchableOpacity,TextInput, Keyboard, Alert, ActivityIndicator } from 'react-native'
 import React,{useContext, useRef, useState} from 'react'
 import { imageLink } from '../ImageLink'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -6,11 +6,13 @@ import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700
 import { format } from 'timeago.js'
 import { AuthContext } from '../Context'
 import axios from 'axios'
+import bbstyles from '../Styles'
 
 export default function Comment({navigation, route}) {
     const[newComment,setNewComment] = useState('')
     
     const[comments,setComments]= useState([])
+    const[loader, setLoader] = useState(true)
     const post_id = route.params
     
     const data = useContext(AuthContext)
@@ -25,6 +27,7 @@ export default function Comment({navigation, route}) {
         try {
             const response = await axios.get('/post/comment/post/'+post_id, config)
             setComments(response.data)
+            setLoader(false)
         } catch (error) {
             Alert.alert('Error', error.request.response)
         }
@@ -32,7 +35,6 @@ export default function Comment({navigation, route}) {
 
     React.useEffect(()=>{
         getComments()
-        
     },[navigation])
 
     
@@ -87,7 +89,11 @@ export default function Comment({navigation, route}) {
    
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-    
+    {loader ? (
+        <View style={bbstyles.loaderContainer}>
+            <ActivityIndicator size={'large'} color='#663399'/>
+        </View>
+    ):(
      <FlatList data={comments}
      contentContainerStyle={{padding: 20}}
      keyExtractor={item=>item._id}
@@ -113,9 +119,9 @@ export default function Comment({navigation, route}) {
             )}
             </TouchableOpacity>
          </View>
-     )}
-         
+     )}   
     />
+    )}
     <View style={styles.addcomment}>
     <View>
     <Image source={{uri:imageLink+userImage}} style={styles.image}></Image>

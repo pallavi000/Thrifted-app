@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View,SafeAreaView, StatusBar, ScrollView,Alert, TextInput,Dimensions, TouchableOpacity} from 'react-native'
+import { StyleSheet, Text, View,SafeAreaView, StatusBar, ScrollView,Alert, TextInput,Dimensions, TouchableOpacity, ActivityIndicator} from 'react-native'
 import React,{useContext,useState} from 'react'
 import {Ionicons} from '@expo/vector-icons'
 import { Raleway_600SemiBold } from '@expo-google-fonts/raleway'
@@ -15,9 +15,11 @@ const validationSchema = Yup.object().shape({
   payment_method:Yup.string().required()
 })
 
-export default function Redeem({navigation}) {
+export default function Redeem({navigation,route}) {
 const data = useContext(AuthContext)
 const {token} = data
+const user = route.params
+const [isSubmitting, setIsSubmitting] = useState(false)
 
 const config = {
   headers:{
@@ -26,14 +28,17 @@ const config = {
 }
 
 async function RedeemForm(data){
+  if(user.balance<data.balance) {
+    return Alert.alert('Error', "Your balance is less than requested amount.")
+  }
+  setIsSubmitting(true)
   try {
     var response = await axios.post('/user/withdraw',data,config)
-    console.log(response.data)
     Alert.alert('Success','Your transaction request has been submitted')
     navigation.navigate('Redeemption History')
-  } catch (error) {
-   
-    console.log(error.request.response)
+    setIsSubmitting(false)
+  } catch (error) {   
+    setIsSubmitting(false)
     Alert.alert('Error',error.request.response)
   }
 }
@@ -55,7 +60,7 @@ async function RedeemForm(data){
      {({handleChange,handleSubmit,errors,touched,setFieldValue,values,handleBlur})=>(
        <>
        <View style={styles.loginForm}>
-        <Text style={styles.login}>Redeem</Text>
+        <Text style={styles.balance}>Balance:&nbsp; रु {user.balance}</Text>
         
         <View style={styles.formgroup}>
           <View style={styles.labelWrapper}>
@@ -108,9 +113,17 @@ async function RedeemForm(data){
            ):(null)}
         </View>
 
-        <TouchableOpacity onPress={handleSubmit} >
-          <View><Text style={styles.loginBtn}>Redeem</Text></View>
+        {isSubmitting ?(
+        <TouchableOpacity style={styles.loginBtn}>
+          <ActivityIndicator size={24} color='#fff'/>
         </TouchableOpacity>
+      ):(
+            <TouchableOpacity style={styles.loginBtn} onPress={handleSubmit} >
+            <Text style={styles.login}>Redeem</Text>
+            </TouchableOpacity>
+      )}
+
+       
 
       </View>
        </>
@@ -136,8 +149,7 @@ const styles = StyleSheet.create({
         color:'white',
         fontFamily:'Raleway_800ExtraBold', 
         padding:20 ,
-        paddingVertical:100,
-        textAlign:'center'
+        paddingVertical:30,
     },
     loginForm:{
       backgroundColor:'white',
@@ -165,19 +177,27 @@ const styles = StyleSheet.create({
         alignItems:'center',
         marginBottom:5
       },
-      label:{
-        fontSize:15,
+      balance: {
+        fontSize:14,
         fontWeight:'600',
-        fontFamily:"Raleway_600SemiBold",
+        fontFamily:'Raleway_700Bold',
         color:'#868686',
-        marginLeft:5,
-       
+        marginBottom: 20,
+        color: '#222'
       },
-      inputField:{
-        paddingVertical:2,
-        paddingHorizontal:10
-        
-      },
+      label:{
+   fontSize:12,
+   fontWeight:'600',
+   fontFamily:'Raleway_700Bold',
+   color:'#868686',
+   marginLeft:5,
+ },
+ inputField:{
+   paddingVertical:5,
+   paddingHorizontal:5,
+   borderBottomColor:'#c4c4c4',
+   borderBottomWidth:1,
+ },
       forgot:{
         fontSize:15,
         fontWeight:'600',
@@ -187,19 +207,21 @@ const styles = StyleSheet.create({
      
       },
       loginBtn:{
-       fontWeight:'700',
-       fontSize:20,
-       color:'white',
-       paddingVertical:15,
-       paddingHorizontal:50,
-       backgroundColor:'#663399',
-       borderRadius:10,
-       marginTop:40,
-       marginBottom:30,
-       textAlign:'center',
-       fontFamily:'Raleway_700Bold',
-       
-      },
+    paddingVertical:10,
+    paddingHorizontal:10,
+    width:Dimensions.get('window').width-60,
+    backgroundColor:'#663399',
+    borderRadius:10,
+    marginTop:30,
+    marginBottom:30
+    },
+    login:{
+    textAlign:'center',
+    fontFamily:'Raleway_700Bold',
+    fontWeight:'700',
+    fontSize:18,
+    color:'white',
+    },
       create:{
        fontSize:15,
        fontWeight:'600',

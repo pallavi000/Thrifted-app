@@ -8,11 +8,10 @@ export default function LikeNotification(props) {
     const navigation = props.navigation
   return (
     <View>
-            <Text style={styles.heading}>Today</Text>
             <TouchableOpacity onPress={()=>navigation.navigate('Product Detail',item.post)} style={styles.wrapper}>
                 <TouchableOpacity  onPress={()=>navigation.navigate('My Closet',item.follower)}><Image source={{uri:imageLink+item.follower.image}} style={styles.userImage}></Image></TouchableOpacity>
                 <View style={styles.detailView}><Text style={styles.detail}><Text style={styles.userName}>{item.follower.name}</Text> with {item.count-1} other likes your post.</Text>
-                <Text style={styles.time}>{format(item.updatedAt)}</Text>
+                <Text style={styles.time}>{format(item.createdAt)}</Text>
                 </View>
                 <View><Image source={{uri:imageLink+item.post.image}} style={styles.postImage}></Image></View>
             </TouchableOpacity>

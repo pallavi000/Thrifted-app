@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView,ScrollView,Image,TextInput,TouchableOpacity,TouchableWithoutFeedback, Dimensions, Alert, KeyboardAvoidingView, Platform } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView,ScrollView,Image,TextInput,TouchableOpacity,TouchableWithoutFeedback, ActivityIndicator, Dimensions, StatusBar, Alert, KeyboardAvoidingView, Platform } from 'react-native'
 import React,{useEffect,useState,useContext,useRef} from 'react'
 import {Feather, MaterialCommunityIcons} from '@expo/vector-icons'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
@@ -14,9 +14,9 @@ import Animated from 'react-native-reanimated';
 import CategorySelect from './selects/CategorySelect'
 import SimpleSelect from './selects/SimpleSelect'
 import BrandSelect from './selects/BrandSelect'
+import EditMainImage from '../Image/EditMainImage'
 
 const validationSchema = Yup.object().shape({
-    image1:Yup.string().required('Image is required'),
     name:Yup.string().required('Product Name is required'),
     detail:Yup.string().required('Product Detail is required'),
     category:Yup.string().required('Category is required'),
@@ -29,7 +29,9 @@ const validationSchema = Yup.object().shape({
     type:Yup.string().required('Product Type is required'),
 })
 
-export default function CreatePost({navigation}) {
+const EditPost = ({navigation,route}) => {
+    const[isSubmitting,setIsSubmitting] = useState(false)
+    const[product,setProduct] = useState(route.params)
     const[colors,setColors] = useState([])
     const[sizes,setSizes] = useState([])
     const[brands,setBrands] = useState([])
@@ -40,7 +42,7 @@ export default function CreatePost({navigation}) {
     const openCameraRef = useRef()
     const selectImageRef = useRef()
     const fill = new Animated.Value(1)
-    const[earningPrice, setEarningPrice] = useState()
+    const[earningPrice, setEarningPrice] = useState(0)
     const[openSelectField, setOpenSelectField] = useState(null)
     const [productTypes, setProductTypes] = useState([
         {
@@ -52,11 +54,20 @@ export default function CreatePost({navigation}) {
             name: 'Sale'
         }
     ])
-    const [selectedCategory, setSelectedCategory] = useState({name:"Select Category"})
-    const [selectedColor, setSelectedColor] = useState({name:"Select Color"})
-    const [selectedSize, setSelectedSize] = useState({name:"Select Product Size"})
-    const [selectedType, setSelectedType] = useState({name: 'Select Product Type'})
-    const [selectedBrand, setSelectedBrand] = useState({name: 'Select Brand'})
+    function getProductType(type) {
+        var type = productTypes.find(pt=>pt._id==type)
+        if(type) {
+            return type
+        }
+        return {name: 'Select Product Type'}
+    }
+
+
+    const [selectedCategory, setSelectedCategory] = useState(product.category_id)
+    const [selectedColor, setSelectedColor] = useState(product.color_id)
+    const [selectedSize, setSelectedSize] = useState(product.size_id)
+    const [selectedType, setSelectedType] = useState(getProductType(product.type))
+    const [selectedBrand, setSelectedBrand] = useState(product.brand_id)
 
     const data = useContext(AuthContext)
     const {token} = data
@@ -67,9 +78,9 @@ export default function CreatePost({navigation}) {
         }
     }
 
-    function addPost() {
-        console.log(formRef.current.values)
+    function editPost() {
         var errors = Object.values(formRef.current.errors)
+        console.log(errors)
         if(errors && errors.length>0) {
             Alert.alert('Error', errors[0])
             return
@@ -78,18 +89,27 @@ export default function CreatePost({navigation}) {
     }
 
     useEffect(()=>{
-        navigation.setOptions({
-            headerShown: true,
-            headerTitleAlign: 'center',
-            headerRight:()=>(
-                    <TouchableOpacity onPress={()=>addPost()}>
-                        <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Post <MaterialCommunityIcons name='send-circle-outline' size={16} color='#663399'/></Text>
-                    </TouchableOpacity>
+        if(isSubmitting) {
+            navigation.setOptions({
+                headerShown: true,
+                headerRight:()=>(
+                <View>
+                    <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Updating...</Text>
+                </View>
                 )
             })
-    },[])
-       
-    
+        } else {
+            navigation.setOptions({
+                headerShown: true,
+                headerRight:()=>(
+                <TouchableOpacity onPress={()=>editPost()}>
+                    <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Update <MaterialCommunityIcons name='send-circle-outline' size={16} color='#663399'/></Text>
+                </TouchableOpacity>
+                )
+            })
+        }
+    },[isSubmitting])
+
 
     useEffect(() => {
         axios.get('/frontend/createpost',config).then(response=>{
@@ -100,45 +120,29 @@ export default function CreatePost({navigation}) {
         })
      }, [])
 
-    function createPost(values){ 
-        axios.post('/product/create/post',values,config).then(response=>{
-            console.log(response.data)
-       }).catch(err=>{
-           console.log(err.request.response)
-       })
+    async function updatePost(values){ 
+        setIsSubmitting(true)
+        try {
+            const response = await axios.put('/product/edit/post/'+product._id, values, config)
+            setIsSubmitting(false)
+            navigation.goBack()
+        } catch (error) {
+            setIsSubmitting(false)
+            Alert.alert('Error', error.request.response)
+        }
     }
 
-     function brandValue(item,setFieldValue){
-        setFieldValue('brand',item)
-        if(item=="others"){
-            setShowBrand(true)
-        }else setShowBrand(false)
-     }
-
-
-     function renderChildren(categories,n){
-         var inc = n;
-        function increment(n){
-            var ele = "\u00A0 \u00A0 \u00A0"
-            inc += 1;
-            return ele.repeat(n)
-        }
-         if(categories&&categories.length!=0){
-             const arr=[]
-             categories.map(category=>{
-               arr.push(<Picker.Item key={category._id}  label={increment(n)+ category.name} value={category._id} />,renderChildren(category.childrens,inc))
-             })
-             return arr
-         }
-     }
-
     function calcEarning(value){
-        formRef.current.setFieldValue('price',value)
+        formRef.current.setFieldValue('price',value.toString())
         var  price= value
-        var profit = price- price*20/100
-        formRef.current.setFieldValue('earning_price',profit)
+        var profit = price-price*20/100
+        formRef.current.setFieldValue('earning_price',profit.toString())
         setEarningPrice(profit.toString())
      }
+
+     useEffect(()=>{
+         calcEarning(product.price)
+     },[])
 
      useEffect(()=>{
          formRef.current.setFieldValue('category', selectedCategory._id)
@@ -157,7 +161,7 @@ export default function CreatePost({navigation}) {
          formRef.current.setFieldValue('brand', selectedBrand._id)
      },[selectedBrand])
 
-     
+
      const renderHeader = () =>(
         <>
         <View style={{
@@ -202,8 +206,9 @@ export default function CreatePost({navigation}) {
 
 
 
+
   return (
-    <>
+     <>
     
     {openSelectField==="category" ? (
         <CategorySelect
@@ -256,7 +261,16 @@ export default function CreatePost({navigation}) {
     ):(null)}
 
 
-    <SafeAreaView style={{backgroundColor:'white',flex:1}} >
+{isSubmitting ? (
+    <SafeAreaView style={{backgroundColor:'#fff',flex:1}}>
+    <View style={bbstyles.loaderContainer}>
+        <ActivityIndicator size={100} color='#663399'/>
+        <Text style={styles.payProcessing}>Updating Post</Text>
+        <Text style={styles.subtitle}>Please wait...</Text>
+    </View>
+    </SafeAreaView>
+):(
+<SafeAreaView style={{backgroundColor:'white',flex:1}} >
 
 <KeyboardAvoidingView
 keyboardVerticalOffset={-500}
@@ -264,7 +278,7 @@ keyboardVerticalOffset={-500}
       style={{flex:1}}
 >
 
-<BottomSheet
+ <BottomSheet
             ref={sheetRef}
             snapPoints={[300, 0]}
             borderRadius={10}
@@ -275,9 +289,9 @@ keyboardVerticalOffset={-500}
             callbackNode={fill}
       />
 
-     <ScrollView style={{position:'relative'}} >
+     <ScrollView>
 
-    
+   
 
         <Animated.View style={[styles.container,{
             opacity: Animated.add(0.3, Animated.multiply(fill, 1.0))
@@ -285,16 +299,19 @@ keyboardVerticalOffset={-500}
         
         <Formik
             innerRef={formRef}
-           initialValues={{name:'',detail:'',category:'',stock:'',size:'',brand:'',color:'',original:'',price:'',earning_price:'',type:'',image1:'',custombrand:'',image2:'',image3:'',image4:''}}
-           onSubmit={(values)=>createPost(values)}
+           initialValues={{name:product.name,detail:product.detail,category:product.category_id?._id,stock:product.stock,size:product.size_id?._id,brand:product.brand_id?._id,color:product.color_id?._id,original:product.original,price:product.price,earning_price:earningPrice,type:product.type,image1:'',custombrand:'',image2:'',image3:'',image4:''}}
+           onSubmit={(values)=>updatePost(values)}
            validationSchema={validationSchema}
+           enableReinitialize
            >
            {({handleChange,handleSubmit,errors,values,setFieldValue,touched,handleBlur})=>(
                <>
-               <MainImage
+               <EditMainImage
                    sheetRef={sheetRef}
                    openCameraRef={openCameraRef}
                    selectImageRef={selectImageRef}
+                   mainImage = {product.image}
+                   featureImages = {product.feature_image}
                />
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>What are you selling? (Required)</Text>
@@ -303,6 +320,7 @@ keyboardVerticalOffset={-500}
                         keyboardType='default'
                         onChangeText={handleChange("name")}
                         onBlur={handleBlur('name')}
+                        defaultValue={product.name}
                          />
                          {errors.name && touched.name?(
                             <Text style={bbstyles.error}>{errors.name}</Text>
@@ -316,6 +334,8 @@ keyboardVerticalOffset={-500}
                     keyboardType='default'
                     onChangeText={handleChange("detail")}
                     onBlur={handleBlur('detail')}
+                    defaultValue={product.detail}
+                    multiline={true}
                 />
                 {errors.detail && touched.detail?(
                 <Text style={bbstyles.error}>{errors.detail}</Text>
@@ -342,6 +362,7 @@ keyboardVerticalOffset={-500}
                  style={styles.input}
                  onChangeText={handleChange("stock")}
                  onBlur={handleBlur('stock')}
+                 defaultValue={`${product.stock}`}
                  ></TextInput>
                    {errors.stock && touched.stock?(
                             <Text style={bbstyles.error}>{errors.stock}</Text>
@@ -408,6 +429,7 @@ keyboardVerticalOffset={-500}
                  style={styles.input}
                  onChangeText={handleChange("original")}
                 onBlur={handleBlur('original')}
+                defaultValue={`${product.original}`}
                  ></TextInput>
                 {touched.original && errors.original?(
                     <Text style={bbstyles.error}>{errors.original}</Text>
@@ -420,6 +442,7 @@ keyboardVerticalOffset={-500}
                  style={styles.input}
                  onChangeText={(value)=>calcEarning(value)}
                 onBlur={handleBlur('price')}
+                defaultValue={`${product.price}`}
                  ></TextInput>
                   {touched.price && errors.price?(
                     <Text style={bbstyles.error}>{errors.price}</Text>
@@ -455,11 +478,31 @@ keyboardVerticalOffset={-500}
      </ScrollView>
      </KeyboardAvoidingView>
      </SafeAreaView>
+    )}
     </>
+    
   )
 }
 
+export default EditPost
+
 const styles = StyleSheet.create({
+    payProcessing: {
+        fontWeight:'700',
+        fontSize:24,
+        fontFamily:"Raleway_700Bold",
+        color: '#663399',
+        textAlign: 'center',
+        marginTop:20
+    },
+    subtitle: {
+        fontSize:14,
+        fontWeight:'600',
+        fontFamily:"Raleway_600SemiBold",
+        color:'#663388',
+        marginTop: 10,
+        textAlign:'center',
+    },
     container:{
         padding:20
     },

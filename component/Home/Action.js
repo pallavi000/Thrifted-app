@@ -1,18 +1,123 @@
-import { StyleSheet, Text, View ,TextInput,Image,TouchableOpacity,Button, FlatList} from 'react-native'
-import React,{useContext, useEffect, useState} from 'react'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { StyleSheet, Text, View ,TextInput,Image,TouchableOpacity,Button, FlatList, TouchableWithoutFeedback, Dimensions, Alert, Share} from 'react-native'
+import React,{useContext, useEffect, useMemo, useRef, useState} from 'react'
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons'
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { Raleway_500Medium } from '@expo-google-fonts/raleway'
-// import { SliderBox } from "react-native-image-slider-box";
-
+import { SliderBox } from "react-native-image-slider-box";
+import Animated, { Easing, EasingNode, Extrapolate, interpolate, useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import ExpoFastImage from 'expo-fast-image'
+import { PinchGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler'
 
 export default React.memo(function Action(props) {
     const[comment,setComment] = useState('')
     const[like,setLike]= useState(false)
     const {navigation} = props
-    const[item,setItem] = useState(props.product)
+    const[product,setProduct] = useState(props.product)
+    const[doubleClick, setDoubleClick] = useState(0)
+
+    const handle = useRef()
+
+    const currentValue = useSharedValue(1)
+    const scaleHeart = useSharedValue(0)
+    const rStyle = useAnimatedStyle(()=>({
+        transform: [{scale: currentValue.value ? currentValue.value : 1}]
+    }))
+    const mStyle = useAnimatedStyle(()=>({
+        transform: [{scale: Math.max(scaleHeart.value,0)}]
+    }))
+
+    // const scale =  React.useRef(new Animated.Value(1));
+    // const translateX =  React.useRef(new Animated.Value(0));
+    // const translateY =  React.useRef(new Animated.Value(0));
+    
+    // const HandlePinch = new Animated.event(
+    //     [
+    //         {
+    //             nativeEvent:{scale:scale.current}
+    //         }
+    //     ],
+    //     {
+    //         useNativeDriver: false
+    //     })
+
+    // const HandlePinchStateChange = (event) => {
+    //     if(event.nativeEvent.state===State.ACTIVE) {
+    //         translateX.current.setValue((Dimensions.get('window').width/2)-event.nativeEvent.focalX)
+    //         translateY.current.setValue(200-event.nativeEvent.focalY)
+    //     }
+    //     //left
+    //     if(event.nativeEvent.oldState===State.ACTIVE) {
+    //         translateX.current.setValue(0)
+    //         translateY.current.setValue(0)
+    //         Animated.timing(scale.current, {
+    //             toValue: 1,
+    //             duration: 300,
+    //             easing: EasingNode.linear,
+    //             useNativeDriver: true
+    //         }).start()
+            
+    //     }
+    // }
+
+    const focalX = useSharedValue(0);
+    const focalY = useSharedValue(0);
+    const xCurrent = useSharedValue(0);
+    const yCurrent = useSharedValue(0);
+    const xPrevious = useSharedValue(0);
+    const yPrevious = useSharedValue(0);
+    const scaleCurrent = useSharedValue(1);
+    const scalePrevious = useSharedValue(1);
+
+    const WIDTH = Dimensions.get('window').width
+    const HEIGHT = 400
+
+    const pinchHandler = useAnimatedGestureHandler({
+        onStart: (event) => {
+            if (event.numberOfPointers == 2) {
+                focalX.value = event.focalX;
+                focalY.value = event.focalY;
+            }
+        },
+        onActive: (event) => {
+            if (event.numberOfPointers == 2) {
+                // On Android, the onStart event gives 0,0 for the focal
+                // values, so we set them here instead too.
+                if (event.oldState === 2) {
+                    focalX.value = event.focalX;
+                    focalY.value = event.focalY;
+                }
+                scaleCurrent.value = event.scale;
+
+                xCurrent.value = (1 - scaleCurrent.value) * (focalX.value - WIDTH / 2);
+                yCurrent.value = (1 - scaleCurrent.value) * (focalY.value - HEIGHT / 2);
+            }
+        },
+        onEnd: () => {
+            focalX.value = 0
+            focalY.value = 0
+            xCurrent.value = 0
+            yCurrent.value = 0
+            xPrevious.value = 0
+            yPrevious.value = 0
+            scaleCurrent.value = 1
+            scalePrevious.value = 1
+        },
+    });
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                { translateX: xCurrent.value },
+                { translateY: yCurrent.value },
+                { scale: scaleCurrent.value },
+                { translateX: xPrevious.value },
+                { translateY: yPrevious.value },
+                { scale: scalePrevious.value },
+            ],
+        };
+    });
 
     const data = useContext(AuthContext)
     const {token,decode} = data
@@ -27,27 +132,42 @@ export default React.memo(function Action(props) {
             setLike(true)
         }
     },[])
-  
+
+    useEffect(()=>{
+        
+    },[like])
+
 
     async function addLike(){
+        currentValue.value = withSpring(0.1, undefined, (isFinished)=>{
+            if(isFinished) {
+                currentValue.value = withSpring(1)
+            }
+        })
+        scaleHeart.value = withSpring(1, undefined, (isFinished)=>{
+            if(isFinished) {
+                scaleHeart.value = withSpring(0)
+            }
+        })
+
         try {
             const data={
                 action:like?'unlike':'like'
             }
-            const response = await axios.post('/post/like/post/'+props.product._id,data,config)
-            setLike(!like)
             if(like){
-                
-                setItem({...item,likes_count:item.likes_count-1})
-
+                setProduct({...product,likes_count:product.likes_count-1})
             }else{
-                setItem({...item,likes_count:item.likes_count+1})
-
+                setProduct({...product,likes_count:product.likes_count+1})
             }
-            console.log(response.data)
-            
+            setLike(!like)
+            const response = await axios.post('/post/like/post/'+props.product._id,data,config)          
         } catch (error) {
-            console.log(error.request.response)
+            if(like){
+                setProduct({...product,likes_count:product.likes_count+1})
+            }else{
+                setProduct({...product,likes_count:product.likes_count-1})
+            }
+            setLike(like)
         }
     }   
     
@@ -59,35 +179,123 @@ export default React.memo(function Action(props) {
         return arr
     }
 
+    function singleOrDoubleClick(item) {
+        if(doubleClick>=1) {
+            if(handle.current) {
+                clearTimeout(handle.current)
+            }
+            setDoubleClick(0)
+            // Double Clicked
+            addLike()
+        } else {
+            setDoubleClick(doubleClick+1)
+            handle.current = setTimeout(()=>{
+                setDoubleClick(0)
+                // Single Click
+                navigation.navigate('Product Detail',item)
+            },300)
+        }
+    }
+
+    const onShare = async (item) => {
+        try {
+        const result = await Share.share({
+            message: `${item.name} \n\n रु ${item.price} \n\n${imageLink}/product-detail/${item._id}`
+        });
+        if (result.action === Share.sharedAction) {
+            // shared
+        } else if (result.action === Share.dismissedAction) {
+            // dismissed
+        }
+        } catch (error) {
+         Alert.alert('Error', error.message);
+        }
+    };
+
   return (
       <>
     
-    <TouchableOpacity  onPress={()=>navigation.navigate('Product Detail',item)}>
-          <View style={styles.productWrapper} key={item._id}>
-            <TouchableOpacity onPress={()=>navigation.navigate('My Closet',item.seller_id)} style={styles.userWrapper}>
-               <Image style={styles.userimage} source={{uri:imageLink+item.seller_id?.image}}></Image> 
-               <Text style={styles.username}>{item.seller_id?.name}</Text>   
-            </TouchableOpacity>
+            <TouchableOpacity  onPress={()=>navigation.navigate('Product Detail',product)}>
+            <View style={{marginBottom: 5}} key={product._id}>
+                <TouchableOpacity onPress={()=>navigation.navigate('My Closet',product.seller_id)} style={styles.userWrapper}>
+                <Image style={styles.userimage} source={{uri:imageLink+product.seller_id?.image}}></Image> 
+                <Text style={styles.username}>{product.seller_id?.name}</Text>   
+                </TouchableOpacity>
             </View>
             </TouchableOpacity>
+            
             <View style={styles.productWrapper}>
-
             <View style={styles.product}>
-                <Image style={styles.productImage} source={{uri:imageLink+item.image}}></Image>
+            
+
+            {/* <FlatList
+            data={parseImages(product.image, product.feature_image)}
+            keyExtractor={item=>item}
+            horizontal={true}
+            showsHorizontalScrollIndicator={true}
+            initialNumToRender={1}
+            renderItem={({item})=>(
+                <TouchableWithoutFeedback onPress={()=>singleOrDoubleClick(product)}>
+                    <Image style={styles.productImage} source={{uri:item}}></Image>
+                </TouchableWithoutFeedback>
+            )}
+            /> */}
+
+
+            <Animated.View style={[styles.bigHeart,mStyle]}>
+                <MaterialCommunityIcons name='cards-heart' size={130} color='white' style={styles.bigHeartIcon} />
+            </Animated.View>
+
+            {product.stock<=0 ? (
+                <View style={styles.isSold}>
+                    <Text style={styles.isSoldText}>Sold</Text>
+                </View>
+            ):(null)}
+            
+            <TapGestureHandler onActivated={()=>singleOrDoubleClick(product)}>
+                <View style={styles.productImage}>
+                <PinchGestureHandler onGestureEvent={pinchHandler}>
+                    {/* <ExpoFastImage
+                        uri={imageLink+product.image} // image address
+                        cacheKey={product._id} // could be a unque id
+                        style={styles.productImage} // your custom style object
+                        // any supported props by Image
+                    /> */}
+                    <Animated.Image
+                    source={{uri:imageLink+product.image}}
+                    style={[styles.productImage, animatedStyle]}
+                    />
+                </PinchGestureHandler>
+                </View>
+                </TapGestureHandler>
+
+            
+                
 
                 {/* <SliderBox
-                images={parseImages(item.image, item.feature_image)}
+                images={parseImages(product.image, product.feature_image)}
                 ImageComponentStyle	= {styles.productImage}
                 dotColor="#663399"
                 imageLoadingColor="#663399"
-                onCurrentImagePressed={()=>navigation.navigate('Product Detail',item)}
+                activeOpacity={1}
+                onCurrentImagePressed={()=>singleOrDoubleClick(product)}
                 /> */}
+                
                 <View style={styles.productreview}>
+
+
+                
                 <TouchableOpacity onPress={()=>addLike()} style={{marginRight:5}}>
                 {like?(
-                    <MaterialCommunityIcons name='cards-heart' size={25} color='red'></MaterialCommunityIcons>
+                    <Animated.View  style={rStyle}>
+                        <MaterialCommunityIcons name='cards-heart' size={25} color='red'
+                        />
+                    </Animated.View>
                 ):(
-                    <MaterialCommunityIcons name='heart-outline' size={25} color='black'></MaterialCommunityIcons>
+                    <Animated.View  style={rStyle}>
+                        <MaterialCommunityIcons name='heart-outline' size={25} color='black' 
+                    />
+                    </Animated.View>
                 )}
                 </TouchableOpacity>
                 
@@ -95,30 +303,30 @@ export default React.memo(function Action(props) {
                 <Image source={require('../../assets/icons/Shop.png')} style={styles.smallIcon}/>
                 </View> */}
                 
-                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',item._id)}>
+                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',product._id)}>
                     <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
                 </TouchableOpacity>
 
-                <View>
+                <TouchableOpacity onPress={()=>onShare(product)}>
                     <Image source={require('../../assets/icons/Share.png')} style={styles.smallIcon}/>
-                </View>
+                </TouchableOpacity>
                 
                 </View>
                 <View  style={styles.typeWrapper}>
-                    <Text style={styles.productname}>{item.likes_count} Likes</Text>
+                    <Text style={styles.productname}>{product.likes_count} Likes</Text>
                 </View>
                 
-                <TouchableOpacity onPress={()=>navigation.navigate('Product Detail',item)}>
+                <TouchableOpacity onPress={()=>navigation.navigate('Product Detail',product)}>
                 <View style={styles.typeWrapper}> 
-                    <View><Text style={styles.productname} numberOfLines={1}>{item.name}</Text></View> 
-                    <View><Text style={styles.type}>{item.type}</Text></View> 
+                    <View><Text style={styles.productname} numberOfLines={1}>{product.name}</Text></View> 
+                    <View><Text style={styles.type}>{product.type}</Text></View> 
                 </View>
                 <View style={styles.detailWrapper}>
-                    <Text style={styles.price}>Rs. {item.price}</Text><Text>|</Text><Text style={styles.size}>Size: {item.size_id?.name}</Text><Text>|</Text><Text style={styles.brand}>{item.brand_id?.name}</Text>
+                    <Text style={styles.price}>Rs. {product.price}</Text><Text>|</Text><Text style={styles.size}>Size: {product.size_id?.name}</Text><Text>|</Text><Text style={styles.brand}>{product.brand_id?.name}</Text>
                 </View>  
                 </TouchableOpacity> 
-                <TouchableOpacity onPress={()=>navigation.navigate('Comments',item._id)} style={styles.typeWrapper}>
-                    <Text style={styles.viewComment}>View All {item.comments_count} Comments</Text>
+                <TouchableOpacity onPress={()=>navigation.navigate('Comments',product._id)} style={styles.typeWrapper}>
+                    <Text style={styles.viewComment}>View All {product.comments_count} Comments</Text>
                 </TouchableOpacity>
             </View>
             </View>
@@ -129,6 +337,45 @@ export default React.memo(function Action(props) {
 })
 
 const styles = StyleSheet.create({
+    bigHeartIcon: {
+        shadowOffset: {
+            width: 0,
+            height: 20,
+        },
+        shadowOpacity: 0.95,
+        shadowRadius: 35,
+        elevation: 20,
+        shadowColor: '#000'
+    },
+    bigHeart: {
+        position: 'absolute',
+        left: (Dimensions.get('window').width/2)-70,
+        top: 130,
+        zIndex: 3
+    },
+    isSold: {
+        shadowOffset: {
+            width: 0,
+            height: 20,
+        },
+        shadowOpacity: 0.35,
+        shadowRadius: 35,
+        elevation: 10,
+        paddingHorizontal:10,
+        paddingVertical:2,
+        borderRadius:10,
+        backgroundColor: '#fa4a0c',
+        position: 'absolute',
+        right: 20,
+        top: 350,
+        alignContent: 'center',
+        
+    },
+    isSoldText: {
+        fontFamily: "Raleway_500Medium",
+        color: 'white'
+    },
+
     productreview:{
     paddingVertical:10,
     flexDirection:'row',
@@ -153,15 +400,14 @@ color:'rgba(0, 0, 0, 0.5)'
         color:'red'   
     },
     productWrapper:{
-        marginBottom:20
-        
+        marginBottom:20,
     },
     userWrapper:{
         display:'flex',
         flexDirection:'row',
         alignItems:'center',
        paddingHorizontal:5,
-       paddingVertical:10,
+       paddingVertical:5,
     },
     userimage:{
         height:34,
@@ -182,9 +428,9 @@ color:'rgba(0, 0, 0, 0.5)'
     },
     productImage:{
         height:400,
-        width:'100%',
-        resizeMode:'cover'
-        
+        width:Dimensions.get('window').width,
+        resizeMode:'cover',     
+        zIndex: 2   
     },
     typeWrapper:{
         display:'flex',
@@ -211,13 +457,12 @@ color:'rgba(0, 0, 0, 0.5)'
     },
     type:{
         fontSize:14,
-        paddingHorizontal:9,
+        paddingHorizontal:10,
         paddingVertical:1,
         borderRadius:10,
         borderWidth:1,
         borderColor:'#ddd',
         textTransform:'capitalize'
-      
     },
     price:{
         fontSize:15,

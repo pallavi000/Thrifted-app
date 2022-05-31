@@ -99,6 +99,44 @@ export default function App(props) {
   },[socket,unreadMessage,unreadNotification,unreadNormalNotificationCount])
 
 
+  function socketConnect(decoded) {
+    socket.current= io('http://167.86.77.80')   
+    socket.current.on('connect', () => {
+        socket.current.emit('join',decoded._id)
+    })
+  }
+
+  async function userImageSet(decoded) {
+    try {
+      const userImg = await AsyncStorage.getItem('userImage')
+      if(!userImg) {
+        if(decoded.image) {
+          await AsyncStorage.setItem('userImage', decoded.image)
+        }
+        setUserImage(decoded.image)
+      } else {
+        setUserImage(userImg)
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  async function getCartItems(token) {
+    try {
+      const config = {
+          headers: {
+            'access-token':token
+          }
+        }
+        const response = await axios.get('/addtocart/cartcount',config)
+        retotal(response.data)
+    } catch (error) {
+      // getCartItemsFromCache()
+    }
+  }
+
+
   async function getToken(){
     try {  
       const authConfig = await AsyncStorage.getItem('token')
@@ -107,28 +145,11 @@ export default function App(props) {
         var token = authConfig;
         var decoded = jwt_decode(token);
         setDecode(decoded)
-        socket.current= io('http://167.86.77.80')   
-        socket.current.on('connect', () => {
-            socket.current.emit('join',decoded._id)
-        })
-        const userImg = await AsyncStorage.getItem('userImage')
-        if(!userImg) {
-          if(decoded.image) {
-            await AsyncStorage.setItem('userImage', decoded.image)
-          }
-          setUserImage(decoded.image)
-        } else {
-          setUserImage(userImg)
-        }
 
-        const config = {
-          headers: {
-            'access-token':token
-          }
-        }
+        socketConnect(decoded)
+        userImageSet(decoded)
         setIsLoggedIn(true)
-        const response = await axios.get('/addtocart/cartcount',config)
-        retotal(response.data)
+        getCartItems(token)
       }
       setAppReady(true)
     } catch (error) { 

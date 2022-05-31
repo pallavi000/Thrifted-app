@@ -126,10 +126,6 @@ export default function Closet(props) {
         setActiveTab(action)
     }
 
-    function numberWithCommas(x) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
     async function followUser() {
         setFollowSubmit(true)
         try {
@@ -225,9 +221,21 @@ export default function Closet(props) {
         }
     }
 
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     function getFollowersCount() {
         if(user.followers && user.followers.length>0) {
-            return numberWithCommas(user.followers.length)
+            const num = user.followers.length
+            if(num >= 1000000) {
+                return (num/1000000).toFixed(1)+'M';
+            }
+            if(num >= 1000) {
+                
+                return (num/1000).toFixed(1)+'k';
+            }
+            return numberWithCommas(num);
         }
         return 0;
     }

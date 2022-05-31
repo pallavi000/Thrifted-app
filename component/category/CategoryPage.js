@@ -63,7 +63,7 @@ export default function CategoryPage({navigation,route}) {
             sorting
         }
         var response = await axios.post('/category/filter',data)
-        
+
         var currentPageNo = response.data.total/itemsPerPage
         currentPageNo=  Math.ceil(currentPageNo)
         if(currentPageNo==pageNo){
@@ -71,7 +71,7 @@ export default function CategoryPage({navigation,route}) {
         }
 
         if(nextPageProducts) {
-            setProducts([...products, response.data.products])
+            setProducts([...products, ...response.data.products])
         } else {
             setProducts(response.data.products)
             setBrands(response.data.brands)
@@ -156,6 +156,7 @@ export default function CategoryPage({navigation,route}) {
             setPageNo(pageNo+1)
         }
     })
+
    
 
   return (
@@ -214,13 +215,13 @@ export default function CategoryPage({navigation,route}) {
             <Image source={{uri:imageLink+item.image}} style={styles.productImage}></Image>
             <View style={styles.detailWrapper}>
             <Text style={styles.productName} numberOfLines={1} >{item.name}</Text>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
+            {/* <View style={{flexDirection:'row',alignItems:'center'}}>
                 <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1, marginRight:5}}>Brands</Text>
                 <Text>{item.brand_id?.name}</Text>
-            </View>
+            </View> */}
             <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1,marginRight:5}}>Price</Text>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1}}>Rs.{item.price}</Text>
+                {/* <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1,marginRight:5}}>Price</Text> */}
+                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1}}>रु {item.price}</Text>
             </View>
             </View>
         </TouchableOpacity>
@@ -292,8 +293,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5
     },
     productImage:{
-        height:210,
-        resizeMode:'cover'
+        height:170,
+        resizeMode:'cover',
+        borderRadius: 6,
     },
     productWrapper:{
         width:(Dimensions.get('window').width-30)/2,
@@ -304,26 +306,28 @@ const styles = StyleSheet.create({
             width: 0,
             height: 2,
         },
-        shadowOpacity: 0.25,
+        shadowOpacity: 0.15,
         shadowRadius: 3.84,
         elevation: 5,
         backgroundColor: 'white',
+        borderTopLeftRadius: 6,
+        borderTopRightRadius: 6,
     },
     productName:{
         fontSize:12,
         fontWeight:'500',
-        marginVertical:5,
+        marginVertical:2,
         fontFamily:'Raleway_600SemiBold'
     },
     detailWrapper:{
         padding:10,
+        paddingVertical: 5,
         shadowColor: "#ddd",
         shadowOffset: {
             width: 0,
             height: 5,
         },
         shadowRadius: 5,
-
         elevation: 7,
     }
 

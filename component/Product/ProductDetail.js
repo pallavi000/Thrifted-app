@@ -3,14 +3,13 @@ import React, { useContext, useState,useRef,useEffect } from 'react'
 import { View,ActivityIndicator, Alert,Text, Image,SafeAreaView,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, TouchableOpacity} from 'react-native'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
-import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold, Raleway_700Bold_Italic } from '@expo-google-fonts/raleway'
+import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold, Raleway_700Bold_Italic } from '@expo-google-fonts/raleway'
 import { Feather, Ionicons } from '@expo/vector-icons'
-// import { SliderBox } from "react-native-image-slider-box";
+import { SliderBox } from "react-native-image-slider-box";
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import { useIsFocused } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-
 
 export default function ProductDetail({navigation,route}) {
     const [showFullDesc, setShowFullDesc] = useState(false)
@@ -114,6 +113,24 @@ export default function ProductDetail({navigation,route}) {
         return arr
     }
 
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function getFollowersCount(user) {
+        if(user.followers && user.followers.length>0) {
+            const num = user.followers.length
+            if(num >= 1000000) {
+                return (num/1000000).toFixed(1)+'M';
+            }
+            if(num >= 1000) {
+                return (num/1000).toFixed(1)+'k';
+            }
+            return numberWithCommas(num);
+        }
+        return 0;
+    }
+
 
     const renderContent = () => (
         <View
@@ -157,18 +174,46 @@ export default function ProductDetail({navigation,route}) {
        
             <View style={styles.detailImage}>
             
-            {/* <SliderBox
+            <SliderBox
             images={parseImages(product.image, product.feature_image)}
             ImageComponentStyle	= {styles.productImage}
             dotColor="#663399"
             imageLoadingColor="#663399"
-            /> */}
+            />
 
             </View>
             <View style={styles.detailContainer}>
                 <View style={styles.productName}>
                     <Text style={styles.name}>{product.name}</Text>
                 </View>
+
+
+                <View style={styles.productreview}>
+                <TouchableOpacity onPress={()=>addLike()} style={{marginRight:5}}>
+                {like?(
+                    <MaterialCommunityIcons name='cards-heart' size={25} color='red'></MaterialCommunityIcons>
+                ):(
+                    <MaterialCommunityIcons name='heart-outline' size={25} color='black'></MaterialCommunityIcons>
+                )}
+                </TouchableOpacity>
+        
+                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',product._id)}>
+                    <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
+                </TouchableOpacity>
+
+                <View>
+                    <Image source={require('../../assets/icons/Share.png')} style={styles.smallIcon}/>
+                </View>
+            </View>
+            <View  style={styles.typeWrapper}>
+                <Text style={styles.productname}>{product.likes_count} Likes</Text>
+            </View>
+            <TouchableOpacity onPress={()=>navigation.navigate('Comments',product._id)} style={styles.typeWrapper}>
+                <Text style={styles.viewComment}>View All {product.comments_count} Comments</Text>
+            </TouchableOpacity>
+
+
+
                 <View style={styles.productFeature}>
                     <View style={styles.sizeWrapper}>
                         <Text style={styles.featureName}>Size</Text>
@@ -188,7 +233,7 @@ export default function ProductDetail({navigation,route}) {
                     </View>
                 </View>
                 <View style={styles.productDetailWrapper}>
-                    <Text style={styles.detailHeader}>Item Detail</Text>
+                    <Text style={styles.detailHeader}>Description</Text>
                     {showFullDesc ?(
                         <>
                             <Text style={styles.productDetail}>{product.detail}</Text>
@@ -208,32 +253,20 @@ export default function ProductDetail({navigation,route}) {
                     )}
                 </View>
 
-
-
-            <View style={styles.productreview}>
-                <TouchableOpacity onPress={()=>addLike()} style={{marginRight:5}}>
-                {like?(
-                    <MaterialCommunityIcons name='cards-heart' size={25} color='red'></MaterialCommunityIcons>
-                ):(
-                    <MaterialCommunityIcons name='heart-outline' size={25} color='black'></MaterialCommunityIcons>
-                )}
-                </TouchableOpacity>
-        
-                <TouchableOpacity  onPress={()=>navigation.navigate('Comments',product._id)}>
-                    <Image source={require('../../assets/icons/Comment.png')} style={styles.smallIcon}/>
-                </TouchableOpacity>
-
-                <View>
-                    <Image source={require('../../assets/icons/Share.png')} style={styles.smallIcon}/>
+                <View style={styles.productDetailWrapper}>
+                    <Text style={styles.detailHeader}>About this seller</Text>
+                    <View style={styles.shopWrapper}>
+                        <Image source={{uri:imageLink+product.seller_id?.image}} style={styles.sellerImage} />
+                        <View>
+                            <Text style={styles.sellerName}>{product.seller_id?.name}</Text>
+                            <Text style={styles.sellerEmail}>{product.seller_id?.email}</Text>
+                            <Text style={styles.sellerFollowers}>{getFollowersCount(product.seller_id)} followers</Text>
+                        </View>
+                    </View>
+                    <TouchableOpacity onPress={()=>navigation.navigate('My Closet',product.seller_id)} style={styles.shopFeatureWrapper}>
+                        <Text style={styles.featureValue}>View Seller</Text>
+                    </TouchableOpacity>
                 </View>
-                
-            </View>
-            <View  style={styles.typeWrapper}>
-                <Text style={styles.productname}>{product.likes_count} Likes</Text>
-            </View>
-            <TouchableOpacity onPress={()=>navigation.navigate('Comments',product._id)} style={styles.typeWrapper}>
-                <Text style={styles.viewComment}>View All {product.comments_count} Comments</Text>
-            </TouchableOpacity>
 
                 {/* <View style={styles.productPrice}>
                     <Text style={styles.priceTitle}>Total</Text>
@@ -278,8 +311,31 @@ export default function ProductDetail({navigation,route}) {
 }
 
 const styles = StyleSheet.create({
+    sellerName: {
+        fontFamily: "Raleway_500Medium"
+    },
+    sellerEmail: {
+        fontFamily: "Raleway_400Regular",
+        color: 'rgba(0, 0, 0, 0.5)',
+        marginVertical: 2
+    },
+    sellerFollowers:{
+        color: 'rgba(0, 0, 0, 0.5)'
+    },
+    shopWrapper: {
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginTop: 5
+    },
+    sellerImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        marginRight: 15
+    },
     productreview:{
-    paddingVertical:10,
+    paddingVertical:5,
     flexDirection:'row',
     alignItems:'center',
     paddingHorizontal:10
@@ -288,7 +344,8 @@ viewComment:{
 fontSize:13,
 fontWeight:'500',
 fontFamily:"Raleway_500Medium",
-color:'rgba(0, 0, 0, 0.5)'
+color:'rgba(0, 0, 0, 0.5)',
+marginBottom: 10
 },
     smallIcon: {
         height: 25,
@@ -414,8 +471,7 @@ color:'rgba(0, 0, 0, 0.5)'
 
     },
     productName:{
-        marginBottom:15
-        
+        marginBottom:0
     },
 
     productFeature:{
@@ -446,6 +502,26 @@ color:'rgba(0, 0, 0, 0.5)'
         fontWeight:'700',
         fontFamily:'Raleway_700Bold',
         textTransform: 'capitalize'
+    },
+    shopFeatureWrapper: {
+        textAlign:'center',
+        paddingVertical:10,
+        paddingHorizontal:10,
+        borderWidth:1,
+        borderColor:'#E3E3E3',
+        borderRadius:7,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3,
+        elevation: 0.8,
+        width: (Dimensions.get('window').width-60),
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 15
     },
     productFeatureWrapper:{
         textAlign:'center',

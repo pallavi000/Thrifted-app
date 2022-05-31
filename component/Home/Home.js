@@ -7,6 +7,7 @@ import { imageLink } from '../ImageLink'
 import { AuthContext } from '../Context'
 import { useIsFocused } from '@react-navigation/native'
 import Action from './Action'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 export default function Home({navigation}) {
@@ -21,7 +22,7 @@ export default function Home({navigation}) {
     const[itemsCountPerPage,setItemsCountPerPage]= useState(10)
     const[loader,setLoader] = useState(true)
     const[nextPage,setNextPage] = useState(true)
-    const[comment,setComment] = useState('')
+    const[dataType, setDataType] = useState('cache')
     const data = useContext(AuthContext)
     const {unreadMessage, setUnreadMessage, token,unreadNotification,setUnreadNotification,socket,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount} = data
     const config = {
@@ -40,12 +41,13 @@ export default function Home({navigation}) {
         try {
             const response = await axios.post('/frontend/app/home', data)
             if(!productOnly) {
-                console.log('starts fin')
                 setProducts(response.data.product)
                 setBanners(response.data.banner)
                 setRentProducts(response.data.rentProduct)
                 setSellProducts(response.data.saleProduct)
                 setCategories(response.data.categories)
+                storeInCache(response.data)
+                setDataType('real')
             } else {
                 setProducts([...products, ...response.data.product])
             }
@@ -54,6 +56,29 @@ export default function Home({navigation}) {
             console.log('ends')
         } catch (error) {
             setLoader(false)
+        }
+    }
+
+    async function storeInCache(data) {
+        try {
+            await AsyncStorage.setItem('products', JSON.stringify(data.product))
+            await AsyncStorage.setItem('categories', JSON.stringify(data.categories))
+        } catch (error) {
+            
+        }
+    }
+
+    async function getProductsFromCache() {
+        try {
+            const products = await AsyncStorage.getItem('products')
+            const categories = await AsyncStorage.getItem('categories')
+            if(products && categories) {
+                setProducts(JSON.parse(products))
+                setCategories(JSON.parse(categories))
+                setLoader(false)
+            }
+        } catch (error) {
+            
         }
     }
 
@@ -83,6 +108,7 @@ export default function Home({navigation}) {
     },[token, isFocused])
 
     useEffect(() => {
+        getProductsFromCache()
         getProducts(activePage, itemsCountPerPage, false)
     }, [])
 
@@ -130,7 +156,7 @@ export default function Home({navigation}) {
                 )}
                 />                
             ):(null)}
-            <Action product={item} products={products} setProducts={setProducts} navigation= {navigation}/>
+            <Action product={item} dataType={dataType} products={products} setProducts={setProducts} navigation= {navigation}/>
             </View>
         )
     }
@@ -165,7 +191,7 @@ export default function Home({navigation}) {
             </View>
         </View>
 
-        <View style={{paddingBottom:50}}>
+        <View style={{paddingBottom:50,height:'100%'}}>
         
 
           <FlatList

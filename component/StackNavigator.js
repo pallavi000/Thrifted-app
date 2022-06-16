@@ -176,10 +176,6 @@ function homeNavigation(props) {
           }}
       name="Cart Items" component={CartItem}/>
 
-          <Stack.Screen options={{
-                headerShown: false,
-              }} name="Order Success" component={OrderSuccess}/>
-
     <Stack.Screen options={{
                 headerShown: false,
               }} name="Track Order" component={OrderTrack}/>

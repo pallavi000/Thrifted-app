@@ -1,6 +1,5 @@
-import { View, ActivityIndicator,Text,SafeAreaView, StatusBar, Image,Dimensions,TouchableOpacity, StyleSheet,Alert, Button,ScrollView,TouchableWithoutFeedback} from 'react-native'
+import { View, ActivityIndicator,Text,SafeAreaView, StatusBar, Image,TouchableOpacity, StyleSheet,Alert,ScrollView} from 'react-native'
 import React,{useState,useEffect,useContext} from 'react'
-import { Raleway_400Regular, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import { Feather, Ionicons } from '@expo/vector-icons'
 import { RadioButton } from 'react-native-paper';
 import { AuthContext } from '../Context';
@@ -17,117 +16,110 @@ import bbstyles from '../Styles';
 
 
 export default function Checkout({navigation}) {
-const[paymentMethod,setPaymentMethod] = useState('')
-const[addresses,setAddresses] = useState([])
-const[selectedId,setSelectedId] = useState(0)
-const[shippingAddress,setShippingAddresses] = useState()
-const[sameBilling,setSameBilling] = useState(true)
-const[billingAddress,setBillingAddress] = useState({})
-const[pid,setPid] = useState(uuidv4())
-const[shippingFee,setShippingFee] = useState(0)
-const[esewaVisible,setEsewaVisible] = useState(false)
-const[khaltiVisible,setKhaltiVisible] = useState(false)
-const[isSubmitting,setIsSubmitting] = useState(false)
-
-const[loader,setLoader] = useState(true)
-
-
-const IsFocused = useIsFocused()
-
-async function loadSelectedCheckBox() {
-    var addressId = await AsyncStorage.getItem('shippingId')
-    if(addressId) {
-        setSelectedId(addressId)
+    const[paymentMethod,setPaymentMethod] = useState('')
+    const[addresses,setAddresses] = useState([])
+    const[selectedId,setSelectedId] = useState(0)
+    const[shippingAddress,setShippingAddresses] = useState()
+    const[sameBilling,setSameBilling] = useState(true)
+    const[billingAddress,setBillingAddress] = useState({})
+    const[pid,setPid] = useState(uuidv4())
+    const[shippingFee,setShippingFee] = useState(0)
+    const[esewaVisible,setEsewaVisible] = useState(false)
+    const[khaltiVisible,setKhaltiVisible] = useState(false)
+    const[isSubmitting,setIsSubmitting] = useState(false)
+    const data = useContext(AuthContext)
+    const {token,subtotal,getCartItems} = data
+    const config = {
+        headers:{
+            'access-token': token
+        }
     }
-}
+    const[loader,setLoader] = useState(true)
+    const IsFocused = useIsFocused()
 
-useEffect(()=>{
-if(addresses && addresses.length>0 && selectedId){
-    var shippingAddress = addresses.find(address=>address._id==selectedId)
-    if(shippingAddress){
-        setShippingAddresses(shippingAddress)
-    } else {
-        setShippingAddresses(addresses[0])
-    }
-} else {
-    setShippingAddresses()
-}
-},[addresses,selectedId])
+    const loadSelectedCheckBox = React.useCallback(async()=>{
+        var addressId = await AsyncStorage.getItem('shippingId')
+        if(addressId) {
+            setSelectedId(addressId)
+        }
+    })
 
+    useEffect(()=>{
+        if(addresses && addresses.length>0 && selectedId){
+            var shippingAddress = addresses.find(address=>address._id==selectedId)
+            if(shippingAddress){
+                setShippingAddresses(shippingAddress)
+            } else {
+                setShippingAddresses(addresses[0])
+            }
+        } else {
+            setShippingAddresses()
+        }
+    },[addresses,selectedId])
+            
+    useEffect(() => {
+        getaddress()
+        loadSelectedCheckBox()
+    }, [IsFocused])
 
-const data = useContext(AuthContext)
-const {token,subtotal,getToken} = data
-const config = {
-    headers:{
-        'access-token': token
-    }
-}
-        
-useEffect(() => {
-    getaddress()
-    loadSelectedCheckBox()
-}, [IsFocused])
-
-useEffect(()=>{
-    if(!isSubmitting) {
-       navigation.setOptions({
-            headerStyle:{
-              backgroundColor:'#fff',
-            },
-            headerTitleStyle:{
-                color: '#000'
-            },
-            headerTintColor:'black',
-        }) 
-    } else {
+    useEffect(()=>{
+        if(!isSubmitting) {
         navigation.setOptions({
-            headerStyle:{
-              backgroundColor:'#663399',
-            },
-            headerTitleStyle:{
-                color: '#fff'
-            },
-            headerTintColor:'white',
-        })
-    }
-},[isSubmitting])
-    
-async function getaddress(){
-    try {
-        var response = await axios.get('/address',config)
-        setAddresses(response.data)
-        setLoader(false)
-    } catch (error) {
-        setLoader(false)
-       Alert.alert('Error', error.request.response)
-    }
-}
+                headerStyle:{
+                backgroundColor:'#fff',
+                },
+                headerTitleStyle:{
+                    color: '#000'
+                },
+                headerTintColor:'black',
+            })
+        } else {
+            navigation.setOptions({
+                headerStyle:{
+                backgroundColor:'#663399',
+                },
+                headerTitleStyle:{
+                    color: '#fff'
+                },
+                headerTintColor:'white',
+            })
+        }
+    },[isSubmitting])
 
+    const getaddress = React.useCallback(async()=>{
+        try {
+            var response = await axios.get('/address',config)
+            setAddresses(response.data)
+            setLoader(false)
+        } catch (error) {
+            setLoader(false)
+            Alert.alert('Error', error.request.response)
+        }
+    })
 
-function changeBillingAddress(id){
-    var billing = addresses.find(address=>address._id == id)
-    if(billing){
-        setBillingAddress(billing)
-    }
-}
+    const changeBillingAddress = React.useCallback((id)=>{
+        var billing = addresses.find(address=>address._id == id)
+        if(billing){
+            setBillingAddress(billing)
+        }
+    },[addresses])
 
-function orderSuccess() {
-    getToken()
-    navigation.navigate('Order Success')
-}
+    const orderSuccess = React.useCallback(()=>{
+        getCartItems()
+        navigation.navigate('Order Success')
+    })
 
-
-function payment(){
-    if(!paymentMethod){
-        Alert.alert('Please Select Payment Method')
-        return
-    }
-    if(paymentMethod=='khalti'){
-        setKhaltiVisible(true)
-    }else{
-        setEsewaVisible(true)
-    }
-}
+    const payment = React.useCallback(()=>{
+        if(!paymentMethod){
+            Alert.alert('Please Select Payment Method')
+            return
+        }
+        if(paymentMethod=='khalti'){
+            setKhaltiVisible(true)
+        }else{
+            setEsewaVisible(true)
+        }
+    },[paymentMethod])
 
   return ( 
     isSubmitting ? (

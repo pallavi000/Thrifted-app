@@ -1,14 +1,10 @@
-import { Raleway_400Regular, Raleway_600SemiBold, Raleway_700Bold, } from '@expo-google-fonts/raleway';
-import { Feather, FontAwesome } from '@expo/vector-icons';
-import React,{useEffect,useState,useContext} from 'react'
-import { View,ActivityIndicator, Text,SafeAreaView,Alert, Image,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, ViewPagerAndroidBase, TouchableOpacityComponent, TouchableOpacity} from 'react-native'
-import bbstyles from '../Styles'
+import { Feather } from '@expo/vector-icons';
+import React,{useState,useContext} from 'react'
+import { View,ActivityIndicator, Text,SafeAreaView,Alert, Image,Dimensions, StyleSheet,ScrollView, TouchableOpacity} from 'react-native'
 import axios from 'axios'
 import { AuthContext } from '../Context';
 import { imageLink } from '../ImageLink';
 import EmptyCart from './EmptyCart';
-
-
 
 export default function CartItem({navigation}) {
 
@@ -22,10 +18,9 @@ export default function CartItem({navigation}) {
         }
     }
 
-    
-    async function removeCart(item){
-        setDeletingItemId(item._id)
+    const removeCart = React.useCallback(async (item)=>{
         try {
+            setDeletingItemId(item._id)
             var res = await axios.delete('/addtocart/cartremove/'+item._id,config)
             var products =  cartItems.filter(product=>product.product_id?._id!=item.product_id._id)     
             setCartItems(products)
@@ -35,9 +30,7 @@ export default function CartItem({navigation}) {
             Alert.alert('Error', error.request.response)
             setDeletingItemId(0)
         }
-    }
-   
-
+    },[cartItems])
 
   return (
 <SafeAreaView style={{backgroundColor:'white',flex:1}} >

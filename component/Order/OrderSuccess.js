@@ -1,7 +1,14 @@
 import { StyleSheet, Text, SafeAreaView,ScrollView,Dimensions, View,TouchableOpacity,Image, } from 'react-native'
 import React from 'react'
+import { AuthContext } from '../Context'
 
 export default function OrderSuccess({navigation}) {
+  const {getCartItems,token} = React.useContext(AuthContext)
+
+  React.useEffect(()=>{
+    getCartItems(token)
+  },[])
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1,justifyContent:'center',alignItems:'center'}} >
     <ScrollView>

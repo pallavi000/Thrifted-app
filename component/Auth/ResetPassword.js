@@ -1,13 +1,10 @@
-import { ScrollView, StyleSheet,Dimensions, Text, View,TouchableOpacity,TextInput } from 'react-native'
-import React,{useState,useContext} from 'react'
+import { ScrollView, StyleSheet, Text, View,TouchableOpacity,TextInput, Alert } from 'react-native'
+import React from 'react'
 import { Ionicons } from '@expo/vector-icons'
-import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
-import { AuthContext } from '../Context';
 import axios from 'axios';
 import bbstyles from '../Styles'
 import * as Yup from 'yup'
 import { Formik } from 'formik';
-import { Alert } from 'react-native-web';
 
 
 const validationSchema = Yup.object().shape({
@@ -18,20 +15,15 @@ const validationSchema = Yup.object().shape({
 
 
 export default function ResetPassword() {
-    const [newPassword,setNewPassword] = useState('')
-    const [confirmPassword,setConfirmPassword] = useState('')
-    const [verifyKey,setVerifyKey] = useState('')
-    const[error,setError] =useState('')
-    const[success,setSuccess] = useState('')
 
-async function resetPassword(data){
+  const resetPassword = React.useCallback(async(data)=>{
     try {
-      var response =await axios.post('/user/reset/password',data)
-      Alert.alert('your password has been successfully updated')
+      var response = await axios.post('/user/reset/password',data)
+      Alert.alert('Your password has been successfully updated')
     } catch (error) {
       Alert.alert('Error',error.request.response)
     }
-  }
+  })
 
 
   return (

@@ -1,6 +1,6 @@
 import axios  from 'axios';
 import React, { useEffect } from 'react';
-import { Button, SafeAreaView ,Alert} from 'react-native';
+import { SafeAreaView ,Alert} from 'react-native';
 
 import { KhatiSdk } from 'rn-all-nepal-payment';
 
@@ -11,16 +11,16 @@ const Khalti = (props) => {
     setIsVisible(props.visible)
   },[props])
 
-  const _onPaymentComplete = async(data) => {
-    props.setIsSubmitting(true)
-    props.setVisible(false);
-    const str = data.nativeEvent.data;
-    const resp = JSON.parse(str);
-    if (resp.event === 'CLOSED') {
-      // handle closed action
-      props.setIsSubmitting(false)
-    } else if (resp.event === 'SUCCESS') {
-      try {
+  const _onPaymentComplete = React.useCallback(async(data)=>{
+    try {
+      props.setIsSubmitting(true)
+      props.setVisible(false);
+      const str = data.nativeEvent.data;
+      const resp = JSON.parse(str);
+      if (resp.event === 'CLOSED') {
+        // handle closed action
+        props.setIsSubmitting(false)
+      } else if (resp.event === 'SUCCESS') {
         const data = {
           total:props.subtotal+props.shippingFee,
           shipping:props.shippingFee,
@@ -33,16 +33,16 @@ const Khalti = (props) => {
         await axios.post('/order',data, props.config)
         props.setIsSubmitting(false)
         props.orderSuccess()
-      } catch (error) {
+      } else if (resp.event === 'ERROR') {
         props.setIsSubmitting(false)
-        Alert.alert('Error', error.request.response)
+        Alert.alert('Error','Payment Failed')
       }
-    } else if (resp.event === 'ERROR') {
+      return;
+    } catch (error) {
       props.setIsSubmitting(false)
-      Alert.alert('Error','Payment Failed')
+      Alert.alert('Error', error.request.response)
     }
-    return;
-  };
+  })
 
   return (
     <SafeAreaView style={styles.container}>

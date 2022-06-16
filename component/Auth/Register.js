@@ -1,7 +1,6 @@
 import { ScrollView, StatusBar,ActivityIndicator, StyleSheet,Dimensions, Text,SafeAreaView,Alert, View,TouchableOpacity,TextInput } from 'react-native'
 import React,{useState,useContext} from 'react'
 import { Ionicons } from '@expo/vector-icons'
-import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
 import { AuthContext } from '../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
@@ -20,9 +19,9 @@ export default function Register({navigation}) {
     const {setIsLoggedIn} = useContext(AuthContext)
     const[isSubmitting,setIsSubmitting] = useState(false)
 
-    async function registerForm(data){
-      setIsSubmitting(true)
+    const registerForm = React.useCallback(async(data)=>{
       try {
+        setIsSubmitting(true)
         var response= await axios.post('/user/all',data)
         if(response.data){
           await AsyncStorage.setItem('token',response.data.token)
@@ -33,7 +32,7 @@ export default function Register({navigation}) {
         Alert.alert('Error',error.request.response)
         setIsSubmitting(false)
       }
-  }
+    })
    
 
   return (

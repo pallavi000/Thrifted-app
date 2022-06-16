@@ -7,19 +7,13 @@ import Login from './component/Auth/Login'
 import Register from './component/Auth/Register';
 import Welcome from './component/Home/Welcome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import {Feather} from '@expo/vector-icons'
 import axios from 'axios'
 import { AuthContext } from './component/Context';
 import jwt_decode from "jwt-decode";
 import Comment from './component/Home/Comment';
 
-import CreatePost from './component/post/CreatePost'
-
 import ForgotPassword from './component/Auth/ForgotPassword'
 import ResetPassword from './component/Auth/ResetPassword';
-import { CartNavigation, categoryNavigation, homeNavigation, profileNavigation } from './component/StackNavigator';
 import TabNavigator from './component/TabNavigator';
 import Chat from './component/message/Chat';
 import NewChat from './component/message/NewChat';
@@ -38,12 +32,13 @@ import ChangePassword from './component/Auth/ChangePassword';
 import ChangeProfile from './component/Profile/ChangeProfile';
 import Redeem from './component/redeem/Redeem';
 import EditPost from './component/post/EditPost';
+import OrderTrack from './component/Order/OrderTrack';
+import OrderSuccess from './component/Order/OrderSuccess';
 
 // axios.defaults.baseURL="http://localhost:5000/api"
 axios.defaults.baseURL="http://167.86.77.80/api"
 
 const Stack = createNativeStackNavigator()
-const Tab = createBottomTabNavigator()
  
 export default function App(props) {
   const[isLoggedIn,setIsLoggedIn] = useState(false)
@@ -68,22 +63,17 @@ export default function App(props) {
   )
   
 
-
-
-  const {navigation} = props
-
-
-  function retotal(cartitems){
+  const retotal = React.useCallback((cartitems)=>{
     var a = 0
     var total = 0
-      cartitems.map(q=>{
-           a  += q.quantity
-           total += (q.price*q.quantity)
-      })
+    cartitems.map(q=>{
+          a  += q.quantity
+          total += (q.price*q.quantity)
+    })
      setCartCount(a)
      setSubtotal(total)
      setCartItems(cartitems)
-  }
+  },[])
   
 
   useEffect(()=>{
@@ -99,14 +89,14 @@ export default function App(props) {
   },[socket,unreadMessage,unreadNotification,unreadNormalNotificationCount])
 
 
-  function socketConnect(decoded) {
+  const socketConnect = React.useCallback((decoded)=>{
     socket.current= io('http://167.86.77.80')   
     socket.current.on('connect', () => {
         socket.current.emit('join',decoded._id)
     })
-  }
+  },[])
 
-  async function userImageSet(decoded) {
+  const userImageSet = React.useCallback(async (decoded)=>{
     try {
       const userImg = await AsyncStorage.getItem('userImage')
       if(!userImg) {
@@ -118,11 +108,11 @@ export default function App(props) {
         setUserImage(userImg)
       }
     } catch (error) {
-      
+      // Do Nothing
     }
-  }
+  },[])
 
-  async function getCartItems(token) {
+  const getCartItems = React.useCallback(async(token)=>{
     try {
       const config = {
           headers: {
@@ -132,13 +122,12 @@ export default function App(props) {
         const response = await axios.get('/addtocart/cartcount',config)
         retotal(response.data)
     } catch (error) {
-      // getCartItemsFromCache()
+      // Maybe cache implementation??
     }
-  }
+  },[])
 
-
-  async function getToken(){
-    try {  
+  const getToken = React.useCallback(async ()=>{
+    try {
       const authConfig = await AsyncStorage.getItem('token')
       if(authConfig) {
         setToken(authConfig)
@@ -152,22 +141,22 @@ export default function App(props) {
         getCartItems(token)
       }
       setAppReady(true)
-    } catch (error) { 
-      console.log(error.message)
+    } catch (error) {
+      // Error Handle
     }
+  },[])
+
+  useEffect(() => {
+      getToken()
+  }, [props,isLoggedIn])
+
+  let [fontsLoaded] = useFonts({
+      Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular,Raleway_500Medium
+  });
+  if (!fontsLoaded) {
+      return null;
   }
 
-
-useEffect(() => {
-    getToken()
-}, [props,isLoggedIn])
-
-    let [fontsLoaded] = useFonts({
-        Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular,Raleway_500Medium
-    });
-    if (!fontsLoaded) {
-        return null;
-    }
 
   return (
     !appReady?(
@@ -178,7 +167,7 @@ useEffect(() => {
       
       <AuthContext.Provider
       value={{
-        isLoggedIn,getToken,unreadNotification,setUnreadNotification, socket,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage,userImage,setUserImage,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount
+        isLoggedIn,getToken,unreadNotification,setUnreadNotification, socket,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage,userImage,setUserImage,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount,getCartItems
       }}>
       {isLoggedIn ?(
         <Stack.Navigator>
@@ -200,6 +189,26 @@ useEffect(() => {
             headerTitleAlign: 'center',
             headerShadowVisible: false,
           }} name="Checkout" component={Checkout}/>
+
+          <Stack.Screen options={{
+              headerTitleAlign: 'center',
+              headerShadowVisible: false,
+              headerShown:true,
+              headerStyle:{
+                backgroundColor:'#663399',
+                color:'white'
+              },
+              headerTintColor:'white',
+              headerTitleStyle:{
+                fontSize:18,
+                fontWeight:'700',
+                color:'white'
+              }
+          }} name="Order Track" component={OrderTrack}/>
+
+          <Stack.Screen options={{
+            headerShown: false,
+          }} name="Order Success" component={OrderSuccess}/>
 
           <Stack.Screen name="Search" options={{
         
@@ -247,19 +256,19 @@ useEffect(() => {
               }} component={EditShipping}/>
 
               <Stack.Screen name="Redeem" options={{
-            headerTitleAlign: 'center',
-            headerShadowVisible: false,
-            headerShown:true,
-            headerStyle:{
-              backgroundColor:'#663399',
-              color:'white'
-            },
-            headerTintColor:'white',
-            headerTitleStyle:{
-              fontSize:18,
-              fontWeight:'700',
-              color:'white'
-            } 
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                headerShown:true,
+                headerStyle:{
+                  backgroundColor:'#663399',
+                  color:'white'
+                },
+                headerTintColor:'white',
+                headerTitleStyle:{
+                  fontSize:18,
+                  fontWeight:'700',
+                  color:'white'
+                } 
           }} component={Redeem}/> 
 
           <Stack.Screen name='Comments' component={Comment}/>
@@ -359,6 +368,5 @@ const styles = StyleSheet.create({
     lineHeight:20,
     borderWidth: 1,
     borderColor: '#fff'
-    
   }
 });

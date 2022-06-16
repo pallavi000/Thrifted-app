@@ -1,7 +1,6 @@
-import { StyleSheet, FlatList, ActivityIndicator, Text, View,SafeAreaView, ScrollView,Image ,Dimensions,TouchableOpacity} from 'react-native'
+import { StyleSheet, FlatList, ActivityIndicator, Text, View,SafeAreaView, RefreshControl,Image ,Dimensions,TouchableOpacity} from 'react-native'
 import React,{useState,useEffect,useRef,useLayoutEffect, useCallback} from 'react'
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
-import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import Filter from '../Product/filters/Filter'
 import axios from 'axios'
 import { imageLink } from '../ImageLink'
@@ -18,6 +17,7 @@ export default function CategoryPage({navigation,route}) {
    const[colors,setColors] = useState([])
    const[totalProduct,setTotalProduct] = useState(24)
    const[loader,setLoader] = useState(true)
+   const [refreshing, setRefreshing] = useState(false);
 
     const sheetRef = useRef(null);
 
@@ -51,11 +51,12 @@ export default function CategoryPage({navigation,route}) {
         getProducts()
     }
    }, [pageNo,sorting,brand_id,color_id,category_id,minprice])
-   
-   async function getProducts(){
+
+   const getProducts = React.useCallback(async()=>{
        if(!nextPageProducts) {
            setLoader(true)
        }
+
        try {
         const data = {
             category_slug:category.slug,
@@ -84,7 +85,7 @@ export default function CategoryPage({navigation,route}) {
        } catch (error) {
            setLoader(false)
        }
-   }
+   },[pageNo, sorting, nextPageProducts])
 
 
    async function filterProducts(){
@@ -135,7 +136,7 @@ export default function CategoryPage({navigation,route}) {
         }
    }
 
-   function getSortingInfo() {
+   const getSortingInfo = React.useCallback(()=>{
        if(sorting=="popular") {
            return 'Popular'
        } else if(sorting=="-_id") {
@@ -147,7 +148,7 @@ export default function CategoryPage({navigation,route}) {
        } else {
            return 'Newest'
        }
-   }
+   },[sorting])
 
    const GetNextPage = useCallback(()=>{
        if (!nextPage && hasNextPage) {
@@ -155,6 +156,11 @@ export default function CategoryPage({navigation,route}) {
             setNextPage(true)
             setPageNo(pageNo+1)
         }
+    })
+
+    const onRefresh = useCallback(()=>{
+        setActivePage(1)
+        getProducts()
     })
 
    
@@ -204,6 +210,7 @@ export default function CategoryPage({navigation,route}) {
     </View>
     {products.length>0?(
     <FlatList
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         contentContainerStyle={styles.container}
         data={products}
         numColumns={2}

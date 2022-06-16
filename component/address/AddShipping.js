@@ -17,19 +17,20 @@ const validationSchema = Yup.object().shape({
 })
 
 export default function AddShipping({navigation}) {
+
     const[isSubmitting,setIsSubmitting] = useState(false)
-        const data = useContext(AuthContext)
-        const {token} = data
-        const config = {
-            headers:{
-                'access-token': token
-            }
+    const data = useContext(AuthContext)
+    const {token} = data
+    const config = {
+        headers:{
+            'access-token': token
         }
-    
-    async function add(values){
-        setIsSubmitting(true)
+    }
+
+    const add = React.useCallback(async (values)=>{
         try {
-            var response = await  axios.post('/address',values,config)
+            setIsSubmitting(true)
+            var response = await axios.post('/address',values,config)
             Alert.alert('Success','Address has been added')
             setIsSubmitting(false)
             navigation.goBack()
@@ -37,9 +38,7 @@ export default function AddShipping({navigation}) {
             setIsSubmitting(false)
             Alert.alert('Error',error.request.response)
         }
-    }
-    
-
+    },[])
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >

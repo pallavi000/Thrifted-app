@@ -13,6 +13,8 @@ const EditMainImage = (props) => {
     const [imageIndex,setImageIndex] = useState('')
     const[mainImage, setMainImage] = useState(imageLink+props.mainImage)
     const[featureImages,setFeatureImages] = useState([])
+    const {setFieldValue,values,touched,errors} = useFormikContext()
+
 
     useEffect(()=>{
         var arr = []
@@ -22,89 +24,78 @@ const EditMainImage = (props) => {
         setFeatureImages(arr)
     },[])
 
-async function getRequestPermission(){
-    const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
-    if(!granted){
-        const result = await imagePicker.requestMediaLibraryPermissionsAsync()
-        if(!result.granted) {
-          alert("Permission denied")
-        }
-    }
-}
-
-async function getCameraPermission(){
-    const {granted} = await imagePicker.getCameraPermissionsAsync()
-    if(!granted){
-      const result = await imagePicker.requestCameraPermissionsAsync()
-      if(!result.granted) {
-        alert("Permission denied")
+    const getRequestPermission = React.useCallback(async()=>{
+      const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
+      if(!granted){
+          const result = await imagePicker.requestMediaLibraryPermissionsAsync()
+          if(!result.granted) {
+            Alert.alert("Error", "Permission denied")
+          }
       }
-    }
-}
+    })
 
+    const getCameraPermission = React.useCallback(async()=>{
+      const {granted} = await imagePicker.getCameraPermissionsAsync()
+      if(!granted){
+        const result = await imagePicker.requestCameraPermissionsAsync()
+        if(!result.granted) {
+          Alert.alert("Error", "Permission denied")
+        }
+      }
+    })
 
-const {setFieldValue,values,touched,errors} = useFormikContext()
+  useEffect(() => {
+      props.openCameraRef.current = openCamera
+      props.selectImageRef.current = selectImage
+    getRequestPermission()
+    getCameraPermission()
+  }, [])
 
-useEffect(() => {
+  useEffect(()=>{
     props.openCameraRef.current = openCamera
     props.selectImageRef.current = selectImage
-   getRequestPermission()
-   getCameraPermission()
-}, [])
+  },[imageIndex])
 
-async function selectImage(){
-    const result = await imagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      mediaTypes: imagePicker.MediaTypeOptions.Images
-    })
-    if(!result.cancelled){
-        setFieldValue(`image${imageIndex}`,result.uri)
-        if(imageIndex==1) {
-            setMainImage(result.uri)
-        } else {
-            var newFeatureImages = [...featureImages]
-            newFeatureImages[imageIndex-2] = result.uri
-            setFeatureImages(newFeatureImages)
-        }
-        setModalVisible(false)
-        props.sheetRef.current.snapTo(1)
-    }
-}
+  async function selectImage(){
+      const result = await imagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        mediaTypes: imagePicker.MediaTypeOptions.Images
+      })
+      if(!result.cancelled){
+          setFieldValue(`image${imageIndex}`,result.uri)
+          if(imageIndex==1) {
+              setMainImage(result.uri)
+          } else {
+              var newFeatureImages = [...featureImages]
+              newFeatureImages[imageIndex-2] = result.uri
+              setFeatureImages(newFeatureImages)
+          }
+          setModalVisible(false)
+          props.sheetRef.current.snapTo(1)
+      }
+  }
 
-async function openCamera(){
-    const result = await imagePicker.launchCameraAsync()
-    if(!result.cancelled){
-        setFieldValue(`image${imageIndex}`,result.uri)
-        if(imageIndex==1) {
-            setMainImage(result.uri)
-        } else {
-            var newFeatureImages = [...featureImages]
-            newFeatureImages[imageIndex-2] = result.uri
-            setFeatureImages(newFeatureImages)
-        }
-        setModalVisible(false)
-        props.sheetRef.current.snapTo(1)
-    }
-}
+  async function openCamera(){
+      const result = await imagePicker.launchCameraAsync()
+      if(!result.cancelled){
+          setFieldValue(`image${imageIndex}`,result.uri)
+          if(imageIndex==1) {
+              setMainImage(result.uri)
+          } else {
+              var newFeatureImages = [...featureImages]
+              newFeatureImages[imageIndex-2] = result.uri
+              setFeatureImages(newFeatureImages)
+          }
+          setModalVisible(false)
+          props.sheetRef.current.snapTo(1)
+      }
+  }
 
-useEffect(()=>{
-  props.openCameraRef.current = openCamera
-    props.selectImageRef.current = selectImage
-},[imageIndex])
-
-function toggleImage(index){
-  //setModalVisible(true)
-  setImageIndex(index)
-  props.sheetRef.current.snapTo(0)
-}
-
-function multiImage(){
-}
-
-
-
-
-
+  function toggleImage(index){
+    //setModalVisible(true)
+    setImageIndex(index)
+    props.sheetRef.current.snapTo(0)
+  }
 
     return (
         <View>

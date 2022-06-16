@@ -1,6 +1,6 @@
 import axios from 'axios'
-import React, { useContext, useState,useRef,useEffect } from 'react'
-import { View,ActivityIndicator, Alert,Text, Image,SafeAreaView,Dimensions, StyleSheet, Button,ScrollView,TouchableWithoutFeedback, TouchableOpacity} from 'react-native'
+import React, { useContext, useState,useRef,useEffect, useCallback } from 'react'
+import { View,ActivityIndicator, Alert,Text, Image,SafeAreaView,Dimensions, StyleSheet, Button,ScrollView, TouchableOpacity} from 'react-native'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold, Raleway_700Bold_Italic } from '@expo-google-fonts/raleway'
@@ -22,20 +22,30 @@ export default function ProductDetail({navigation,route}) {
     const [product,setProduct] = useState(route.params)
     const data = useContext(AuthContext)
     const {cartCount,setCartCount,token,cartItems,decode} = data
-    const {getToken} = data
+    const {getCartItems} = data
     const config = {
         headers: {
             'access-token':token
         }
     } 
+
     useEffect(() => {
-      const isInCart = cartItems.find(item=>item.product_id._id==product._id)
-      if(isInCart) {
-          setProduct({...product, stock: product.stock-isInCart.quantity})
-      }
+        const isInCart = cartItems.find(item=>item.product_id._id==product._id)
+        if(isInCart) {
+            setProduct({...product, stock: product.stock-isInCart.quantity})
+        }
+        if(product?.likes.find(like=>like.user_id==decode._id)){
+            setLike(true)
+        }
     }, [])
 
-    async function checkIfInOrder() {
+    useEffect(()=>{
+        if(product.seller_id._id==decode._id) {
+            checkIfInOrder()
+        }
+    },[decode])
+
+    const checkIfInOrder = useCallback(async()=>{
         try {
             const data = {
                 product_id: product._id
@@ -46,21 +56,9 @@ export default function ProductDetail({navigation,route}) {
         } catch (error) {
             // No Order Ongoing for this product
         }
-    }
-
-    useEffect(()=>{
-        if(product.seller_id._id==decode._id) {
-            checkIfInOrder()
-        }
-    },[decode])
-
-    useEffect(()=>{
-        if(product?.likes.find(like=>like.user_id==decode._id)){
-            setLike(true)
-        }
     },[])
 
-    async function addLike(){
+    const addLike = useCallback(async ()=>{
         try {
             const data={
                 action:like?'unlike':'like'
@@ -69,55 +67,55 @@ export default function ProductDetail({navigation,route}) {
             setLike(!like)
             if(like){
                 setProduct({...product,likes_count:product.likes_count-1})
-            }else{
+            } else{
                 setProduct({...product,likes_count:product.likes_count+1})
-            }            
+            }
         } catch (error) {
-            console.log(error.request.response)
+            if(like){
+                setProduct({...product,likes_count:product.likes_count+1})
+            }else{
+                setProduct({...product,likes_count:product.likes_count-1})
+            }
+            setLike(like)
         }
-    } 
-    
-  
-    function addtocart(pid){
-        setIsSubmitting(true)
-        const data={
-            pid,
-            quantity:1
-        }  
-        axios.post('/addtocart/cart',data,config).then(response=>{
+    },[like,product])
+
+    const addtocart = async (pid) =>{
+        try {
+            setIsSubmitting(true)
+            const data={
+                pid,
+                quantity:1
+            }
+            const response = await axios.post('/addtocart/cart',data,config)
             setIsSubmitting(false)
             sheetRef.current.snapTo(0)
-            getToken()
+            getCartItems(token)
             setCartCount(cartCount+1)
             setProduct({...product, stock: product.stock-1})
-        }).catch(err=>{
+        } catch (err) {
             if(err.request.status==410) {
                 // Out Of Stock
                 setProduct({...product, stock: 0})
             }
             setIsSubmitting(false)
             Alert.alert('Error', err.request.response)
-            console.log(err.request.response)
-        })
+        }
     }
 
-    function buyNow(){
-        
-    }
-
-    function parseImages(image, images){
+    const parseImages = useCallback((image, images)=>{
         var arr=[imageLink+image]
         images.forEach(image => {
             arr.push(imageLink+image)
         });
         return arr
-    }
+    })
 
-    function numberWithCommas(x) {
+    const numberWithCommas = useCallback((x)=>{
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
+    },[])
 
-    function getFollowersCount(user) {
+    const getFollowersCount = useCallback((user)=>{
         if(user.followers && user.followers.length>0) {
             const num = user.followers.length
             if(num >= 1000000) {
@@ -129,10 +127,9 @@ export default function ProductDetail({navigation,route}) {
             return numberWithCommas(num);
         }
         return 0;
-    }
+    },[])
 
-
-    const renderContent = () => (
+    const renderContent = useCallback(()=>(
         <View
         style={{
             backgroundColor: '#fff',
@@ -150,8 +147,8 @@ export default function ProductDetail({navigation,route}) {
             <Text style={styles.loginText}>Back to Shopping</Text>
         </TouchableOpacity>
         </View>
-  );
-  
+    ))
+
   return (
    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
 

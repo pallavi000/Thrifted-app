@@ -11,79 +11,68 @@ import Animated from 'react-native-reanimated';
 
 
 const MainImage = (props) => {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [imageIndex,setImageIndex] = useState('')
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imageIndex,setImageIndex] = useState('')
+  const {setFieldValue,values,touched,errors} = useFormikContext()
 
-async function getRequestPermission(){
+  useEffect(() => {
+    props.openCameraRef.current = openCamera
+    props.selectImageRef.current = selectImage
+    getRequestPermission()
+    getCameraPermission()
+  }, [])
+
+  useEffect(()=>{
+    props.openCameraRef.current = openCamera
+    props.selectImageRef.current = selectImage
+  },[imageIndex])
+
+  const getRequestPermission = React.useCallback(async()=>{
     const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
     if(!granted){
         const result = await imagePicker.requestMediaLibraryPermissionsAsync()
         if(!result.granted) {
-          alert("Permission denied")
+          Alert.alert("Error", "Permission denied")
         }
     }
-}
+  })
 
-async function getCameraPermission(){
+  const getCameraPermission = React.useCallback(async()=>{
     const {granted} = await imagePicker.getCameraPermissionsAsync()
     if(!granted){
       const result = await imagePicker.requestCameraPermissionsAsync()
       if(!result.granted) {
-        alert("Permission denied")
+        Alert.alert("Error", "Permission denied")
       }
     }
-}
+  })
 
+  async function selectImage(){
+      const result = await imagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        mediaTypes: imagePicker.MediaTypeOptions.Images
+      })
+      if(!result.cancelled){
+          setFieldValue(`image${imageIndex}`,result.uri)
+          setModalVisible(false)
+          props.sheetRef.current.snapTo(1)
+      }
+  }
 
-const {setFieldValue,values,touched,errors} = useFormikContext()
+  async function openCamera(){
+      const result = await imagePicker.launchCameraAsync()
+      if(!result.cancelled){
+          setFieldValue(`image${imageIndex}`,result.uri)
+          setModalVisible(false)
+          props.sheetRef.current.snapTo(1)
+      }
+  }
 
-useEffect(() => {
-    props.openCameraRef.current = openCamera
-    props.selectImageRef.current = selectImage
-   getRequestPermission()
-   getCameraPermission()
-}, [])
-
-async function selectImage(){
-    const result = await imagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      mediaTypes: imagePicker.MediaTypeOptions.Images
-    })
-    if(!result.cancelled){
-        setFieldValue(`image${imageIndex}`,result.uri)
-        setModalVisible(false)
-        props.sheetRef.current.snapTo(1)
-    }
-}
-
-async function openCamera(){
-    const result = await imagePicker.launchCameraAsync()
-    if(!result.cancelled){
-        setFieldValue(`image${imageIndex}`,result.uri)
-        setModalVisible(false)
-        props.sheetRef.current.snapTo(1)
-    }
-}
-
-useEffect(()=>{
-  props.openCameraRef.current = openCamera
-    props.selectImageRef.current = selectImage
-},[imageIndex])
-
-function toggleImage(index){
-  //setModalVisible(true)
-  setImageIndex(index)
-  props.sheetRef.current.snapTo(0)
-}
-
-function multiImage(){
-}
-
-
-
-
-
-
+  function toggleImage(index){
+    //setModalVisible(true)
+    setImageIndex(index)
+    props.sheetRef.current.snapTo(0)
+  }
     return (
         <View>
     <View style={styles.uploadImageWrapper}>

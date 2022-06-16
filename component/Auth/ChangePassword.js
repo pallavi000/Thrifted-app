@@ -1,7 +1,5 @@
 import { ScrollView, ActivityIndicator, StyleSheet,Dimensions,StatusBar,Alert,Text, View,TouchableOpacity,TextInput, SafeAreaView } from 'react-native'
 import React,{useState,useContext} from 'react'
-import { Ionicons } from '@expo/vector-icons'
-import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
 import { AuthContext } from '../Context';
 import axios from 'axios';
 import bbstyles from '../Styles'
@@ -16,25 +14,20 @@ const validationSchema = Yup.object().shape({
 
 
 const ChangePassword = ({navigation}) => {
-    const [newPassword,setNewPassword] = useState('')
-    const [currentPassword,setCurrentPassword] = useState('')
-    const [confirmPassword,setConfirmPassword] = useState('')
-    const[error,setError] = useState('')
-    const {setIsLoggedIn} = useContext(AuthContext)
+
     const[isSubmitting, setIsSubmitting] = useState(false)
 
     const data =useContext(AuthContext)
     const {token} = data
-
     const config = {
-            headers:{
-                'access-token': token
-            }
+        headers:{
+            'access-token': token
         }
+    }
 
-    async function changePassword(data){
-      setIsSubmitting(true)
+    const changePassword = React.useCallback(async (data)=>{
       try {
+        setIsSubmitting(true)
         var response = await axios.post('/user/change/password',data,config)
         Alert.alert('Success','Password has been changed.')
         setIsSubmitting(false)
@@ -43,8 +36,7 @@ const ChangePassword = ({navigation}) => {
         setIsSubmitting(false)
         Alert.alert('Error',error.request.response)
       }
-    }
-
+    },[])
 
 
   return (

@@ -1,11 +1,9 @@
-import { StyleSheet, Text, View ,SafeAreaView,ScrollView,TouchableOpacity,Alert, ActivityIndicator, FlatList, Image, Dimensions} from 'react-native'
+import { StyleSheet, Text, View ,SafeAreaView,TouchableOpacity,Alert, ActivityIndicator, FlatList, Image, Dimensions} from 'react-native'
 import React,{useState,useEffect,useContext} from 'react'
-import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
-import {Fontisto, Ionicons} from '@expo/vector-icons'
-import CheckBox from 'expo-checkbox'
+import {Fontisto} from '@expo/vector-icons'
 import axios from 'axios'
 import { AuthContext } from '../Context'
-import {useFocusEffect, useIsFocused} from '@react-navigation/native'
+import {useIsFocused} from '@react-navigation/native'
 import CustomCheckBox from '../ui/CustomCheckBox'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import bbstyles from '../Styles'
@@ -19,68 +17,62 @@ export default function Shipping(props) {
     const [isSelected, setSelection] = useState(0);
     const [loader, setLoader] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(0)
+    const data = useContext(AuthContext)
+    const {token} = data
+    const config = {
+        headers:{
+            'access-token': token
+        }
+    }
 
-    async function loadSelectedCheckBox() {
+    const loadSelectedCheckBox = React.useCallback(async()=>{
         var addressId = await AsyncStorage.getItem('shippingId')
         setSelection(addressId)
-    }
-    
+    },[])
 
     useEffect(()=>{
         loadSelectedCheckBox()
     },[isSelected])
 
-   
-
-    const data = useContext(AuthContext)
-        const {token} = data
-        const config = {
-            headers:{
-                'access-token': token
-            }
-        }
-
     useEffect(() => {
         getaddress()
     }, [IsFocused])
-    
-async function getaddress(){
-    try {
-        var response = await axios.get('/address',config)
-        setAddresses(response.data) 
-        if(!isSelected && response.data && response.data.length>0) {
-            setSelection(response.data[0]._id)
-            await AsyncStorage.setItem('shippingId',response.data[0]._id)
-        }
-        setLoader(false)
-    } catch (error) {
-       Alert.alert('Error', error.request.response)
-    }
 
-}
-
-async function removeAddress(id){
-    setIsSubmitting(id)
-    try {
-        var response =await axios.delete('/address/'+id,config)
-        var deleted= addresses.filter(address=>address._id!= id)
-        setAddresses(deleted)
-        if(isSelected==id) {
-            await AsyncStorage.removeItem('shippingId')
-            if(deleted && deleted.length>0) {
-                setSelection(deleted[0]._id)
-                await AsyncStorage.setItem('shippingId',deleted[0]._id)
-            } else {
-                setSelection(0)
+    const getaddress = React.useCallback(async ()=>{
+        try {
+            var response = await axios.get('/address',config)
+            setAddresses(response.data) 
+            if(!isSelected && response.data && response.data.length>0) {
+                setSelection(response.data[0]._id)
+                await AsyncStorage.setItem('shippingId',response.data[0]._id)
             }
+            setLoader(false)
+        } catch (error) {
+            Alert.alert('Error', error.request.response)
         }
-        setIsSubmitting(0)
-        // Alert.alert('Success','Address Deleted!')
-    } catch (error) {
-        setIsSubmitting(0)
-        Alert.alert('Error',error.request.response)
-    }
-}
+    },[])
+
+    const removeAddress = React.useCallback(async(id)=>{
+        try {
+            setIsSubmitting(id)
+            var response = await axios.delete('/address/'+id,config)
+            var deleted= addresses.filter(address=>address._id!= id)
+            setAddresses(deleted)
+            if(isSelected==id) {
+                await AsyncStorage.removeItem('shippingId')
+                if(deleted && deleted.length>0) {
+                    setSelection(deleted[0]._id)
+                    await AsyncStorage.setItem('shippingId',deleted[0]._id)
+                } else {
+                    setSelection(0)
+                }
+            }
+            setIsSubmitting(0)
+        } catch (error) {
+            setIsSubmitting(0)
+            Alert.alert('Error',error.request.response)
+        }
+    },[isSelected, addresses])
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1,padding:10}} >

@@ -1,12 +1,12 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View,Image, FlatList,TouchableOpacity,TextInput, Keyboard, Alert, ActivityIndicator } from 'react-native'
-import React,{useContext, useRef, useState} from 'react'
+import { SafeAreaView, StyleSheet, Text, View,Image, FlatList,TextInput, Keyboard, Alert, ActivityIndicator } from 'react-native'
+import React,{useContext, useState} from 'react'
 import { imageLink } from '../ImageLink'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold } from '@expo-google-fonts/raleway'
 import { format } from 'timeago.js'
 import { AuthContext } from '../Context'
 import axios from 'axios'
 import bbstyles from '../Styles'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 export default function Comment({navigation, route}) {
     const[newComment,setNewComment] = useState('')
@@ -16,14 +16,14 @@ export default function Comment({navigation, route}) {
     const post_id = route.params
     
     const data = useContext(AuthContext)
-    const {decode,token,titleShown,setTitleShown,userImage} = data
+    const {decode,token,userImage} = data
     const config = {
         headers: {
             'access-token':token
         }
     }
 
-    async function getComments() {
+    const getComments = React.useCallback(async()=>{
         try {
             const response = await axios.get('/post/comment/post/'+post_id, config)
             setComments(response.data)
@@ -31,17 +31,13 @@ export default function Comment({navigation, route}) {
         } catch (error) {
             Alert.alert('Error', error.request.response)
         }
-    }
+    })
 
     React.useEffect(()=>{
         getComments()
     },[navigation])
 
-    
-
-    
-
-    async function addLike(comment){
+    const addLike = React.useCallback(async(comment)=>{
         try {
             var data={
                action:isLiked(comment)?'unlike':'like'
@@ -55,37 +51,36 @@ export default function Comment({navigation, route}) {
             }else{
                 singleComment.likes = [...singleComment.likes,{user_id:decode._id}]
                 singleComment.likes_count+= 1
-
             }
             setComments(newcomments)
         } catch (error) {
-            console.log(error.request.response)
+            // console.log(error.request.response)
         }
-    }
+    },[comments])
 
-    function isLiked(comment){
-       var like =  comment.likes.find(like=>like.user_id==decode._id)
+    const isLiked = React.useCallback((comment)=>{
+        var like =  comment.likes.find(like=>like.user_id==decode._id)
        if(like){
            return true
        }else{
            return false
        }
-    }
+    })
 
-    async function addComment(){
-        if(newComment.trim().length==0) return
+    const addComment = React.useCallback(async (com)=>{
+        if(com.trim().length==0) return
         Keyboard.dismiss()
         setNewComment('')
         try {
             const data={
-                comment:newComment
+                comment:com
             }
             const response = await axios.post('/post/comment/post/'+post_id,data,config)
             setComments([...comments,response.data])
         } catch (error) {
             console.log(error.request.response)
         }
-    }
+    },[comments])
    
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>
@@ -112,11 +107,13 @@ export default function Comment({navigation, route}) {
             </View>
            
             <TouchableOpacity onPress={()=>addLike(item)}>
-            {isLiked(item)?(
-                <MaterialCommunityIcons name='cards-heart' size={10} color='red'></MaterialCommunityIcons>
-            ):(
-                <MaterialCommunityIcons name='heart-outline' color={'black'} size={10}></MaterialCommunityIcons>
-            )}
+            <View>
+                {isLiked(item)?(
+                    <MaterialCommunityIcons name='cards-heart' size={10} color='red'></MaterialCommunityIcons>
+                ):(
+                    <MaterialCommunityIcons name='heart-outline' color={'black'} size={10}></MaterialCommunityIcons>
+                )}
+            </View>
             </TouchableOpacity>
          </View>
      )}   
@@ -134,11 +131,11 @@ export default function Comment({navigation, route}) {
         style={styles.input}
         returnKeyLabel='Send'
         placeholder="Write a comment..."
-        onSubmitEditing={()=>addComment()}
+        onSubmitEditing={()=>addComment(newComment)}
         ></TextInput>
     </View>
     {newComment.trim()?(
-        <TouchableOpacity onPress={()=>addComment()}>
+        <TouchableOpacity onPress={()=>addComment(newComment)}>
     <Text style={styles.post}>Post</Text>
 
     </TouchableOpacity>

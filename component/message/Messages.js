@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView ,Image ,TextInput,TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native'
-import React, { useEffect,useContext,useState, useRef, useLayoutEffect } from 'react'
+import { StyleSheet, Text, View, SafeAreaView ,Image ,TextInput,TouchableOpacity, ActivityIndicator, Dimensions, Alert } from 'react-native'
+import React, { useEffect,useContext,useState, useLayoutEffect } from 'react'
 import {FontAwesome5, Ionicons} from '@expo/vector-icons'
-import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import { FlatList } from 'react-native-gesture-handler'
@@ -9,7 +8,6 @@ import { imageLink } from '../ImageLink'
 import {format} from 'timeago.js'
 import { useIsFocused } from '@react-navigation/native'
 import bbstyles from '../Styles'
-import { io } from 'socket.io-client'
 
 
 export default function Messages({navigation}) {
@@ -20,13 +18,12 @@ export default function Messages({navigation}) {
     const {token,titleShown,setTitleShown,decode,socket} = data
     const[chats,setChats]= useState([])
     const[originalChats, setOriginalChats] = useState([])
- 
-    
     const config = {
         headers: {
             'access-token':token
         }
     } 
+
     useEffect(()=>{
         if(socket.current) {
             socket.current.on('conversation',(conversation)=>{
@@ -53,67 +50,65 @@ export default function Messages({navigation}) {
         })
     }, [])
 
-useEffect(()=>{
-    getMessage()
-},[isFocused])
+    useEffect(()=>{
+        getMessage()
+    },[isFocused])
 
-async function getMessage(){
-    try {
-        const response = await axios.get('/chat/conversation',config)
-        setChats(response.data)
-        setOriginalChats(response.data)
-        setLoader(false)
-    } catch (error) {
-        console.log(error.request.response)
-    }
-}
+    const getMessage = React.useCallback(async()=>{
+        try {
+            const response = await axios.get('/chat/conversation',config)
+            setChats(response.data)
+            setOriginalChats(response.data)
+            setLoader(false)
+        } catch (error) {
+            Alert.alert("Error",error.request.response)
+        }
+    },[])
 
+    const startChat = React.useCallback(async(conversation)=>{
+        if(decode._id == conversation.sender_id._id){
+            const receiver = {
+                user: conversation.receiver_id,
+                conversation: conversation
+            }
+            navigation.navigate('chat',receiver)
+        }else{
+            const receiver = {
+                user: conversation.sender_id,
+                conversation: conversation
+            }
+            navigation.navigate('chat',receiver)
+        }
+    },[])
 
-async function startChat(conversation){
-   if(decode._id == conversation.sender_id._id){
-    const receiver = {
-        user: conversation.receiver_id,
-        conversation: conversation
-    }
-    navigation.navigate('chat',receiver)
-   }else{
-    const receiver = {
-        user: conversation.sender_id,
-        conversation: conversation
-    }
-    navigation.navigate('chat',receiver)
-   }
-    
-}
+    const getUnreadCount = React.useCallback((conversation)=>{
+        if(conversation.sender_id._id==decode._id) {
+            return conversation.sender_id_unread_count
+        }
+        if(conversation.receiver_id._id==decode._id) {
+            return conversation.receiver_id_unread_count
+        }
+        return 0
+    })
 
-function getUnreadCount(conversation) {
-    if(conversation.sender_id._id==decode._id) {
-        return conversation.sender_id_unread_count
-    }
-    if(conversation.receiver_id._id==decode._id) {
-        return conversation.receiver_id_unread_count
-    }
-    return 0
-}
+    const getImage = React.useCallback((item)=>{
+        return decode._id==item.sender_id._id?imageLink+item.receiver_id.image:imageLink+item.sender_id.image
+    })
 
+    const getName = React.useCallback((item)=>{
+        return decode._id==item.sender_id._id?item.receiver_id.name:item.sender_id.name
+    })
 
-function getImage(item) {
-    return decode._id==item.sender_id._id?imageLink+item.receiver_id.image:imageLink+item.sender_id.image
-}
+    const searchChats = React.useCallback((text)=>{
+        if(text.trim().length>0) {
+            text = text.toLowerCase().trim()
+            let filterChats = originalChats.filter(chat=>getName(chat).toLowerCase().includes(text))
+            setChats(filterChats)
+        } else {
+            setChats(originalChats)
+        }
+    },[originalChats])
 
-function getName(item) {
-    return decode._id==item.sender_id._id?item.receiver_id.name:item.sender_id.name
-}
-
-function searchChats(text) {
-    if(text.trim().length>0) {
-        text = text.toLowerCase().trim()
-      let filterChats = originalChats.filter(chat=>getName(chat).toLowerCase().includes(text))
-      setChats(filterChats)
-    } else {
-      setChats(originalChats)
-    }
-}
 
 
   return (

@@ -16,15 +16,12 @@ const validationSchema = Yup.object().shape({
 })
 
 export default function Login({navigation}) {
-  const [email,setEmail] = useState('')
-  const [password,setPassword] = useState('')
-  const[error,setError] = useState('')
   const {setIsLoggedIn} = useContext(AuthContext)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  async function loginForm(data){
-    setIsSubmitting(true)
+  const loginForm = React.useCallback(async(data)=>{
     try {
+      setIsSubmitting(true)
       const response = await axios.post('/user',data)
       await AsyncStorage.setItem('token',response.data.token)
       setIsSubmitting(false)
@@ -33,8 +30,7 @@ export default function Login({navigation}) {
       setIsSubmitting(false)
       Alert.alert('Error',error.request.response)
     }
-
-  }
+  })
 
   return (
   <SafeAreaView style={{backgroundColor:'white',flex:1}}>

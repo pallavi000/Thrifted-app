@@ -1,5 +1,5 @@
 import React,{useCallback,useEffect} from 'react';
-import { Button, Text, SafeAreaView, Alert } from 'react-native';
+import { SafeAreaView, Alert } from 'react-native';
 import axios from 'axios'
 
 import { EsewaSdk } from 'rn-all-nepal-payment';
@@ -8,9 +8,7 @@ const Esewa = (props) => {
   const [isVisible, setisVisible] = React.useState(false);
   const [response, setResponse] = React.useState('');
 
-  
-
-  const _onPaymentComplete = async (response) => {
+  const _onPaymentComplete = useCallback(async(response)=>{
     setResponse(response);
     props.setVisible(false)
     props.setIsSubmitting(true)
@@ -36,10 +34,9 @@ const Esewa = (props) => {
       }
     } else {
       props.setIsSubmitting(false)
-      Alert.alert('Error', response.message)
     }
     return
-  }
+  })
 
   useEffect(()=>{
     setisVisible(props.visible)

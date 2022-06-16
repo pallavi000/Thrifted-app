@@ -30,19 +30,18 @@ export default function EditShipping({navigation,route}) {
       }
   }
 
-async function Edit(data){
-    setIsSubmitting(true)
-    try {
-        var response = await axios.put('/address/edit/'+address._id,data,config)
-        Alert.alert('Success','Address has been updated')
-        navigation.goBack()
-        setIsSubmitting(false) 
-    } catch (error) {
-        Alert.alert('Error',error.request.response)
-        setIsSubmitting(false) 
-    }
-
-}
+  const Edit = React.useCallback(async(data)=>{
+      try {
+            setIsSubmitting(true)
+            var response = await axios.put('/address/edit/'+address._id,data,config)
+            Alert.alert('Success','Address has been updated')
+            navigation.goBack()
+            setIsSubmitting(false)
+      } catch (error) {
+            Alert.alert('Error',error.request.response)
+            setIsSubmitting(false)
+      }
+  },[])
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >

@@ -1,5 +1,5 @@
 import React,{useCallback, useContext, useEffect,useState} from 'react'
-import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl,TextInput, View,ScrollView, FlatList, ActivityIndicator } from 'react-native'
+import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl,TextInput, View,ScrollView, FlatList, ActivityIndicator, Alert } from 'react-native'
 import axios from 'axios'
 import {Ionicons,Feather, MaterialIcons, Fontisto } from '@expo/vector-icons'
 import bbstyles from '../Styles'
@@ -32,12 +32,13 @@ export default function Home({navigation}) {
     } 
     const isFocused = useIsFocused()
 
-    async function getProducts(currentPage, countPerPage, productOnly) {
+    const getProducts  = useCallback(async (currentPage, countPerPage, productOnly)=>{
         const data = {
             activePage: currentPage,
             itemsCountPerPage: countPerPage,
             productOnly
         }
+        console.log('hiii')
         try {
             const response = await axios.post('/frontend/app/home', data)
             if(!productOnly) {
@@ -51,24 +52,25 @@ export default function Home({navigation}) {
             } else {
                 setProducts([...products, ...response.data.product])
             }
+            console.log('results')
             setLoader(false)
             setNextPage(false)
-            console.log('ends')
         } catch (error) {
+            Alert.alert('Error', error.request.response)
             setLoader(false)
         }
-    }
+    },[products])
 
-    async function storeInCache(data) {
+    const storeInCache = useCallback(async (data) => {
         try {
             await AsyncStorage.setItem('products', JSON.stringify(data.product))
             await AsyncStorage.setItem('categories', JSON.stringify(data.categories))
         } catch (error) {
-            
+            // Pass
         }
-    }
+    },[])
 
-    async function getProductsFromCache() {
+    const getProductsFromCache = useCallback(async ()=>{
         try {
             const products = await AsyncStorage.getItem('products')
             const categories = await AsyncStorage.getItem('categories')
@@ -78,9 +80,9 @@ export default function Home({navigation}) {
                 setLoader(false)
             }
         } catch (error) {
-            
+            //Pass
         }
-    }
+    },[])
 
 
     const GetNextPage = useCallback(()=>{
@@ -89,16 +91,16 @@ export default function Home({navigation}) {
             setNextPage(true)
             getProducts(activePage+1,itemsCountPerPage, true)
         }
-    })
+    },[nextPage, activePage])
     
-
-    async function getUnreadMessageCount() {
+    const getUnreadMessageCount = useCallback(async()=>{
         try {
             const response = await axios.get('/chat/message/unread-count', config)
             setUnreadMessage(response.data)
         } catch (error) {
+            // Pass
         }
-    }
+    },[])
 
     useEffect(()=>{
         if(token) {
@@ -112,29 +114,21 @@ export default function Home({navigation}) {
         getProducts(activePage, itemsCountPerPage, false)
     }, [])
 
-
-   async function getUnreadNotificationCount(){
+    const getUnreadNotificationCount = useCallback(async ()=>{
         try {
             var response = await axios.get('/notification/count',config)
             setUnreadNotification(response.data.total)
             setUnreadNormalNotificationCount(response.data.normalNotificationCount)
             setUnreadOrderNotificationCount(response.data.orderNotificationCount) 
         } catch (error) {
-            
+            // Pass
         }
-    }
-    
-    function onRefresh() {
+    },[])
+
+    const onRefresh = useCallback(()=>{
         setActivePage(1)
         getProducts(1, itemsCountPerPage, false)
-    }
-
-
-    // const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-    //     const paddingToBottom = 500;
-    //     return layoutMeasurement.height + contentOffset.y >=
-    //         contentSize.height - paddingToBottom;
-    // }
+    })
 
     const renderItem = useCallback(({item, index}) => originalRenderItem({item, index}), [products,categories])
 

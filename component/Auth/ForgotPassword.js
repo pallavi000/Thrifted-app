@@ -1,7 +1,6 @@
 import { ScrollView, StatusBar,ActivityIndicator,Alert, StyleSheet,Dimensions,SafeAreaView, Text, View,TouchableOpacity,TextInput } from 'react-native'
-import React,{useState,useContext} from 'react'
+import React,{useState} from 'react'
 import { Ionicons } from '@expo/vector-icons'
-import { useFonts,Raleway_700Bold,Raleway_800ExtraBold,Raleway_600SemiBold  } from '@expo-google-fonts/raleway';
 import { AuthContext } from '../Context';
 import axios from 'axios';
 import bbstyles from '../Styles'
@@ -14,29 +13,23 @@ const validationSchema = Yup.object().shape({
 
 export default function ForgotPassword({navigation}) {
 
-    const [email,setEmail] = useState('')
-    const[error,setError] = useState('')
-    const[success,setSuccess] = useState('')
     const[isSubmitting,setIsSubmitting] = useState(false)
 
+    const changePassword = React.useCallback(async(data)=>{
+      try {
+        setIsSubmitting(true)
+        var response = await axios.post('/user/forgot/password',data)
+        if(response.data){
+          Alert.alert('Password reset link has been sent to your email')
+          navigation.navigate('resetpassword')
+        }
+        setIsSubmitting(false)
+      } catch (error) {
+        Alert.alert('Error', error.request.response)
+        setIsSubmitting(false)
+      }
+    },[])
 
-
-async function changePassword(data){
-  setIsSubmitting(true)
-try {
-  var response = await axios.post('/user/forgot/password',data)
-  console.log(response)
-  if(response.data){
-    Alert.alert('password reset link has been sent to your email')
-    navigation.navigate('resetpassword')
-  }
-  setIsSubmitting(false)
-} catch (error) {
-  Alert.alert('Error', error.request.response)
-  setIsSubmitting(false)
-}
-  
-}
 
 
   return (

@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View,SafeAreaView,ScrollView,TouchableOpacity } from 'react-native'
 import React,{useLayoutEffect} from 'react'
 import { Raleway_500Medium, Raleway_600SemiBold } from '@expo-google-fonts/raleway'
+import { FlatList } from 'react-native-gesture-handler'
 
 export default function ChildCat({navigation,route}) {
  
@@ -14,17 +15,19 @@ export default function ChildCat({navigation,route}) {
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
-    <ScrollView >
-    <View><Text style={styles.select}>Select Category</Text></View>
-    <View style={styles.categoryWrapper}>
-    {category.childrens.map(child=>{
-      return(
-      <TouchableOpacity key={child._id} onPress={()=>navigation.navigate('Category Title',child)}><Text style={styles.name}>{child.name} ({child.productcount})</Text></TouchableOpacity>
-      )
-    })}
-    </View>
-   
-    </ScrollView>
+      <View>
+        <Text style={styles.select}>Select Category</Text>
+      </View>
+      <FlatList
+      contentContainerStyle={styles.categoryWrapper}
+      data={category.childrens}
+      keyExtractor={item=>item._id}
+      renderItem={({item})=>(
+        <TouchableOpacity onPress={()=>navigation.navigate('Category Title',item)}>
+          <Text style={styles.name}>{item.name} ({item.productcount})</Text>
+        </TouchableOpacity>
+      )}
+      />
     </SafeAreaView>
   )
 }
@@ -34,10 +37,14 @@ const styles = StyleSheet.create({
         fontSize:16,
         fontWeight:'600',
         fontFamily:'Raleway_600SemiBold',
-        padding:20
+        padding:20,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd'
     },
     categoryWrapper:{
-        marginVertical:10
+        marginVertical:10,
+        paddingBottom: 20
     },
     name:{
         fontSize:16,

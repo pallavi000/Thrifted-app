@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View ,TextInput,Image,TouchableOpacity,Button, FlatList, TouchableWithoutFeedback, Dimensions, Alert, Share} from 'react-native'
-import React,{useContext, useEffect, useMemo, useRef, useState} from 'react'
-import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons'
+import { StyleSheet, Text, View,Image,TouchableOpacity, FlatList, Dimensions, Alert, Share} from 'react-native'
+import React,{useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { Raleway_500Medium } from '@expo-google-fonts/raleway'
 import { SliderBox } from "react-native-image-slider-box";
-import Animated, { Easing, EasingNode, Extrapolate, interpolate, useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import ExpoFastImage from 'expo-fast-image'
-import { PinchGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler'
+import { PinchGestureHandler, TapGestureHandler } from 'react-native-gesture-handler'
 
 export default React.memo(function Action(props) {
     const[comment,setComment] = useState('')
@@ -16,50 +16,26 @@ export default React.memo(function Action(props) {
     const {navigation} = props
     const[product,setProduct] = useState(props.product)
     const[doubleClick, setDoubleClick] = useState(0)
+    const data = useContext(AuthContext)
+    const {token,decode} = data
+    const config = {
+        headers: {
+            'access-token':token
+        }
+    }
 
     const handle = useRef()
 
     const currentValue = useSharedValue(1)
     const scaleHeart = useSharedValue(0)
+
     const rStyle = useAnimatedStyle(()=>({
         transform: [{scale: currentValue.value ? currentValue.value : 1}]
     }))
+
     const mStyle = useAnimatedStyle(()=>({
         transform: [{scale: Math.max(scaleHeart.value,0)}]
     }))
-
-    // const scale =  React.useRef(new Animated.Value(1));
-    // const translateX =  React.useRef(new Animated.Value(0));
-    // const translateY =  React.useRef(new Animated.Value(0));
-    
-    // const HandlePinch = new Animated.event(
-    //     [
-    //         {
-    //             nativeEvent:{scale:scale.current}
-    //         }
-    //     ],
-    //     {
-    //         useNativeDriver: false
-    //     })
-
-    // const HandlePinchStateChange = (event) => {
-    //     if(event.nativeEvent.state===State.ACTIVE) {
-    //         translateX.current.setValue((Dimensions.get('window').width/2)-event.nativeEvent.focalX)
-    //         translateY.current.setValue(200-event.nativeEvent.focalY)
-    //     }
-    //     //left
-    //     if(event.nativeEvent.oldState===State.ACTIVE) {
-    //         translateX.current.setValue(0)
-    //         translateY.current.setValue(0)
-    //         Animated.timing(scale.current, {
-    //             toValue: 1,
-    //             duration: 300,
-    //             easing: EasingNode.linear,
-    //             useNativeDriver: true
-    //         }).start()
-            
-    //     }
-    // }
 
     const focalX = useSharedValue(0);
     const focalY = useSharedValue(0);
@@ -73,38 +49,41 @@ export default React.memo(function Action(props) {
     const WIDTH = Dimensions.get('window').width
     const HEIGHT = 400
 
-    const pinchHandler = useAnimatedGestureHandler({
-        onStart: (event) => {
-            if (event.numberOfPointers == 2) {
-                focalX.value = event.focalX;
-                focalY.value = event.focalY;
-            }
-        },
-        onActive: (event) => {
-            if (event.numberOfPointers == 2) {
-                // On Android, the onStart event gives 0,0 for the focal
-                // values, so we set them here instead too.
-                if (event.oldState === 2) {
+
+    const pinchHandler = useCallback(()=>{
+        useAnimatedGestureHandler({
+            onStart: (event) => {
+                if (event.numberOfPointers == 2) {
                     focalX.value = event.focalX;
                     focalY.value = event.focalY;
                 }
-                scaleCurrent.value = event.scale;
+            },
+            onActive: (event) => {
+                if (event.numberOfPointers == 2) {
+                    // On Android, the onStart event gives 0,0 for the focal
+                    // values, so we set them here instead too.
+                    if (event.oldState === 2) {
+                        focalX.value = event.focalX;
+                        focalY.value = event.focalY;
+                    }
+                    scaleCurrent.value = event.scale;
 
-                xCurrent.value = (1 - scaleCurrent.value) * (focalX.value - WIDTH / 2);
-                yCurrent.value = (1 - scaleCurrent.value) * (focalY.value - HEIGHT / 2);
-            }
-        },
-        onEnd: () => {
-            focalX.value = 0
-            focalY.value = 0
-            xCurrent.value = 0
-            yCurrent.value = 0
-            xPrevious.value = 0
-            yPrevious.value = 0
-            scaleCurrent.value = 1
-            scalePrevious.value = 1
-        },
-    });
+                    xCurrent.value = (1 - scaleCurrent.value) * (focalX.value - WIDTH / 2);
+                    yCurrent.value = (1 - scaleCurrent.value) * (focalY.value - HEIGHT / 2);
+                }
+            },
+            onEnd: () => {
+                focalX.value = 0
+                focalY.value = 0
+                xCurrent.value = 0
+                yCurrent.value = 0
+                xPrevious.value = 0
+                yPrevious.value = 0
+                scaleCurrent.value = 1
+                scalePrevious.value = 1
+            },
+        })
+    },[])
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -116,16 +95,8 @@ export default React.memo(function Action(props) {
                 { translateY: yPrevious.value },
                 { scale: scalePrevious.value },
             ],
-        };
-    });
-
-    const data = useContext(AuthContext)
-    const {token,decode} = data
-    const config = {
-        headers: {
-            'access-token':token
         }
-    }
+    })
 
     useEffect(()=>{
         if(props.product?.likes.find(like=>like.user_id==decode._id)){
@@ -133,12 +104,7 @@ export default React.memo(function Action(props) {
         }
     },[])
 
-    useEffect(()=>{
-        
-    },[like])
-
-
-    async function addLike(){
+    const addLike = useCallback(async()=>{
         currentValue.value = withSpring(0.1, undefined, (isFinished)=>{
             if(isFinished) {
                 currentValue.value = withSpring(1)
@@ -149,7 +115,6 @@ export default React.memo(function Action(props) {
                 scaleHeart.value = withSpring(0)
             }
         })
-
         try {
             const data={
                 action:like?'unlike':'like'
@@ -160,7 +125,7 @@ export default React.memo(function Action(props) {
                 setProduct({...product,likes_count:product.likes_count+1})
             }
             setLike(!like)
-            const response = await axios.post('/post/like/post/'+props.product._id,data,config)          
+            const response = await axios.post('/post/like/post/'+props.product._id,data,config)
         } catch (error) {
             if(like){
                 setProduct({...product,likes_count:product.likes_count+1})
@@ -169,17 +134,17 @@ export default React.memo(function Action(props) {
             }
             setLike(like)
         }
-    }   
+    },[like])
     
-    function parseImages(image, images){
+    const parseImages = useCallback((image, images)=>{
         var arr=[imageLink+image]
         images.forEach(image => {
             arr.push(imageLink+image)
         });
         return arr
-    }
+    },[])
 
-    function singleOrDoubleClick(item) {
+    const singleOrDoubleClick = useCallback((item)=>{
         if(doubleClick>=1) {
             if(handle.current) {
                 clearTimeout(handle.current)
@@ -195,22 +160,22 @@ export default React.memo(function Action(props) {
                 navigation.navigate('Product Detail',item)
             },300)
         }
-    }
+    },[doubleClick])
 
-    const onShare = async (item) => {
+    const onShare = useCallback(async()=>{
         try {
-        const result = await Share.share({
-            message: `${item.name} \n\n रु ${item.price} \n\n${imageLink}/product-detail/${item._id}`
-        });
-        if (result.action === Share.sharedAction) {
-            // shared
-        } else if (result.action === Share.dismissedAction) {
-            // dismissed
-        }
+            const result = await Share.share({
+                message: `${item.name} \n\n रु ${item.price} \n\n${imageLink}/product-detail/${item._id}`
+            });
+            if (result.action === Share.sharedAction) {
+                // shared
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
+            }
         } catch (error) {
-         Alert.alert('Error', error.message);
+            Alert.alert('Error', error.message);
         }
-    };
+    },[])
 
   return (
       <>

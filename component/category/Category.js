@@ -13,33 +13,33 @@ export default function Category({navigation}) {
     const[activeCategory,setActiveCategory] = useState()
     const[loader,setLoader] = useState(true)
 
-useEffect(()=>{
-    getCategory()
-},[])
+    useEffect(()=>{
+        getCategory()
+    },[])
 
-async function getCategory(){
-    try {
-        var response = await axios.get('/category')
-        setCategories(response.data)
-        setActiveCategory(response.data[0])
-        setActive(response.data[0]._id)
-        navigation.setOptions({
-            title: response.data[0].name,
-        })
-        setLoader(false)
-    } catch (error) {
-        setLoader(false)
-        console.log(error.request.response)
-    }
-}
-
-function currentCategory(category){
-    setActive(category._id)
-    setActiveCategory(category)
-    navigation.setOptions({
-        title:category.name
+    const getCategory = React.useCallback(async()=>{
+        try {
+            var response = await axios.get('/category')
+            setCategories(response.data)
+            setActiveCategory(response.data[0])
+            setActive(response.data[0]._id)
+            navigation.setOptions({
+                title: response.data[0].name,
+            })
+            setLoader(false)
+        } catch (error) {
+            setLoader(false)
+        }
     })
-}
+
+
+    const currentCategory = React.useCallback((category)=>{
+        setActive(category._id)
+        setActiveCategory(category)
+        navigation.setOptions({
+            title:category.name
+        })
+    })
 
 
   return (

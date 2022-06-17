@@ -1,5 +1,5 @@
 import React,{useCallback, useContext, useEffect,useState} from 'react'
-import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl,TextInput, View,ScrollView, FlatList, ActivityIndicator, Alert } from 'react-native'
+import { Image, StyleSheet,SafeAreaView, StatusBar, Text,TouchableOpacity,Dimensions, TouchableWithoutFeedback, RefreshControl,TextInput, View,ScrollView, FlatList, ActivityIndicator, Alert, Button } from 'react-native'
 import axios from 'axios'
 import {Ionicons,Feather, MaterialIcons, Fontisto } from '@expo/vector-icons'
 import bbstyles from '../Styles'
@@ -8,6 +8,10 @@ import { AuthContext } from '../Context'
 import { useIsFocused } from '@react-navigation/native'
 import Action from './Action'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
+
+
+
 
 
 export default function Home({navigation}) {
@@ -22,6 +26,7 @@ export default function Home({navigation}) {
     const[itemsCountPerPage,setItemsCountPerPage]= useState(10)
     const[loader,setLoader] = useState(true)
     const[nextPage,setNextPage] = useState(true)
+    const[notificationToken,setNotificationToken] = useState('')
     const[dataType, setDataType] = useState('cache')
     const data = useContext(AuthContext)
     const {unreadMessage, setUnreadMessage, token,unreadNotification,setUnreadNotification,socket,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount} = data
@@ -31,6 +36,13 @@ export default function Home({navigation}) {
         }
     } 
     const isFocused = useIsFocused()
+
+
+    
+
+
+
+
 
     const getProducts  = useCallback(async (currentPage, countPerPage, productOnly)=>{
         const data = {

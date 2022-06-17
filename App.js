@@ -34,11 +34,23 @@ import Redeem from './component/redeem/Redeem';
 import EditPost from './component/post/EditPost';
 import OrderTrack from './component/Order/OrderTrack';
 import OrderSuccess from './component/Order/OrderSuccess';
+import * as Notifications from 'expo-notifications';
+import { greaterThan, timing } from 'react-native-reanimated';
+
 
 // axios.defaults.baseURL="http://localhost:5000/api"
 axios.defaults.baseURL="http://167.86.77.80/api"
 
 const Stack = createNativeStackNavigator()
+
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
  
 export default function App(props) {
   const[isLoggedIn,setIsLoggedIn] = useState(false)
@@ -61,7 +73,39 @@ export default function App(props) {
       display: 'flex',
     }
   )
-  
+
+
+  // notification
+
+  async function registerForPushNotificationsAsync(configToken) {
+    const config = {
+      headers: {
+        'access-token':configToken
+      }
+    }
+      try {
+        let token;
+        const  {existingStatus} = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus !== 'granted') {
+          alert('Failed to get push token for push notification!');
+          return;
+        }
+        token = (await Notifications.getExpoPushTokenAsync()).data;
+        console.log(token);
+        const data={
+          token
+        }
+        const response = await axios.post('/frontend/notification/token',data,config)
+        console.log(response.data)
+      } catch (error) {
+        
+      }
+    }
 
   const retotal = React.useCallback((cartitems)=>{
     var a = 0
@@ -134,7 +178,7 @@ export default function App(props) {
         var token = authConfig;
         var decoded = jwt_decode(token);
         setDecode(decoded)
-
+        registerForPushNotificationsAsync(token)
         socketConnect(decoded)
         userImageSet(decoded)
         setIsLoggedIn(true)

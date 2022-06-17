@@ -78,7 +78,6 @@ export default function Notification({navigation}) {
         return itemsArray
     }
 
-
    async function getNotification(){
        try {   
         const response = await axios.get('/notification',config)

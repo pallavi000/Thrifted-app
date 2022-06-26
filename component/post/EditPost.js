@@ -54,15 +54,6 @@ const EditPost = ({navigation,route}) => {
             name: 'Sale'
         }
     ])
-    function getProductType(type) {
-        var type = productTypes.find(pt=>pt._id==type)
-        if(type) {
-            return type
-        }
-        return {name: 'Select Product Type'}
-    }
-
-
     const [selectedCategory, setSelectedCategory] = useState(product.category_id)
     const [selectedColor, setSelectedColor] = useState(product.color_id)
     const [selectedSize, setSelectedSize] = useState(product.size_id)
@@ -78,9 +69,16 @@ const EditPost = ({navigation,route}) => {
         }
     }
 
+    const getProductType = React.useCallback((type)=>{
+        var type = productTypes.find(pt=>pt._id==type)
+        if(type) {
+            return type
+        }
+        return {name: 'Select Product Type'}
+    })
+
     function editPost() {
         var errors = Object.values(formRef.current.errors)
-        console.log(errors)
         if(errors && errors.length>0) {
             Alert.alert('Error', errors[0])
             return
@@ -88,8 +86,8 @@ const EditPost = ({navigation,route}) => {
         formRef.current.handleSubmit()
     }
 
-    useEffect(()=>{
-        if(isSubmitting) {
+    const changeHeader = React.useCallback((value)=>{
+        if(value) {
             navigation.setOptions({
                 headerShown: true,
                 headerRight:()=>(
@@ -108,19 +106,25 @@ const EditPost = ({navigation,route}) => {
                 )
             })
         }
+    })
+
+    useEffect(()=>{
+        changeHeader(isSubmitting)
     },[isSubmitting])
 
-
-    useEffect(() => {
-        axios.get('/frontend/createpost',config).then(response=>{
+    const getSelectFields = React.useCallback(async ()=>{
+        try {
+            const response = await axios.get('/frontend/createpost',config)
             setColors(response.data.colors)
             setSizes(response.data.sizes)
             setCategories(response.data.categories)
             setBrands(response.data.brands)
-        })
-     }, [])
+        } catch (error) {
+            
+        }
+    })
 
-    async function updatePost(values){ 
+    const updatePost = React.useCallback(async(values)=>{
         setIsSubmitting(true)
         try {
             const response = await axios.put('/product/edit/post/'+product._id, values, config)
@@ -130,15 +134,15 @@ const EditPost = ({navigation,route}) => {
             setIsSubmitting(false)
             Alert.alert('Error', error.request.response)
         }
-    }
+    })
 
-    function calcEarning(value){
+    const calcEarning = React.useCallback((value)=>{
         formRef.current.setFieldValue('price',value.toString())
         var  price= value
         var profit = price-price*20/100
         formRef.current.setFieldValue('earning_price',profit.toString())
         setEarningPrice(profit.toString())
-     }
+    })
 
      useEffect(()=>{
          calcEarning(product.price)
@@ -162,7 +166,7 @@ const EditPost = ({navigation,route}) => {
      },[selectedBrand])
 
 
-     const renderHeader = () =>(
+     const renderHeader = React.useCallback(() =>(
         <>
         <View style={{
             backgroundColor: '#fff',
@@ -185,27 +189,25 @@ const EditPost = ({navigation,route}) => {
             >Choose Image</Text>
         </View>
         </>
-    )
-    function renderContent() {
+    ))
+
+    const renderContent = React.useCallback(()=>{
         return(
-        <View
-        style={{
-            backgroundColor: '#fff',
-            height:300
-        }}
-        >
-        <TouchableOpacity onPress={()=>selectImageRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
-            <Image style={styles.cameraIcon} source={require('../../assets/gallery.png')}/><Text style={styles.loginText}>Select Image</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>openCameraRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
-            <Image style={styles.cameraIcon} source={require('../../assets/camera.png')}/><Text style={styles.loginText}>Open Camera</Text>
-        </TouchableOpacity>
-        </View>
+            <View
+            style={{
+                backgroundColor: '#fff',
+                height:300
+            }}
+            >
+            <TouchableOpacity onPress={()=>selectImageRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
+                <Image style={styles.cameraIcon} source={require('../../assets/gallery.png')}/><Text style={styles.loginText}>Select Image</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>openCameraRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
+                <Image style={styles.cameraIcon} source={require('../../assets/camera.png')}/><Text style={styles.loginText}>Open Camera</Text>
+            </TouchableOpacity>
+            </View>
         )
-    }
-
-
-
+    })
 
   return (
      <>

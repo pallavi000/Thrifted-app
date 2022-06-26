@@ -7,12 +7,12 @@ import Animated from 'react-native-reanimated';
 
 const Sort = (props) => {
 
-    function changeSorting(sort) {
+    const changeSorting = React.useCallback((sort)=>{
         props.setSorting(sort)
         props.sheetRef.current.snapTo(1)
-    }
+    })
 
-    const renderHeader = () =>(
+    const renderHeader = React.useCallback(() =>(
         <>
         <View style={{
             backgroundColor: '#fff',
@@ -37,8 +37,9 @@ const Sort = (props) => {
             >Sort By</Text>
         </View>
         </>
-    )
-    const renderContent = () => (
+    ))
+
+    const renderContent = React.useCallback(() => (
         <View
         style={{
             backgroundColor: '#fff',
@@ -61,7 +62,8 @@ const Sort = (props) => {
             <Text style={props.sorting=="highest" ? styles.optionsSelected : styles.options}>Price: highest to low</Text>
         </TouchableOpacity>
         </View>
-  );
+  ))
+  
   return (
     <>
       <BottomSheet

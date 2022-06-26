@@ -76,13 +76,12 @@ export default function App(props) {
 
 
   // notification
-
-  async function registerForPushNotificationsAsync(configToken) {
-    const config = {
-      headers: {
-        'access-token':configToken
+  const registerForPushNotificationsAsync = React.useCallback(async (configToken)=>{
+      const config = {
+        headers: {
+          'access-token':configToken
+        }
       }
-    }
       try {
         let token;
         const  {existingStatus} = await Notifications.getPermissionsAsync();
@@ -92,20 +91,18 @@ export default function App(props) {
           finalStatus = status;
         }
         if (finalStatus !== 'granted') {
-          alert('Failed to get push token for push notification!');
+          Alert.alert('Error', 'Failed to get push token for push notification!');
           return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log(token);
         const data={
           token
         }
         const response = await axios.post('/frontend/notification/token',data,config)
-        console.log(response.data)
       } catch (error) {
         
       }
-    }
+  })
 
   const retotal = React.useCallback((cartitems)=>{
     var a = 0

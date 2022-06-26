@@ -8,16 +8,17 @@ export default function OrderDetail({navigation, route}) {
     const item = route.params
   
 
-    function changeDate(createdAt){
+    const changeDate = React.useCallback((createdAt)=>{
         var arr = createdAt.split('T')
         return arr[0]
-    }
-    function orderQuantity(orders){
-       var total = orders.reduce((total,order)=>{
+    })
+
+    const orderQuantity = React.useCallback((orders)=>{
+        var total = orders.reduce((total,order)=>{
             return total += order.quantity
        },0)
        return total
-    }
+    })
 
 
 return (

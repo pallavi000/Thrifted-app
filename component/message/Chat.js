@@ -24,6 +24,7 @@ export default function Chat({route,navigation}) {
 
     const data = useContext(AuthContext)
     const {token,decode,unreadMessage, setUnreadMessage,socket} = data
+    const receiver = route.params
 
     const config = {
         headers: {
@@ -39,7 +40,7 @@ export default function Chat({route,navigation}) {
         }
     }, [socket, messages])
 
-    async function sendMessage() {
+    const sendMessage = React.useCallback(async ()=>{
         try {
             Keyboard.dismiss()
             messageInput.current.clear()
@@ -57,15 +58,10 @@ export default function Chat({route,navigation}) {
         } catch (error) {
             Alert.alert('Error', error.request.response)
         }
-    }
-    
+    },[messages])
 
-
-    
-    const receiver = route.params
-    
-    useLayoutEffect(() => {
-      navigation.setOptions({
+    const changeHeader = React.useCallback(()=>{
+        navigation.setOptions({
             title:receiver.user.name,
             headerTitle: () => (
                 <View style={{flexDirection: 'row',alignItems:'center',marginLeft:-30}}>
@@ -88,22 +84,25 @@ export default function Chat({route,navigation}) {
                 </View>
             )
         })
+    })
+    
+    useLayoutEffect(() => {
+      changeHeader()
     }, [])
 
-    function videoCall() {
+    const videoCall = React.useCallback(()=>{
         Alert.alert("Oops!!", "Feature not yet enabled.")
-    }
-    function call() {
-        Alert.alert("Oops!!", "Feature not yet enabled.")
-    }
+    })
 
-   
+    const call = React.useCallback(()=>{
+        Alert.alert("Oops!!", "Feature not yet enabled.")
+    },[])
 
     useEffect(()=>{
         getMessages()
     },[])
 
-   async function getMessages(){
+    const getMessages = React.useCallback(async ()=>{
         try {
             const response = await axios.get('/chat/message/'+receiver.conversation._id,config)
             setMessages(response.data)
@@ -112,18 +111,16 @@ export default function Chat({route,navigation}) {
         } catch (error) {
             console.log(error.request.response)
         }
-    }
+    },[])
 
-    
-
-    function changeShowTimer(id) {
+    const changeShowTimer = React.useCallback((id)=>{
         setShowTimer(id)
-    }
+    })
 
-    function emojiIconPress() {
+    const emojiIconPress = React.useCallback(()=>{
         Keyboard.dismiss()
         setShowEmoji(!showEmoji)
-    }
+    })
 
 
   return (

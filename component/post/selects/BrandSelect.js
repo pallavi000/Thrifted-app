@@ -6,7 +6,7 @@ const BrandSelect = (props) => {
     const[brands, setBrands] = useState(props.brands)
     const [selectedSelect, setSelectedSelect] = useState(props.selectedSelect)
 
-    useEffect(()=>{
+    const changeHeader = React.useCallback(()=>{
         props.navigation.setOptions({
             headerShown:true,
             headerRight:()=>(
@@ -15,6 +15,10 @@ const BrandSelect = (props) => {
                 </TouchableOpacity>
             )
         })
+    })
+
+    useEffect(()=>{
+        changeHeader()
     },[selectedSelect])
 
     function doneSelect() {
@@ -27,14 +31,14 @@ const BrandSelect = (props) => {
         setSelectedSelect(item)
     }
 
-    function searchBrand(text) {
+    const searchBrand = React.useCallback((text)=>{
         if(text.trim().length>0) {
             let filterBrands = props.brands.filter(brand=>brand.name.includes(text))
             setBrands(filterBrands)
         } else {
             setBrands(props.brands)
         }
-    }    
+    })   
 
   return (
     <View style={styles.container}>

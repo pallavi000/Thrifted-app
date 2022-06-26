@@ -16,32 +16,31 @@ const validationSchema = Yup.object().shape({
 })
 
 export default function Redeem({navigation,route}) {
-const data = useContext(AuthContext)
-const {token} = data
-const user = route.params
-const [isSubmitting, setIsSubmitting] = useState(false)
+  const data = useContext(AuthContext)
+  const {token} = data
+  const user = route.params
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-const config = {
-  headers:{
-    'access-token':token
+  const config = {
+    headers:{
+      'access-token':token
+    }
   }
-}
 
-async function RedeemForm(data){
-  if(user.balance<data.balance) {
-    return Alert.alert('Error', "Your balance is less than requested amount.")
-  }
-  setIsSubmitting(true)
-  try {
-    var response = await axios.post('/user/withdraw',data,config)
-    Alert.alert('Success','Your transaction request has been submitted')
-    navigation.navigate('Redeemption History')
-    setIsSubmitting(false)
-  } catch (error) {   
-    setIsSubmitting(false)
-    Alert.alert('Error',error.request.response)
-  }
-}
+  const RedeemForm = React.useCallback(async (data)=>{
+    try {
+      if(user.balance<data.balance) {
+        return Alert.alert('Error', "Your balance is less than requested amount.")
+      }
+      var response = await axios.post('/user/withdraw',data,config)
+      Alert.alert('Success','Your transaction request has been submitted')
+      navigation.navigate('Redeemption History')
+      setIsSubmitting(false)
+    } catch (error) {
+      setIsSubmitting(false)
+      Alert.alert('Error',error.request.response)
+    }
+  })
 
 
   return (

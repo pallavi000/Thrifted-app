@@ -19,13 +19,19 @@ export default function Profile({navigation}) {
             'access-token': token
         }
     }
-    useEffect(() => {
-        axios.get('/user/currentuser',config).then(response=>{
+
+    const getUser = React.useCallback(async ()=>{
+        try {
+            const response = await axios.get('/user/currentuser',config)
             setUser(response.data.user)
             setLoader(false)
-        }).catch(err=>{
+        } catch (error) {
             
-        })
+        }
+    },[])
+
+    useEffect(() => {
+        getUser()
     }, [isFocused])
     
   return (

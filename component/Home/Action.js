@@ -5,7 +5,7 @@ import axios from 'axios'
 import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { Raleway_500Medium } from '@expo-google-fonts/raleway'
-import { SliderBox } from "react-native-image-slider-box";
+// import { SliderBox } from "react-native-image-slider-box";
 import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import ExpoFastImage from 'expo-fast-image'
 import { PinchGestureHandler, TapGestureHandler } from 'react-native-gesture-handler'
@@ -334,6 +334,7 @@ const styles = StyleSheet.create({
         right: 20,
         top: 350,
         alignContent: 'center',
+        zIndex: 4
         
     },
     isSoldText: {

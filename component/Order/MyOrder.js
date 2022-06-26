@@ -27,7 +27,7 @@ export default function MyOrder({navigation}) {
         getOrder()
     },[])
 
-    async function getOrder(){
+    const getOrder = React.useCallback(async ()=>{
         try {
             var response = await axios.get('/order/transaction',config)
             setItems(response.data)
@@ -36,21 +36,21 @@ export default function MyOrder({navigation}) {
         } catch (error) {
             console.log(error.request.response)
         }
-    }
+    },[])
 
-    function changeDate(createdAt){
+    const changeDate = React.useCallback((createdAt)=>{
         var arr = createdAt.split('T')
         return arr[0]
-    }
+    })
 
-    function orderQuantity(orders){
-       var total = orders.reduce((total,order)=>{
+    const orderQuantity = React.useCallback((orders)=>{
+        var total = orders.reduce((total,order)=>{
             return total += order.quantity
        },0)
        return total
-    }
+    })
 
-    function toggleTab(action) {
+    const toggleTab = React.useCallback((action)=>{
         setTab(action)
         if(action=="delivered") {
             setItems(delivered)
@@ -59,7 +59,7 @@ export default function MyOrder({navigation}) {
         } else {
             setItems(cancelled)
         }
-    }
+    })
 
     
 

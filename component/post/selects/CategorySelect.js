@@ -13,7 +13,7 @@ const CategorySelect = (props) => {
     const [selectedGrandChildId, setSelectedGrandChildId] = useState(null)
     const [selectedCategory, setSelectedCategory] = useState(props.selectedCategory)
 
-    useEffect(()=>{
+    const changeHeader = React.useCallback(()=>{
         props.navigation.setOptions({
         headerShown:true,
         headerRight:()=>(
@@ -22,6 +22,10 @@ const CategorySelect = (props) => {
                 </TouchableOpacity>
             )
         })
+    })
+
+    useEffect(()=>{
+        changeHeader()
     },[selectedCategory])
 
     function doneSelect() {

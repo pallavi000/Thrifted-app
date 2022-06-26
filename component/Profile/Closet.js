@@ -52,7 +52,7 @@ export default function Closet(props) {
         getSales()
     }, [isFocused])
 
-    async function getProducts() {
+    const getProducts = React.useCallback(async()=>{
         try {
             const response = await axios.post('/frontend/closet/'+props.route.params._id)
             setProducts(response.data.product)
@@ -70,7 +70,20 @@ export default function Closet(props) {
         } catch (error) {
             setLoading(false)
         }
-    }
+    })
+
+    const getSales = React.useCallback(async()=>{
+        try {
+            const data = {
+                pageno: salePageNo,
+            }
+            const response = await axios.post('/order/sales/get/'+props.route.params._id,data,config)
+            setSales(response.data.orders)
+            setTotalSales(response.data.total)
+        } catch (error) {
+            console.log(error.request.response)
+        } 
+    })
 
     async function nextPageCloset() {
         if(!hasNextPage) return
@@ -81,7 +94,6 @@ export default function Closet(props) {
             }
             setPageNo(pageNo+1)
             const response = await axios.post('/frontend/closet/'+props.route.params._id,data)
-            console.log(totalProducts, products.length, response.data.length)
             if(products.length+response.data.length>=totalProducts) {
                 setHasNextPage(false)
             }
@@ -89,19 +101,6 @@ export default function Closet(props) {
         } catch (error) {
             
         }
-    }
-
-    async function getSales() {
-        try {
-            const data = {
-                pageno: salePageNo,
-            }
-            const response = await axios.post('/order/sales/get/'+props.route.params._id,data,config)
-            setSales(response.data.orders)
-            setTotalSales(response.data.total)
-        } catch (error) {
-            console.log(error.request.response)
-        }        
     }
 
     async function nextPageSalesCloset() {
@@ -122,11 +121,11 @@ export default function Closet(props) {
         }
     }
 
-    function toggleTab(action) {
+    const toggleTab = React.useCallback((action)=>{
         setActiveTab(action)
-    }
+    })
 
-    async function followUser() {
+    const followUser = React.useCallback(async ()=>{
         setFollowSubmit(true)
         try {
             const response = await axios.post('/user/follow/'+user._id, {}, config)
@@ -136,9 +135,9 @@ export default function Closet(props) {
         } catch (error) {
             Alert.alert('Error', error.request.response)
         }
-    }
+    })
 
-    async function doUnfollow() {
+    const doUnfollow = React.useCallback(async ()=>{
         setFollowSubmit(true)
         try {
             const response = await axios.post('/user/unfollow/'+user._id, {}, config)
@@ -148,17 +147,17 @@ export default function Closet(props) {
         } catch (error) {
             Alert.alert('Error', error.request.response)
         }
-    }
+    })
 
-    function unFollowUser() {
-        // doUnfollow()
+    const unFollowUser = React.useCallback(()=>{
+        //doUnfollow()
         Alert.alert("Unfollow User", "Are you sure you want to unfollow?", [
             {text: 'Yes', onPress: doUnfollow},
             {text: 'Cancel'}
         ])
-    }
+    })
 
-    async function selectImage() {
+    const selectImage = React.useCallback(async()=>{
         const {granted} = await imagePicker.getMediaLibraryPermissionsAsync()
         if(!granted){
             const result = await imagePicker.requestMediaLibraryPermissionsAsync()
@@ -179,9 +178,9 @@ export default function Closet(props) {
             }
             uploadUserImage(uri)
         }
-    }
+    })
 
-    async function openCamera() {
+    const openCamera = React.useCallback(async ()=>{
         const {granted} = await imagePicker.getCameraPermissionsAsync()
         if(!granted){
             const result = await imagePicker.requestCameraPermissionsAsync()
@@ -201,9 +200,9 @@ export default function Closet(props) {
             }
             uploadUserImage(uri)
         }
-    }
+    })
 
-    async function uploadUserImage(uri) {
+    const uploadUserImage = React.useCallback(async ()=>{
         sheetRef.current.snapTo(1)
         setImageUploading(true)
         try {
@@ -219,13 +218,13 @@ export default function Closet(props) {
             Alert.alert(error.request.response)
             setImageUploading(false)
         }
-    }
+    })
 
-    function numberWithCommas(x) {
+    const numberWithCommas = React.useCallback((x)=>{
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
+    })
 
-    function getFollowersCount() {
+    const getFollowersCount = React.useCallback(()=>{
         if(user.followers && user.followers.length>0) {
             const num = user.followers.length
             if(num >= 1000000) {
@@ -238,9 +237,9 @@ export default function Closet(props) {
             return numberWithCommas(num);
         }
         return 0;
-    }
+    })
 
-    function parseBio(bio) {
+    const parseBio = React.useCallback((bio)=>{
         if(!bio) return bio
         const bioArr = bio.split(' ')
         let parsedBio = []
@@ -252,9 +251,9 @@ export default function Closet(props) {
             }
         })
         return parsedBio
-    }
+    })
 
-    async function sendMessage() {
+    const sendMessage = React.useCallback(async()=>{
         setMessageSubmit(true)
         try {
             const data = {
@@ -271,10 +270,9 @@ export default function Closet(props) {
         } catch (error) {
             Alert.alert('Error', error.request.response)
         }
-    }
+    })
 
-
-    const renderHeader = () =>(
+    const renderHeader = React.useCallback(() =>(
         <>
         <View style={{
             backgroundColor: '#fff',
@@ -297,8 +295,9 @@ export default function Closet(props) {
             >Choose Image</Text>
         </View>
         </>
-    )
-    function renderContent() {
+    ))
+
+    const renderContent = React.useCallback(()=>{
         return(
         <View
         style={{
@@ -314,9 +313,9 @@ export default function Closet(props) {
         </TouchableOpacity>
         </View>
         )
-    }
+    })
 
-    function closetHeader() {
+    const closetHeader = ()=>{
         return(
             <>
             <View style={{paddingHorizontal:20}}>
@@ -431,49 +430,39 @@ export default function Closet(props) {
         opacity: Animated.add(0.3, Animated.multiply(fill, 1.0))
 }]}>
 
-{activeTab=="listing" ?(
-    <FlatList
-    ListHeaderComponent={closetHeader}
-    data={products}
-    keyExtractor={item=>item._id}
-    numColumns={2}
-    onEndReached={nextPageCloset}
-    renderItem={({item})=>(
+<FlatList
+ListHeaderComponent={closetHeader}
+data={activeTab=="listing"?products:sales}
+keyExtractor={item=>item._id}
+numColumns={2}
+onEndReached={activeTab=="listing"?nextPageCloset:nextPageSalesCloset}
+renderItem={({item})=>(
+    activeTab=="listing" ? (
         <TouchableOpacity onPress={()=>navigation.navigate('Product Detail', item)} style={styles.productImage} key={item._id}>
             <Image source={{uri:imageLink+item.image}} style={styles.closetImage}></Image>
         </TouchableOpacity>
-    )}
-    ListFooterComponent={()=>(
+    ):(
+        <TouchableOpacity onPress={()=>navigation.navigate('Product Detail', item.product_id)} style={styles.productImage}>
+            <Image source={{uri:imageLink+item.product_id.image}} style={styles.closetImage}></Image>
+        </TouchableOpacity>
+    )
+)}
+ListFooterComponent={()=>(
+    activeTab=="listing" ?(
         hasNextPage ?(
             <View style={{padding:20}}>
                 <ActivityIndicator size={'large'} color="#663399" />
             </View>
         ):(null)
-    )}
-    />
-):(
-    <FlatList
-    ListHeaderComponent={closetHeader}
-    data={sales}
-    keyExtractor={item=>item._id}
-    numColumns={2}
-    onEndReached={nextPageSalesCloset}
-    renderItem={({item})=>(
-        item.product_id ?(
-            <TouchableOpacity onPress={()=>navigation.navigate('Product Detail', item.product_id)} style={styles.productImage}>
-                <Image source={{uri:imageLink+item.product_id.image}} style={styles.closetImage}></Image>
-            </TouchableOpacity>
-        ):(null)
-    )}
-    ListFooterComponent={()=>(
+    ):(
         salesHasNextPage ?(
             <View style={{padding:20}}>
                 <ActivityIndicator size={'large'} color="#663399" />
             </View>
         ):(null)
-    )}
-    />
+    )
 )}
+/>
 
 
 </Animated.View>

@@ -14,16 +14,20 @@ export default function Filter(props) {
 
     const {navigation} = props
 
-    useLayoutEffect(()=>{
+    const initialize = React.useCallback(()=>{
         setColor_id(props.color_id)
         setBrand_id(props.brand_id)
         if(props.maxprice && props.maxprice.length>0) {
             setMaxprice(props.maxprice)
             setMinprice(props.minprice)
         }
+    })
+
+    useLayoutEffect(()=>{
+        initialize()
     },[])
 
-    useEffect(()=>{
+    const changeHeader = React.useCallback(()=>{
         props.navigation.setOptions({
             title:'Filter',
             headerLeft:()=>(
@@ -32,19 +36,27 @@ export default function Filter(props) {
                 </TouchableOpacity>
             )
         })
-        return() => {
-           props.navigation.setOptions({
+    })
+
+    const normalizeHeader = React.useCallback(()=>{
+        props.navigation.setOptions({
             title: props.title,
             headerLeft:()=>(
                     <TouchableOpacity onPress={()=>props.navigation.goBack()}>
                         <Ionicons name='arrow-back' size={24}/>
                     </TouchableOpacity>
-                )
-            }) 
+            )
+        }) 
+    })
+
+    useEffect(()=>{
+        changeHeader()
+        return() => {
+            normalizeHeader()
         }
     },[])
-    
-    function color_filter(id){
+
+    const color_filter = React.useCallback((id)=>{
         if(color_id.includes(id)){
             var y = color_id.filter(c=>c!=id)
             setColor_id(y)
@@ -52,7 +64,7 @@ export default function Filter(props) {
             var z = [...color_id,id]
             setColor_id(z)
         }
-    }
+    })
 
     function apply() {
         props.setColor_id(color_id)
@@ -67,7 +79,7 @@ export default function Filter(props) {
         setMinprice([data[0]])
     }
 
-    function getBrandNames() {
+    const getBrandNames = React.useCallback(()=>{
         var brandNames = []
         props.brands.forEach(brand=>{
             if(brand_id.includes(brand._id)) {
@@ -75,7 +87,7 @@ export default function Filter(props) {
             }
         })
         return brandNames.join(", ")
-    }
+    })
 
   
 

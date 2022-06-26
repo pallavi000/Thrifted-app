@@ -5,7 +5,7 @@ import { AuthContext } from '../Context'
 import { imageLink } from '../ImageLink'
 import { Raleway_400Regular, Raleway_500Medium, Raleway_600SemiBold, Raleway_700Bold, Raleway_700Bold_Italic } from '@expo-google-fonts/raleway'
 import { Feather, Ionicons } from '@expo/vector-icons'
-import { SliderBox } from "react-native-image-slider-box";
+// import { SliderBox } from "react-native-image-slider-box";
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import { useIsFocused } from '@react-navigation/native'
@@ -29,7 +29,7 @@ export default function ProductDetail({navigation,route}) {
         }
     } 
 
-    useEffect(() => {
+    const initialize = React.useCallback(()=>{
         const isInCart = cartItems.find(item=>item.product_id._id==product._id)
         if(isInCart) {
             setProduct({...product, stock: product.stock-isInCart.quantity})
@@ -37,6 +37,10 @@ export default function ProductDetail({navigation,route}) {
         if(product?.likes.find(like=>like.user_id==decode._id)){
             setLike(true)
         }
+    })
+
+    useEffect(() => {
+        initialize()
     }, [])
 
     useEffect(()=>{
@@ -171,12 +175,12 @@ export default function ProductDetail({navigation,route}) {
        
             <View style={styles.detailImage}>
             
-            <SliderBox
+            {/* <SliderBox
             images={parseImages(product.image, product.feature_image)}
             ImageComponentStyle	= {styles.productImage}
             dotColor="#663399"
             imageLoadingColor="#663399"
-            />
+            /> */}
 
             </View>
             <View style={styles.detailContainer}>

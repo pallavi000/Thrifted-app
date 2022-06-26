@@ -20,32 +20,30 @@ export default function RedeemHistory({navigation}) {
         }
     }
 
-useEffect(()=>{
-getHistory()
-},[])
+    useEffect(()=>{
+        getHistory()
+    },[])
 
+    const getHistory = React.useCallback(async()=>{
+        try {
+            var response = await axios.get('/user/withdraw/all',config)
+            setPayments(response.data)
+            setLoader(false)
+        } catch (error) {
+            console.log(error.request.response)
+        }
+    })
 
-function dateConvert(requestTime){
-var arr = requestTime.split('T')
-return arr[0]
-}
+    const dateConvert = React.useCallback((requestTime)=>{
+        var arr = requestTime.split('T')
+        return arr[0]
+    })
 
-function timeConvert(requestTime){
-    var arr = requestTime.split('T')
-    var time = arr[1].split('.')
-    return time[0]
-}
-
-
-async function getHistory(){
-    try {
-        var response = await axios.get('/user/withdraw/all',config)
-        setPayments(response.data)
-        setLoader(false)
-    } catch (error) {
-        console.log(error.request.response)
-    }
-}
+    const timeConvert = React.useCallback((requestTime)=>{
+        var arr = requestTime.split('T')
+        var time = arr[1].split('.')
+        return time[0]
+    })
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>

@@ -1,40 +1,26 @@
-import { View,TouchableOpacity} from 'react-native'
+import { TouchableOpacity} from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import React,{useContext, useEffect} from 'react'
-import Address from './Address'
+import React,{useContext} from 'react'
 import CartItem from './Cart/CartItem'
 import Category from './category/Category'
 import ChangePassword from './Auth/ChangePassword'
-import Checkout from './Cart/Checkout'
 import CreatePost from '../component/post/CreatePost'
 import Closet from './Profile/Closet'
-import Payouts from './Payouts'
-import ProductDetail from './Product/ProductDetail'
 import Profile from './Profile/Profile'
-import SaleHistory from './SaleHistory'
 import Setting from './setting/Setting'
 import Home from './Home/Home'
 import OrderHistory from './Order/OrderHistory'
-import OrderSuccess from './Order/OrderSuccess'
 import OrderTrack from './Order/OrderTrack'
 import CategoryPage from './category/CategoryPage'
 import ChildCat from './category/ChildCat'
 import Shipping from './address/Shipping'
-import AddShipping from './address/AddShipping'
 import MyOrder from './Order/MyOrder'
 import OrderDetail from './Order/OrderDetail'
-import Redeem from './redeem/Redeem'
 import RedeemHistory from './redeem/RedeemHistory'
-import Messages from './message/Messages'
-import Chat from './message/Chat'
-import EditShipping from './address/EditShipping'
 import { MaterialCommunityIcons} from '@expo/vector-icons'
-import NewChat from './message/NewChat'
-import ChangeProfile from './Profile/ChangeProfile'
 import { AuthContext } from './Context'
 import Notification from './notification/Notification'
-import EditPost from './post/EditPost'
 
 
 const Stack = createNativeStackNavigator()
@@ -382,32 +368,5 @@ function profileNavigation({navigation}){
 
 
 
-  function accountNavigation(){
-    return(
-    <Stack.Navigator
-    screenOptions={{
-      headerStyle:{
-        shadowColor: '#ddd',
-            shadowOffset: {
-              width: 0,
-              height: 2
-            },
-            shadowRadius: 3.5,
-            elevation: 5
-      }
-    }}
-    >
-     <Stack.Screen name="Order History" component={OrderHistory}/>
-      <Stack.Screen  name="Setting" component={Setting}/>
-        <Stack.Screen name="Profile" component={Profile}/>
-        <Stack.Screen name="Address" component={Address}/>
-        <Stack.Screen name="My Closet" component={Closet}/>
-       
-        <Stack.Screen name="Sales History" component={SaleHistory}/>
-        <Stack.Screen name="Payouts" component={Payouts}/>
-    </Stack.Navigator>
-    )
-  }
 
-
-export {homeNavigation,profileNavigation,CartNavigation,accountNavigation,categoryNavigation}
+export {homeNavigation,profileNavigation,CartNavigation,categoryNavigation}

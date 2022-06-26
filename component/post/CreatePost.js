@@ -68,7 +68,6 @@ export default function CreatePost({navigation}) {
     }
 
     function addPost() {
-        console.log(formRef.current.values)
         var errors = Object.values(formRef.current.errors)
         if(errors && errors.length>0) {
             Alert.alert('Error', errors[0])
@@ -77,7 +76,7 @@ export default function CreatePost({navigation}) {
         formRef.current.handleSubmit()
     }
 
-    useEffect(()=>{
+    const changeHeader = React.useCallback(()=>{
         navigation.setOptions({
             headerShown: true,
             headerTitleAlign: 'center',
@@ -85,60 +84,42 @@ export default function CreatePost({navigation}) {
                     <TouchableOpacity onPress={()=>addPost()}>
                         <Text style={{fontFamily:"Raleway_700Bold", fontSize: 16, color: '#663399', marginRight: 10}}>Post <MaterialCommunityIcons name='send-circle-outline' size={16} color='#663399'/></Text>
                     </TouchableOpacity>
-                )
-            })
-    },[])
-       
-    
+            )
+        })
+    })
 
-    useEffect(() => {
-        axios.get('/frontend/createpost',config).then(response=>{
+    useEffect(()=>{
+        changeHeader()
+        getSelectFields()
+    },[])
+
+    const getSelectFields = React.useCallback(async ()=>{
+        try {
+            const response = await axios.get('/frontend/createpost',config)
             setColors(response.data.colors)
             setSizes(response.data.sizes)
             setCategories(response.data.categories)
             setBrands(response.data.brands)
-        })
-     }, [])
-
-    function createPost(values){ 
-        axios.post('/product/create/post',values,config).then(response=>{
-            console.log(response.data)
-       }).catch(err=>{
-           console.log(err.request.response)
-       })
-    }
-
-     function brandValue(item,setFieldValue){
-        setFieldValue('brand',item)
-        if(item=="others"){
-            setShowBrand(true)
-        }else setShowBrand(false)
-     }
-
-
-     function renderChildren(categories,n){
-         var inc = n;
-        function increment(n){
-            var ele = "\u00A0 \u00A0 \u00A0"
-            inc += 1;
-            return ele.repeat(n)
+        } catch (error) {
+            
         }
-         if(categories&&categories.length!=0){
-             const arr=[]
-             categories.map(category=>{
-               arr.push(<Picker.Item key={category._id}  label={increment(n)+ category.name} value={category._id} />,renderChildren(category.childrens,inc))
-             })
-             return arr
-         }
-     }
+    })
 
-    function calcEarning(value){
+    const createPost = React.useCallback(async(values)=>{
+        try {
+            const response = await axios.post('/product/create/post',values,config)
+        } catch (error) {
+            
+        }
+    })
+
+    const calcEarning = React.useCallback((value)=>{
         formRef.current.setFieldValue('price',value)
         var  price= value
         var profit = price- price*20/100
         formRef.current.setFieldValue('earning_price',profit)
         setEarningPrice(profit.toString())
-     }
+    })
 
      useEffect(()=>{
          formRef.current.setFieldValue('category', selectedCategory._id)
@@ -158,7 +139,7 @@ export default function CreatePost({navigation}) {
      },[selectedBrand])
 
      
-     const renderHeader = () =>(
+     const renderHeader = React.useCallback(() =>(
         <>
         <View style={{
             backgroundColor: '#fff',
@@ -181,30 +162,29 @@ export default function CreatePost({navigation}) {
             >Choose Image</Text>
         </View>
         </>
-    )
-    function renderContent() {
-        return(
-        <View
-        style={{
-            backgroundColor: '#fff',
-            height:300
-        }}
-        >
-        <TouchableOpacity onPress={()=>selectImageRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
-            <Image style={styles.cameraIcon} source={require('../../assets/gallery.png')}/><Text style={styles.loginText}>Select Image</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>openCameraRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
-            <Image style={styles.cameraIcon} source={require('../../assets/camera.png')}/><Text style={styles.loginText}>Open Camera</Text>
-        </TouchableOpacity>
-        </View>
-        )
-    }
+    ))
 
+    const renderContent = React.useCallback(()=>{
+        return(
+            <View
+            style={{
+                backgroundColor: '#fff',
+                height:300
+            }}
+            >
+            <TouchableOpacity onPress={()=>selectImageRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
+                <Image style={styles.cameraIcon} source={require('../../assets/gallery.png')}/><Text style={styles.loginText}>Select Image</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>openCameraRef.current()} style={[styles.loginBtn,{borderRadius:0}]}>
+                <Image style={styles.cameraIcon} source={require('../../assets/camera.png')}/><Text style={styles.loginText}>Open Camera</Text>
+            </TouchableOpacity>
+            </View>
+        )
+    })
 
 
   return (
     <>
-    
     {openSelectField==="category" ? (
         <CategorySelect
             categories={categories}

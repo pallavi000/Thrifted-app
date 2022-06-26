@@ -53,7 +53,7 @@ export default function Notification({navigation}) {
         }
     },[socket, originalNotifications])
 
-    function groupNotification(data) {
+    const groupNotification = React.useCallback((data)=>{
         // this gives an object with dates as keys
         const items = data.reduce((items, item) => {
             if(item) {
@@ -76,21 +76,21 @@ export default function Notification({navigation}) {
         });
         itemsArray = itemsArray.sort((a,b) =>  new Date(b.date) - new Date(a.date));
         return itemsArray
-    }
+    })
 
-   async function getNotification(){
-       try {   
-        const response = await axios.get('/notification',config)
-        setOriginalNotifications(response.data)
-        const noti = groupNotification(response.data)
-        setNotifications(noti)
-        setNotificationLoader(false)        
-       } catch (error) {
-           console.log(error.message)
-       }
-    }
+    const getNotification = React.useCallback(async()=>{
+        try {   
+            const response = await axios.get('/notification',config)
+            setOriginalNotifications(response.data)
+            const noti = groupNotification(response.data)
+            setNotifications(noti)
+            setNotificationLoader(false)        
+        } catch (error) {
+            console.log(error.message)
+        }
+    })
 
-    async function getOrderNotification(){
+    const getOrderNotification = React.useCallback(async ()=>{
         try {
             var response = await axios.get('/order-notification/order',config)
             setOriginalOrderNotifications(response.data)
@@ -100,9 +100,9 @@ export default function Notification({navigation}) {
         } catch (error) {
             
         }
-    }
+    })
 
-   async function readNotification(){
+    const readNotification = React.useCallback(async ()=>{
         try {
             var response = await axios.get('/notification/read',config)
             setUnreadNotification(unreadNotification-unreadNormalNotificationCount)
@@ -110,9 +110,9 @@ export default function Notification({navigation}) {
         } catch (error) {
             console.log(error.request.response)
         }
-    }
-
-    async function readOrderNotification() {
+    })
+    
+    const readOrderNotification = React.useCallback(async()=>{
         try {
             await axios.get('/order-notification/read',config)
             setUnreadNotification(unreadNotification-unreadOrderNotificationCount)
@@ -120,9 +120,9 @@ export default function Notification({navigation}) {
         } catch (error) {
             console.log(error.request.response)
         }
-    }
+    })
 
-    function getDisplayDate(date) {
+    const getDisplayDate = React.useCallback((date)=>{
         const dateArr = date.split('-')
         const year = dateArr[0]
         const month = dateArr[1]
@@ -141,7 +141,7 @@ export default function Notification({navigation}) {
         } else { 
             return compDate.toDateString(); // or format it what ever way you want
         }
-    }
+    })
     
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>

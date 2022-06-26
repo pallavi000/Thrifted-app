@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 export default function BrandFilter(props) {
   const [brands, setBrands] = useState(props.brands)
 
-  function brand_filter(id){
+  const brand_filter = React.useCallback((id)=>{
     if(props.brand_id.includes(id)){
         var x = props.brand_id.filter(br=>br !=id)
         props.setBrand_id(x)
@@ -16,16 +16,16 @@ export default function BrandFilter(props) {
         var b = [...props.brand_id, id];
         props.setBrand_id(b)
     }
-  }
+  })
 
-  function searchBrand(text) {
+  const searchBrand = React.useCallback((text)=>{
     if(text.trim().length>0) {
       let filterBrands = props.brands.filter(brand=>brand.name.includes(text))
       setBrands(filterBrands)
     } else {
       setBrands(props.brands)
     }
-  }
+  })
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>

@@ -24,7 +24,7 @@ const ChangeProfile = ({navigation, route}) => {
         }
     }
 
-    async function changeProfile(data) {
+    const changeProfile = React.useCallback(async (data)=>{
         setIsSubmitting(true)
         try {
             const response = await axios.post('/user/change/profile', data, config)
@@ -32,8 +32,9 @@ const ChangeProfile = ({navigation, route}) => {
             navigation.goBack()
         } catch (error) {
             Alert.alert('Error', error.request.response)
-        }
-    }
+        }  
+    })
+
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}} >
     <ScrollView >

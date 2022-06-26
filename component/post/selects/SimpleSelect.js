@@ -6,7 +6,7 @@ const SimpleSelect = (props) => {
     const[selects, setSelects] = useState(props.selects)
     const [selectedSelect, setSelectedSelect] = useState(props.selectedSelect)
 
-    useEffect(()=>{
+    const changeHeader = React.useCallback(()=>{
         props.navigation.setOptions({
         headerShown:true,
         headerRight:()=>(
@@ -15,6 +15,10 @@ const SimpleSelect = (props) => {
                 </TouchableOpacity>
             )
         })
+    })
+
+    useEffect(()=>{
+        changeHeader()
     },[selectedSelect])
 
     function doneSelect() {

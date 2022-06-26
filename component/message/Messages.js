@@ -39,8 +39,8 @@ export default function Messages({navigation}) {
         }
     },[socket, chats])
 
-    useLayoutEffect(() => {
-      navigation.setOptions({
+    const changeHeader = React.useCallback(()=>{
+        navigation.setOptions({
             title: decode.name,
             headerRight:()=>(
                 <TouchableOpacity onPress={()=>navigation.navigate('New Chat')}>
@@ -48,6 +48,10 @@ export default function Messages({navigation}) {
                 </TouchableOpacity>
             )
         })
+    })
+
+    useLayoutEffect(() => {
+        changeHeader()
     }, [])
 
     useEffect(()=>{

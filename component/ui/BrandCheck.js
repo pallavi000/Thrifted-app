@@ -26,6 +26,7 @@ export default function BrandCheck(props) {
   )
 }
 
+
 const styles = StyleSheet.create({
     checkbox: {
         margin: 8,

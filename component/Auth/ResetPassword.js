@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View,TouchableOpacity,TextInput, Alert } from 'react-native'
+import { ScrollView, StyleSheet, Text, View,TouchableOpacity,TextInput, Alert, Dimensions } from 'react-native'
 import React from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import axios from 'axios';
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
         color:'white',
         fontFamily:'Raleway_800ExtraBold', 
         padding:20 ,
-        paddingTop:50  
+        paddingTop:Dimensions.get('window').height/15  
     },
     loginForm:{
       backgroundColor:'white',

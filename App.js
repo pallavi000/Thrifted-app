@@ -35,7 +35,6 @@ import EditPost from './component/post/EditPost';
 import OrderTrack from './component/Order/OrderTrack';
 import OrderSuccess from './component/Order/OrderSuccess';
 import * as Notifications from 'expo-notifications';
-import { greaterThan, timing } from 'react-native-reanimated';
 
 
 // axios.defaults.baseURL="http://localhost:5000/api"
@@ -188,6 +187,7 @@ export default function App(props) {
   },[])
 
   useEffect(() => {
+    console.log('hiii')
       getToken()
   }, [props,isLoggedIn])
 
@@ -195,6 +195,7 @@ export default function App(props) {
       Raleway_700Bold, Raleway_800ExtraBold, Raleway_600SemiBold,Raleway_400Regular,Raleway_500Medium
   });
   if (!fontsLoaded) {
+    console.log('font not loaded')
       return null;
   }
 

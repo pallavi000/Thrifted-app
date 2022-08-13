@@ -13,6 +13,13 @@ const CategoryFilter = (props) => {
     const [selectedCategory, setSelectedCategory] = useState(selectedCategory)
 
     React.useEffect(()=>{
+        changeHeader()
+        return() => {
+            reBuildHeader()
+        }
+    },[selectedCategory])
+
+    const changeHeader = React.useCallback(()=>{
         props.navigation.setOptions({
             headerShown:true,
             headerRight:()=>(
@@ -27,18 +34,19 @@ const CategoryFilter = (props) => {
                 </TouchableOpacity>
             )
         })
-        return() => {
-            props.navigation.setOptions({
-                headerRight: () => (<></>),
-                title: 'Filter',
-                headerLeft:()=>(
-                    <TouchableOpacity onPress={()=>props.setFilter(false)}>
-                        <Ionicons name='arrow-back' size={24}/>
-                    </TouchableOpacity>
-                )
-            })
-        }
-    },[selectedCategory])
+    })
+
+    const reBuildHeader = React.useCallback(()=>{
+        props.navigation.setOptions({
+            headerRight: () => (<></>),
+            title: 'Filter',
+            headerLeft:()=>(
+                <TouchableOpacity onPress={()=>props.setFilter(false)}>
+                    <Ionicons name='arrow-back' size={24}/>
+                </TouchableOpacity>
+            )
+        })
+    })
 
     function doneSelect() {
         props.setSelectedCategory(selectedCategory)

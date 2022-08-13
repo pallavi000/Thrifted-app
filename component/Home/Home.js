@@ -28,6 +28,7 @@ export default function Home({navigation}) {
     const[nextPage,setNextPage] = useState(true)
     const[notificationToken,setNotificationToken] = useState('')
     const[dataType, setDataType] = useState('cache')
+    const[feedSetting,setFeedSetting] = useState("followings")
     const data = useContext(AuthContext)
     const {unreadMessage, setUnreadMessage, token,unreadNotification,setUnreadNotification,socket,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount} = data
     const config = {
@@ -40,24 +41,46 @@ export default function Home({navigation}) {
 
     
 
-
-
+    async function getSwitch(){
+        try {
+            var value= JSON.parse(await  AsyncStorage.getItem('feedsettings'))
+            if(value) {
+                if(value.followings && value.interests) {
+                    setFeedSetting('all')
+                    return 'all'
+                }else if(value.followings){
+                    setFeedSetting('followings')
+                    return 'followings'
+                } else if(value.interests) {
+                    setFeedSetting('interests')
+                    return 'interests'
+                } else {
+                    return 'followings'
+                }
+            } else {
+                return 'followings'
+            }
+        } catch (error) {
+            return 'followings'
+        }
+    }
 
 
     const getProducts  = useCallback(async (currentPage, countPerPage, productOnly)=>{
         const data = {
             activePage: currentPage,
             itemsCountPerPage: countPerPage,
-            productOnly
+            productOnly,
+            feedSetting: await getSwitch()
         }
-        console.log('hiii')
+      
         try {
-            const response = await axios.post('/frontend/app/home', data)
+            const response = await axios.post('/frontend/app/home', data,config)
             if(!productOnly) {
                 setProducts(response.data.product)
-                setBanners(response.data.banner)
-                setRentProducts(response.data.rentProduct)
-                setSellProducts(response.data.saleProduct)
+                // setBanners(response.data.banner)
+                // setRentProducts(response.data.rentProduct)
+                // setSellProducts(response.data.saleProduct)
                 setCategories(response.data.categories)
                 storeInCache(response.data)
                 setDataType('real')
@@ -69,6 +92,7 @@ export default function Home({navigation}) {
             setNextPage(false)
         } catch (error) {
             Alert.alert('Error', error.request.response)
+            console.log(error.request.response)
             setLoader(false)
         }
     },[products])
@@ -166,6 +190,7 @@ export default function Home({navigation}) {
             </View>
         )
     }
+    
 
   return (
     <SafeAreaView style={{backgroundColor:'white',flex:1}}>

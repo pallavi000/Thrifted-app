@@ -18,6 +18,8 @@ export default function BrandFilter(props) {
     }
   })
 
+
+
   const searchBrand = React.useCallback((text)=>{
     if(text.trim().length>0) {
       let filterBrands = props.brands.filter(brand=>brand.name.includes(text))

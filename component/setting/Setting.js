@@ -168,6 +168,18 @@ await AsyncStorage.setItem('notifications',JSON.stringify(notification) )
 
                 <View style={styles.border}></View>
 
+                <TouchableOpacity onPress={()=>navigation.navigate('Feed Setting')} style={styles.pagesWrapper}>
+                    <View style={{flexDirection:'row',alignItems:'center'}}>
+                        <MaterialCommunityIcons name='history' size={20}></MaterialCommunityIcons>
+                        <Text style={styles.pageName}>Feed Setting</Text>
+                        </View>
+                        <View style={{flexDirection:'row'}}>
+                        <MaterialCommunityIcons name='chevron-double-right' size={20} color="#CDCDCD"></MaterialCommunityIcons>
+                    </View>
+                </TouchableOpacity>
+
+                <View style={styles.border}></View>
+
                 
 
                 <View style={styles.pagesWrapper}>

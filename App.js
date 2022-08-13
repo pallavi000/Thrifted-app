@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState,useEffect, useContext, useRef } from 'react';
 import { Alert, StyleSheet, Image, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, StackActions } from '@react-navigation/native';
 import {createNativeStackNavigator }  from '@react-navigation/native-stack'
 import Login from './component/Auth/Login'
 import Register from './component/Auth/Register';
@@ -34,13 +34,21 @@ import Redeem from './component/redeem/Redeem';
 import EditPost from './component/post/EditPost';
 import OrderTrack from './component/Order/OrderTrack';
 import OrderSuccess from './component/Order/OrderSuccess';
+import Interest from './component/Auth/Interest';
 import * as Notifications from 'expo-notifications';
+<<<<<<< HEAD
+=======
+import { greaterThan, timing } from 'react-native-reanimated';
+import { NIL } from 'uuid';
+import FeedSetting from './component/setting/FeedSetting';
+>>>>>>> 75106b4be2a111e3947d7c311f865f8421d87d9e
 
 
-// axios.defaults.baseURL="http://localhost:5000/api"
-axios.defaults.baseURL="http://167.86.77.80/api"
+axios.defaults.baseURL="http://localhost:5000/api"
+// axios.defaults.baseURL="http://167.86.77.80/api"
 
 const Stack = createNativeStackNavigator()
+
 
 
 Notifications.setNotificationHandler({
@@ -209,6 +217,8 @@ export default function App(props) {
       
       <AuthContext.Provider
       value={{
+     
+        
         isLoggedIn,getToken,unreadNotification,setUnreadNotification, socket,setIsLoggedIn,cartCount,setCartCount,token,decode,cartItems,subtotal,setCartItems,retotal,titleShown,setTitleShown,unreadMessage, setUnreadMessage,userImage,setUserImage,unreadNormalNotificationCount,setUnreadNormalNotificationCount,unreadOrderNotificationCount,setUnreadOrderNotificationCount,getCartItems
       }}>
       {isLoggedIn ?(
@@ -312,6 +322,11 @@ export default function App(props) {
                   color:'white'
                 } 
           }} component={Redeem}/> 
+
+<Stack.Screen name="Feed Setting" options={{
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+              }} component={FeedSetting}/>
 
           <Stack.Screen name='Comments' component={Comment}/>
           <Stack.Screen name="Messages" options={{

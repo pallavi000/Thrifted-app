@@ -44,12 +44,10 @@ import OrderSuccess from "./component/Order/OrderSuccess";
 import Interest from "./component/Auth/Interest";
 import * as Notifications from "expo-notifications";
 
-import { greaterThan, timing } from "react-native-reanimated";
-import { NIL } from "uuid";
 import FeedSetting from "./component/setting/FeedSetting";
 
-axios.defaults.baseURL = "http://localhost:5000/api";
-// axios.defaults.baseURL="http://167.86.77.80/api"
+// axios.defaults.baseURL = "http://localhost:5000/api";
+axios.defaults.baseURL = "http://167.86.77.80/api";
 
 const Stack = createNativeStackNavigator();
 

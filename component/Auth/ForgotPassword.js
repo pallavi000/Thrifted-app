@@ -1,179 +1,205 @@
-import { ScrollView, StatusBar,ActivityIndicator,Alert, StyleSheet,Dimensions,SafeAreaView, Text, View,TouchableOpacity,TextInput } from 'react-native'
-import React,{useState} from 'react'
-import { Ionicons } from '@expo/vector-icons'
-import { AuthContext } from '../Context';
-import axios from 'axios';
-import bbstyles from '../Styles'
-import { Formik } from 'formik';
-import * as Yup from 'yup'
+import {
+  ScrollView,
+  StatusBar,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import React, { useRef, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { AuthContext } from "../Context";
+import axios from "axios";
+import bbstyles from "../Styles";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { firebaseAuth } from "../../firebaseConfig";
+import { PhoneAuthProvider } from "firebase/auth";
+import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().required('Email is required').email('Email must be a valid email')
-})
+  phone: Yup.string().required("Phone  is required"),
+});
 
-export default function ForgotPassword({navigation}) {
+export default function ForgotPassword({ navigation }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verificationId, setVerificationId] = useState("");
+  const captchaRef = useRef();
 
-    const[isSubmitting,setIsSubmitting] = useState(false)
-
-    const changePassword = React.useCallback(async(data)=>{
-      try {
-        setIsSubmitting(true)
-        var response = await axios.post('/user/forgot/password',data)
-        if(response.data){
-          Alert.alert('Password reset link has been sent to your email')
-          navigation.navigate('resetpassword')
-        }
-        setIsSubmitting(false)
-      } catch (error) {
-        Alert.alert('Error', error.request.response)
-        setIsSubmitting(false)
+  const changePassword = React.useCallback(async (data) => {
+    try {
+      setIsSubmitting(true);
+      data.phone = "+977" + data.phone;
+      const phoneProvider = new PhoneAuthProvider(firebaseAuth);
+      const verifyId = await phoneProvider.verifyPhoneNumber(
+        data.phone,
+        captchaRef.current
+      );
+      setVerificationId(verifyId);
+      data.code = verifyId;
+      var response = await axios.post("/user/forgot/password", data);
+      if (response.data) {
+        Alert.alert("Otp has been sent to your phone");
+        navigation.navigate("resetpassword", { verificationId });
       }
-    },[])
-
-
+      setIsSubmitting(false);
+    } catch (error) {
+      Alert.alert("Error", error.request.response);
+      setIsSubmitting(false);
+    }
+  }, []);
 
   return (
-    <SafeAreaView style={{backgroundColor:'white',flex:1}}>
-    <StatusBar
-        backgroundColor="#663399"
-        barStyle="light-content"
-    />
-    <ScrollView>
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <View style={styles.loginForm}>
-        <Text style={styles.login}>Forgot Password</Text>
-       <Formik 
-       initialValues={{email:''}}
-       onSubmit={(values)=>changePassword(values)}
-       validationSchema={validationSchema}
-       >
-        {({handleSubmit,handleChange,errors,touched,handleBlur})=>(
-          <>
-          <View style={styles.formgroup}>
-          <View style={styles.labelWrapper}>
-            <Ionicons name="mail-outline" size={14} color={'#868686'}></Ionicons>
-            <Text style={styles.label} >Email</Text>
+    <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+      <FirebaseRecaptchaVerifierModal
+        ref={captchaRef}
+        firebaseConfig={firebaseAuth.config}
+      />
+      <StatusBar backgroundColor="#663399" barStyle="light-content" />
+      <ScrollView>
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <View style={styles.loginForm}>
+            <Text style={styles.login}>Forgot Password</Text>
+            <Formik
+              initialValues={{ phone: "" }}
+              onSubmit={(values) => changePassword(values)}
+              validationSchema={validationSchema}
+            >
+              {({
+                handleSubmit,
+                handleChange,
+                errors,
+                touched,
+                handleBlur,
+              }) => (
+                <>
+                  <View style={styles.formgroup}>
+                    <View style={styles.labelWrapper}>
+                      <Ionicons
+                        name="mail-outline"
+                        size={14}
+                        color={"#868686"}
+                      ></Ionicons>
+                      <Text style={styles.label}>Phone Number</Text>
+                    </View>
+                    <TextInput
+                      keyboardType="phone-pad"
+                      style={styles.inputField}
+                      onChangeText={handleChange("phone")}
+                      onBlur={handleBlur("phone")}
+                    ></TextInput>
+                    {touched.phone && errors.phone ? (
+                      <Text style={bbstyles.error}>{errors.phone}</Text>
+                    ) : null}
+                  </View>
+                  {isSubmitting ? (
+                    <TouchableOpacity style={styles.loginBtn}>
+                      <ActivityIndicator size={24} color="#fff" />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={handleSubmit}
+                      style={styles.loginBtn}
+                    >
+                      <View>
+                        <Text style={styles.loginText}>Submit</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+            </Formik>
           </View>
-          <TextInput keyboardType='email-address'
-           style={styles.inputField}
-            onChangeText={handleChange('email')} 
-            onBlur={handleBlur('email')}
-            ></TextInput>
-            {touched.email&& errors.email?(
-              <Text style={bbstyles.error}>{errors.email}</Text>
-            ):(null)}
         </View>
-        {isSubmitting ?(
-          <TouchableOpacity style={styles.loginBtn}>
-          <ActivityIndicator size={24} color='#fff'/>
-        </TouchableOpacity>
-        ):(
-        <TouchableOpacity onPress={handleSubmit} style={styles.loginBtn}>
-          <View><Text style={styles.loginText}>Submit</Text></View>
-        </TouchableOpacity>
-
-        )}
-          </>
-        )}
-
-       </Formik>
-        
-      </View>
-    </View>
-
-  </ScrollView>
-  </SafeAreaView>
-  )
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container:{
-      backgroundColor:'#663399',  
-      
-   
-   
-    },
-   
-    title:{
-        fontWeight: '800',
-        fontSize: 50,
-        color:'white',
-        fontFamily:'Raleway_800ExtraBold', 
-        padding:20 ,
-       paddingVertical:Dimensions.get('window').height/15
-    },
-    loginForm:{
-      backgroundColor:'white',
-      color:'black',
-     borderTopRightRadius:18,
-     borderTopLeftRadius:18,
-      flex:1,
-      padding:30
-    },
-    login:{
-      fontWeight:'700',
-      fontSize:18,
-      fontFamily:'Raleway_700Bold',
-      marginBottom:30
-    
-    },
-    formgroup:{
-      marginBottom:20,
- 
-    
-   
-    },
-    labelWrapper:{
-      display:'flex',
-      flexDirection:'row',
-      alignItems:'center',
-      marginBottom:5
-    },
-    label:{
-      fontSize:12,
-      fontWeight:'600',
-      fontFamily:'Raleway_700Bold',
-      color:'#868686',
-      marginLeft:5,
-     
-    },
-    inputField:{
-      paddingVertical:5,
-      paddingHorizontal:5,
-      borderBottomColor:'#c4c4c4',
-      borderBottomWidth:1,
-       
-    },
-    forgot:{
-      fontSize:15,
-      fontWeight:'600',
-      fontFamily:'Raleway_600SemiBold',
-      color:'#663399',
-      marginTop:10
-    },
-    loginBtn:{
-    paddingVertical:10,
-    paddingHorizontal:10,
-    width:Dimensions.get('window').width-60,
-    backgroundColor:'#663399',
-    borderRadius:10,
-    marginTop:30,
-    marginBottom:30
-    },
-    loginText:{
-    textAlign:'center',
-    fontFamily:'Raleway_700Bold',
-    fontWeight:'700',
-    fontSize:18,
-    color:'white',
-    },
-    create:{
-     fontSize:15,
-     fontWeight:'600',
-     fontFamily:'Raleway_600SemiBold',
-     color:'#663399',
-     marginTop:10,
-     textAlign:'center'
-    }
-})
+  container: {
+    backgroundColor: "#663399",
+  },
+
+  title: {
+    fontWeight: "800",
+    fontSize: 50,
+    color: "white",
+    fontFamily: "Raleway_800ExtraBold",
+    padding: 20,
+    paddingVertical: Dimensions.get("window").height / 15,
+  },
+  loginForm: {
+    backgroundColor: "white",
+    color: "black",
+    borderTopRightRadius: 18,
+    borderTopLeftRadius: 18,
+    flex: 1,
+    padding: 30,
+  },
+  login: {
+    fontWeight: "700",
+    fontSize: 18,
+    fontFamily: "Raleway_700Bold",
+    marginBottom: 30,
+  },
+  formgroup: {
+    marginBottom: 20,
+  },
+  labelWrapper: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "600",
+    fontFamily: "Raleway_700Bold",
+    color: "#868686",
+    marginLeft: 5,
+  },
+  inputField: {
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    borderBottomColor: "#c4c4c4",
+    borderBottomWidth: 1,
+  },
+  forgot: {
+    fontSize: 15,
+    fontWeight: "600",
+    fontFamily: "Raleway_600SemiBold",
+    color: "#663399",
+    marginTop: 10,
+  },
+  loginBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    width: Dimensions.get("window").width - 60,
+    backgroundColor: "#663399",
+    borderRadius: 10,
+    marginTop: 30,
+    marginBottom: 30,
+  },
+  loginText: {
+    textAlign: "center",
+    fontFamily: "Raleway_700Bold",
+    fontWeight: "700",
+    fontSize: 18,
+    color: "white",
+  },
+  create: {
+    fontSize: 15,
+    fontWeight: "600",
+    fontFamily: "Raleway_600SemiBold",
+    color: "#663399",
+    marginTop: 10,
+    textAlign: "center",
+  },
+});

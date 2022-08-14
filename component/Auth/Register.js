@@ -28,7 +28,7 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().required().email("Email is required."),
   password: Yup.string().required("Password is Required."),
   name: Yup.string().required("Full Name is Required."),
-  number: Yup.string().required("Number is required."),
+  phone: Yup.string().required("Phone Number is required."),
 });
 
 export default function Register({ navigation }) {
@@ -39,14 +39,13 @@ export default function Register({ navigation }) {
   const [formData, setFormData] = useState();
   const [verificationId, setVerificationId] = useState(null);
 
-  const sendOTP = React.useCallback(async (data) => {
+  const sendOTP = async () => {
     try {
-      setFormData(data);
       setIsSubmitting(true);
-      data.number = "+977" + data.number;
+      formData.phone = "+977" + formData.phone;
       const phoneProvider = new PhoneAuthProvider(firebaseAuth);
       const response = await phoneProvider.verifyPhoneNumber(
-        data.number,
+        formData.phone,
         captchaRef.current
       );
       setVerificationId(response);
@@ -56,13 +55,25 @@ export default function Register({ navigation }) {
       setIsSubmitting(false);
       Alert.alert("Error", "Some Error Occurred.");
     }
-  });
+  };
+
+  async function verifyEmail(data) {
+    try {
+      setFormData(data);
+      setIsSubmitting(true);
+      const response = await axios.post("/user/check/email", data);
+      await sendOTP();
+    } catch (error) {
+      setIsSubmitting(false);
+      console.log(error.message);
+      Alert.alert("Error", error.request.response);
+    }
+  }
 
   const registerForm = async () => {
     try {
-      const { number, ...data } = formData;
       setIsSubmitting(true);
-      var response = await axios.post("/user/all", data);
+      var response = await axios.post("/user/all", formData);
       if (response.data) {
         await AsyncStorage.setItem("token", response.data.token);
         setIsLoggedIn(true);
@@ -81,6 +92,7 @@ export default function Register({ navigation }) {
         ref={captchaRef}
         firebaseConfig={firebaseAuth.config}
       />
+
       <StatusBar backgroundColor="#663399" barStyle="light-content" />
       {otpScreen ? (
         <OTP
@@ -102,9 +114,9 @@ export default function Register({ navigation }) {
                   email: "",
                   password: "",
                   name: "",
-                  number: "",
+                  phone: "",
                 }}
-                onSubmit={(values) => sendOTP(values)}
+                onSubmit={(values) => verifyEmail(values)}
                 validationSchema={validationSchema}
               >
                 {({
@@ -166,12 +178,12 @@ export default function Register({ navigation }) {
                       <TextInput
                         keyboardType="phone-pad"
                         style={styles.inputField}
-                        onChangeText={handleChange("number")}
-                        onBlur={handleBlur("number")}
+                        onChangeText={handleChange("phone")}
+                        onBlur={handleBlur("phone")}
                         placeholder="98XXXXXXXX"
                       ></TextInput>
-                      {touched.number && errors.number ? (
-                        <Text style={bbstyles.error}>{errors.number}</Text>
+                      {touched.phone && errors.phone ? (
+                        <Text style={bbstyles.error}>{errors.phone}</Text>
                       ) : null}
                     </View>
 

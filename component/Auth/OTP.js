@@ -39,7 +39,9 @@ const OTP = ({
       setIsSubmitting(false);
       await registerForm();
     } catch (error) {
+      console.log(error)
       Alert.alert("Error", "Some Error Occurred.");
+      setIsSubmitting(false);
     }
   }
 

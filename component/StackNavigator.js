@@ -21,6 +21,7 @@ import RedeemHistory from "./redeem/RedeemHistory";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AuthContext } from "./Context";
 import Notification from "./notification/Notification";
+import Interest from "./Auth/Interest";
 
 const Stack = createNativeStackNavigator();
 
@@ -375,7 +376,22 @@ function profileNavigation({ navigation }) {
         }}
         component={OrderDetail}
       />
-
+      <Stack.Screen
+        name="Interest Setting"
+        options={{
+          headerStyle: {
+            backgroundColor: "#fff",
+            borderWidth: 0,
+          },
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: "700",
+          },
+        }}
+        component={Interest}
+      />
       <Stack.Screen
         options={{
           headerTitleAlign: "center",

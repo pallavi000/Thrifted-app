@@ -12,7 +12,7 @@ import axios from "axios";
 import BrandCheck from "../ui/BrandCheck";
 import { AuthContext } from "../Context";
 
-export default function Interest() {
+export default function Interest({ navigation }) {
   const [category_ids, setCategory_ids] = useState([]);
   const [categories, setCategories] = useState([]);
   const [user, setUser] = useState({});
@@ -92,6 +92,7 @@ export default function Interest() {
         data,
         config
       );
+      navigation.navigate("landing");
     } catch (error) {
       Alert.alert("Error", "Server Error");
     }
@@ -215,6 +216,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     position: "absolute",
     bottom: 0,
+    width: "100%",
   },
   activeBrand: {
     color: "#663399",

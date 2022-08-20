@@ -1,4 +1,4 @@
-import { StyleSheet, Switch, Text, View } from "react-native";
+import { StyleSheet, Switch, Text, View, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import {
   MaterialCommunityIcons,
@@ -9,7 +9,7 @@ import {
 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function FeedSetting() {
+export default function FeedSetting({ navigation }) {
   const [followings, setFollowings] = useState(false);
   const [interests, setInterests] = useState(false);
 
@@ -79,6 +79,16 @@ export default function FeedSetting() {
             value={interests}
           />
         </View>
+      </View>
+
+      <View style={styles.pagesWrapper}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Interest Setting")}
+          style={{ flexDirection: "row", alignItems: "center" }}
+        >
+          <MaterialIcons name="notifications-none" size={20}></MaterialIcons>
+          <Text style={styles.pageName}>Interests Setting</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

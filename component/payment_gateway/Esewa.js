@@ -1,56 +1,58 @@
-import React,{useCallback,useEffect} from 'react';
-import { SafeAreaView, Alert } from 'react-native';
-import axios from 'axios'
+import React, { useCallback, useEffect } from "react";
+import { SafeAreaView, Alert } from "react-native";
+import axios from "axios";
 
-import { EsewaSdk } from 'rn-all-nepal-payment';
+import { EsewaSdk } from "rn-all-nepal-payment";
 
 const Esewa = (props) => {
   const [isVisible, setisVisible] = React.useState(false);
-  const [response, setResponse] = React.useState('');
+  const [response, setResponse] = React.useState("");
 
-  const _onPaymentComplete = useCallback(async(response)=>{
+  const _onPaymentComplete = useCallback(async (response) => {
     setResponse(response);
-    props.setVisible(false)
-    props.setIsSubmitting(true)
-    if(response.token) {
+    props.setVisible(false);
+    props.setIsSubmitting(true);
+    if (response.token) {
       const data = {
-        total:props.subtotal+props.shippingFee,
-        shipping:props.shippingFee,
-        note: '',
-        transaction_id:props.pid,
-        payment_method:'esewa',
-        amt:response.amount,
+        total: props.subtotal + props.shippingFee,
+        shipping: props.shippingFee,
+        note: "",
+        transaction_id: props.pid,
+        payment_method: "esewa",
+        amt: response.amount,
         rid: response.token,
-        pid: props.pid
-      }
+        pid: props.pid,
+        shipping_id: props.shippingAddress?._id,
+        billing_id: props.sameBilling
+          ? props.shippingAddress?._id
+          : props.billingAddress?._id,
+      };
       try {
-        await axios.post('/order',data, props.config)
-        Alert.alert('Success','Payment Success')
-        props.setIsSubmitting(false)
-        props.orderSuccess()
+        await axios.post("/order", data, props.config);
+        Alert.alert("Success", "Payment Success");
+        props.setIsSubmitting(false);
+        props.orderSuccess();
       } catch (error) {
-        props.setIsSubmitting(false)
-        Alert.alert('Error', error.request.response)
+        props.setIsSubmitting(false);
+        Alert.alert("Error", error.request.response);
       }
     } else {
-      props.setIsSubmitting(false)
+      props.setIsSubmitting(false);
     }
-    return
-  })
+    return;
+  });
 
-  useEffect(()=>{
-    setisVisible(props.visible)
-  },[props])
+  useEffect(() => {
+    setisVisible(props.visible);
+  }, [props]);
 
   return (
     <SafeAreaView>
-     
-
       <EsewaSdk
         amt={props.total} // Amount of product or item or ticket etc
         taxAmt={0} // Tax amount on product or item or ticket etc
         totalAmt={props.total} // Total payment amount including tax, service and deliver charge. [i.e tAmt = amt + txAmt + psc + tAmt]
-        env={'EPAYTEST'} // Merchant code provided by eSewa
+        env={"EPAYTEST"} // Merchant code provided by eSewa
         testMode={true} // Boolean value for enabling test endpoint and real payment gateway
         isVisible={isVisible} // Bool to show modal
         onPaymentComplete={_onPaymentComplete} //  Callback from connectips Web Sdk
@@ -62,6 +64,6 @@ const Esewa = (props) => {
       />
     </SafeAreaView>
   );
-}
+};
 
 export default Esewa;

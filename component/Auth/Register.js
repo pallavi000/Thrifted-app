@@ -23,6 +23,7 @@ import { firebaseAuth, firebaseApp } from "../../firebaseConfig";
 import { PhoneAuthProvider } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import OTP from "./OTP";
+import { NIL } from "uuid";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email("Email is required."),
@@ -38,7 +39,6 @@ export default function Register({ navigation }) {
   const [otpScreen, setOtpScreen] = useState(false);
   const [formData, setFormData] = useState();
   const [verificationId, setVerificationId] = useState(null);
-
   const sendOTP = async () => {
     try {
       setIsSubmitting(true);

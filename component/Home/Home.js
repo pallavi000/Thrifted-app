@@ -101,10 +101,10 @@ export default function Home({ navigation }) {
       console.log(response.data.product.length);
       if (!productOnly) {
         setProducts(response.data.product);
+        setCategories(response.data.categories);
         var receiveDate = new Date().getTime();
         var responseTimeMs = receiveDate - sendDate;
         console.log(responseTimeMs / 1000);
-        setCategories(response.data.categories);
         storeInCache(response.data);
         setDataType("real");
       } else {
@@ -301,6 +301,7 @@ export default function Home({ navigation }) {
               keyExtractor={(item) => item._id}
               renderItem={renderItem}
               onEndReached={GetNextPage}
+              onEndReachedThreshold={4}
               ListFooterComponent={() =>
                 hasNextPage && (
                   <ActivityIndicator size={"large"} color="#663399" />

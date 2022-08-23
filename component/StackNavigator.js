@@ -25,7 +25,7 @@ import Interest from "./Auth/Interest";
 
 const Stack = createNativeStackNavigator();
 
-function homeNavigation(props) {
+function HomeNavigation(props) {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -204,7 +204,7 @@ function CartNavigation() {
   );
 }
 
-function categoryNavigation(props) {
+function CategoryNavigation(props) {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -271,7 +271,7 @@ function categoryNavigation(props) {
   );
 }
 
-function profileNavigation({ navigation }) {
+function ProfileNavigation({ navigation }) {
   const data = useContext(AuthContext);
   const { setIsLoggedIn } = data;
 
@@ -446,8 +446,8 @@ function profileNavigation({ navigation }) {
 }
 
 export {
-  homeNavigation,
-  profileNavigation,
+  HomeNavigation,
+  ProfileNavigation,
   CartNavigation,
-  categoryNavigation,
+  CategoryNavigation,
 };

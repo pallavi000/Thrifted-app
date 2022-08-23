@@ -89,7 +89,7 @@ export default function Notification({ navigation }) {
         ]);
       });
     }
-  }, [socket, originalNotifications]);
+  }, [socket, originalNotifications, originalOrderNotifications]);
 
   const groupNotification = React.useCallback((data) => {
     // this gives an object with dates as keys

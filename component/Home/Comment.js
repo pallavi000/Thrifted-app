@@ -27,7 +27,7 @@ export default function Comment({ navigation, route }) {
   const post_id = route.params;
 
   const data = useContext(AuthContext);
-  const { decode, token, userImage } = data;
+  const { decode, token, userImage, products, setProducts } = data;
   const config = {
     headers: {
       "access-token": token,
@@ -106,11 +106,19 @@ export default function Comment({ navigation, route }) {
           config
         );
         setComments([...comments, response.data]);
+        const newproducts = [...products];
+        const index = newproducts.findIndex(
+          (product) => product._id == post_id
+        );
+        if (index != -1) {
+          newproducts[index].comments_count += 1;
+          setProducts(newproducts);
+        }
       } catch (error) {
         console.log(error.request.response);
       }
     },
-    [comments]
+    [comments, products]
   );
 
   return (

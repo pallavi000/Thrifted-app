@@ -92,7 +92,7 @@ export default function Interest({ navigation }) {
         data,
         config
       );
-      navigation.navigate("landing");
+      navigation.navigate(-1);
     } catch (error) {
       Alert.alert("Error", "Server Error");
     }

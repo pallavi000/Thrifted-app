@@ -37,9 +37,10 @@ export default function Home({ navigation }) {
   const [itemsCountPerPage, setItemsCountPerPage] = useState(10);
   const [loader, setLoader] = useState(true);
   const [nextPage, setNextPage] = useState(true);
+  const [hasNextPage, setHasNextPage] = useState(true);
   const [notificationToken, setNotificationToken] = useState("");
   const [dataType, setDataType] = useState("cache");
-  const [feedSetting, setFeedSetting] = useState("followings");
+  const [feedSetting, setFeedSetting] = useState(null);
   const data = useContext(AuthContext);
   const {
     unreadMessage,
@@ -84,39 +85,49 @@ export default function Home({ navigation }) {
     }
   }
 
-  const getProducts = useCallback(
-    async (currentPage, countPerPage, productOnly) => {
-      const data = {
-        activePage: currentPage,
-        itemsCountPerPage: countPerPage,
-        productOnly,
-        feedSetting: await getSwitch(),
-      };
+  const getProducts = async (currentPage, countPerPage, productOnly) => {
+    const data = {
+      activePage: currentPage,
+      itemsCountPerPage: countPerPage,
+      productOnly,
+      feedSetting: feedSetting || (await getSwitch()),
+    };
 
-      try {
-        const response = await axios.post("/frontend/app/home", data, config);
-        if (!productOnly) {
-          setProducts(response.data.product);
-          // setBanners(response.data.banner)
-          // setRentProducts(response.data.rentProduct)
-          // setSellProducts(response.data.saleProduct)
-          setCategories(response.data.categories);
-          storeInCache(response.data);
-          setDataType("real");
-        } else {
-          setProducts([...products, ...response.data.product]);
-        }
-        console.log("results");
-        setLoader(false);
-        setNextPage(false);
-      } catch (error) {
-        Alert.alert("Error", error.request.response);
-        console.log(error.request.response);
-        setLoader(false);
+    try {
+      var sendDate = new Date().getTime();
+      console.log("before", (new Date().getTime() - sendDate) / 1000);
+      const response = await axios.post("/frontend/app/home", data, config);
+      console.log("after", (new Date().getTime() - sendDate) / 1000);
+      console.log(response.data.product.length);
+      if (!productOnly) {
+        setProducts(response.data.product);
+        var receiveDate = new Date().getTime();
+        var responseTimeMs = receiveDate - sendDate;
+        console.log(responseTimeMs / 1000);
+        setCategories(response.data.categories);
+        storeInCache(response.data);
+        setDataType("real");
+      } else {
+        setProducts([...products, ...response.data.product]);
       }
-    },
-    [products]
-  );
+      var receiveDate = new Date().getTime();
+      var responseTimeMs = receiveDate - sendDate;
+      console.log(responseTimeMs / 1000);
+      if (response.data.product.length != itemsCountPerPage) {
+        setHasNextPage(false);
+      }
+      if (!response.data.product.length) {
+        setHasNextPage(false);
+      }
+      setLoader(false);
+      setNextPage(false);
+    } catch (error) {
+      console.log(error.message);
+      Alert.alert("Error", error.request.response);
+      console.log(error.request.response);
+      setLoader(false);
+    }
+  };
 
   const storeInCache = useCallback(async (data) => {
     try {
@@ -143,7 +154,7 @@ export default function Home({ navigation }) {
 
   const GetNextPage = useCallback(() => {
     setActivePage(activePage + 1);
-    if (!nextPage) {
+    if (!nextPage && hasNextPage) {
       setNextPage(true);
       getProducts(activePage + 1, itemsCountPerPage, true);
     }
@@ -290,9 +301,11 @@ export default function Home({ navigation }) {
               keyExtractor={(item) => item._id}
               renderItem={renderItem}
               onEndReached={GetNextPage}
-              ListFooterComponent={() => (
-                <ActivityIndicator size={"large"} color="#663399" />
-              )}
+              ListFooterComponent={() =>
+                hasNextPage && (
+                  <ActivityIndicator size={"large"} color="#663399" />
+                )
+              }
             />
           </View>
         </>

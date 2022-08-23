@@ -65,14 +65,17 @@ export default function App(props) {
   const [token, setToken] = useState("");
   const [decode, setDecode] = useState([]);
   const [cartItems, setCartItems] = useState([]);
+  const [products, setProducts] = useState([]);
   const [subtotal, setSubtotal] = useState([]);
   const [loadingComplete, setLoadingComplete] = useState(false);
+
   const [unreadMessage, setUnreadMessage] = useState(0);
   const [unreadNotification, setUnreadNotification] = useState(0);
   const [unreadNormalNotificationCount, setUnreadNormalNotificationCount] =
     useState(0);
   const [unreadOrderNotificationCount, setUnreadOrderNotificationCount] =
     useState(0);
+
   const [userImage, setUserImage] = useState();
   const [appReady, setAppReady] = useState(false);
   const socket = useRef();
@@ -129,8 +132,20 @@ export default function App(props) {
     setCartItems(cartitems);
   }, []);
 
+  function handleErrors(e) {
+    console.log(e);
+  }
+
   useEffect(() => {
     if (socket.current) {
+      console.log("current");
+      socket.current.on("connect_error", (err) => handleErrors(err));
+      socket.current.on("connect_failed", (err) => handleErrors(err));
+      socket.current.on("disconnect", (err) => handleErrors(err));
+
+      socket.current.on("conversation", (conversation) => {
+        console.log("app");
+      });
       socket.current.on("receiveMessage", (message) => {
         setUnreadMessage(unreadMessage + 1);
       });
@@ -146,12 +161,16 @@ export default function App(props) {
     unreadNormalNotificationCount,
   ]);
 
-  const socketConnect = React.useCallback((decoded) => {
-    socket.current = io("http://167.86.77.80");
+  const socketConnect = (decoded) => {
+    socket.current = io("http://167.86.77.80", {
+      reconnection: true,
+      reconnectionAttempts: "Infinity",
+      reconnectionDelay: 1000,
+    });
     socket.current.on("connect", () => {
       socket.current.emit("join", decoded._id);
     });
-  }, []);
+  };
 
   const userImageSet = React.useCallback(async (decoded) => {
     try {
@@ -204,7 +223,6 @@ export default function App(props) {
   }, []);
 
   useEffect(() => {
-    console.log("hiii");
     getToken();
   }, [props, isLoggedIn]);
 
@@ -252,6 +270,8 @@ export default function App(props) {
             unreadOrderNotificationCount,
             setUnreadOrderNotificationCount,
             getCartItems,
+            setProducts,
+            products,
           }}
         >
           {isLoggedIn ? (

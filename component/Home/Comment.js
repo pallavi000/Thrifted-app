@@ -190,6 +190,7 @@ export default function Comment({ navigation, route }) {
             returnKeyLabel="Send"
             placeholder="Write a comment..."
             onSubmitEditing={() => addComment(newComment)}
+            selectionColor="#663399"
           ></TextInput>
         </View>
         {newComment.trim() ? (

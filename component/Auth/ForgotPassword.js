@@ -93,6 +93,7 @@ export default function ForgotPassword({ navigation }) {
                       style={styles.inputField}
                       onChangeText={handleChange("phone")}
                       onBlur={handleBlur("phone")}
+                      selectionColor="#663399"
                     ></TextInput>
                     {touched.phone && errors.phone ? (
                       <Text style={bbstyles.error}>{errors.phone}</Text>

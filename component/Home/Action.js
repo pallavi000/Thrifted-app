@@ -31,9 +31,13 @@ import Animated, {
 } from "react-native-reanimated";
 import ExpoFastImage from "expo-fast-image";
 import {
+  GestureHandlerRootView,
   PinchGestureHandler,
+  State,
   TapGestureHandler,
 } from "react-native-gesture-handler";
+
+import { SliderBox } from "react-native-image-slider-box";
 
 export default React.memo(function Action(props) {
   const [comment, setComment] = useState("");
@@ -74,42 +78,58 @@ export default React.memo(function Action(props) {
   const WIDTH = Dimensions.get("window").width;
   const HEIGHT = 400;
 
-  const pinchHandler = useCallback(() => {
-    useAnimatedGestureHandler({
-      onStart: (event) => {
-        if (event.numberOfPointers == 2) {
+  const pinchHandler = useAnimatedGestureHandler({
+    onStart: (event) => {
+      if (event.numberOfPointers == 2) {
+        focalX.value = event.focalX;
+        focalY.value = event.focalY;
+      }
+    },
+    onActive: (event) => {
+      if (event.numberOfPointers == 2) {
+        // On Android, the onStart event gives 0,0 for the focal
+        // values, so we set them here instead too.
+        if (event.oldState === 2) {
           focalX.value = event.focalX;
           focalY.value = event.focalY;
         }
-      },
-      onActive: (event) => {
-        if (event.numberOfPointers == 2) {
-          // On Android, the onStart event gives 0,0 for the focal
-          // values, so we set them here instead too.
-          if (event.oldState === 2) {
-            focalX.value = event.focalX;
-            focalY.value = event.focalY;
-          }
-          scaleCurrent.value = event.scale;
+        scaleCurrent.value = event.scale;
+        xCurrent.value = (1 - scaleCurrent.value) * (focalX.value - WIDTH / 2);
+        yCurrent.value = (1 - scaleCurrent.value) * (focalY.value - HEIGHT / 2);
+      }
+    },
+    onCancel: () => {
+      focalX.value = 0;
+      focalY.value = 0;
+      xCurrent.value = 0;
+      yCurrent.value = 0;
+      xPrevious.value = 0;
+      yPrevious.value = 0;
+      scaleCurrent.value = 1;
+      scalePrevious.value = 1;
+    },
+    onEnd: () => {
+      focalX.value = 0;
+      focalY.value = 0;
+      xCurrent.value = 0;
+      yCurrent.value = 0;
+      xPrevious.value = 0;
+      yPrevious.value = 0;
+      scaleCurrent.value = 1;
+      scalePrevious.value = 1;
+    },
+  });
 
-          xCurrent.value =
-            (1 - scaleCurrent.value) * (focalX.value - WIDTH / 2);
-          yCurrent.value =
-            (1 - scaleCurrent.value) * (focalY.value - HEIGHT / 2);
-        }
-      },
-      onEnd: () => {
-        focalX.value = 0;
-        focalY.value = 0;
-        xCurrent.value = 0;
-        yCurrent.value = 0;
-        xPrevious.value = 0;
-        yPrevious.value = 0;
-        scaleCurrent.value = 1;
-        scalePrevious.value = 1;
-      },
-    });
-  }, []);
+  const pinchHandlerStateChange = (event) => {
+    //start
+    if (event.nativeEvent.state === State.ACTIVE) {
+      props.setEnableScroll(false);
+    }
+    // ends
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      props.setEnableScroll(true);
+    }
+  };
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -259,31 +279,37 @@ export default React.memo(function Action(props) {
             </View>
           ) : null}
 
-          <TapGestureHandler onActivated={() => singleOrDoubleClick(product)}>
-            <View style={styles.productImage}>
-              <PinchGestureHandler onGestureEvent={pinchHandler}>
-                {/* <ExpoFastImage
+          <GestureHandlerRootView style={{ flex: 1, zIndex: 99 }}>
+            <TapGestureHandler onActivated={() => singleOrDoubleClick(product)}>
+              <View style={styles.productImage}>
+                <PinchGestureHandler
+                  onGestureEvent={pinchHandler}
+                  onHandlerStateChange={pinchHandlerStateChange}
+                >
+                  {/* <ExpoFastImage
                         uri={imageLink+product.image} // image address
                         cacheKey={product._id} // could be a unque id
                         style={styles.productImage} // your custom style object
                         // any supported props by Image
                     /> */}
-                <Animated.Image
-                  source={{ uri: imageLink + product.image }}
-                  style={[styles.productImage, animatedStyle]}
-                />
-              </PinchGestureHandler>
-            </View>
-          </TapGestureHandler>
+                  <Animated.Image
+                    source={{ uri: imageLink + product.image }}
+                    style={[styles.productImage, animatedStyle]}
+                  />
+                </PinchGestureHandler>
+              </View>
+            </TapGestureHandler>
+          </GestureHandlerRootView>
 
           {/* <SliderBox
-                images={parseImages(product.image, product.feature_image)}
-                ImageComponentStyle	= {styles.productImage}
-                dotColor="#663399"
-                imageLoadingColor="#663399"
-                activeOpacity={1}
-                onCurrentImagePressed={()=>singleOrDoubleClick(product)}
-                /> */}
+            images={parseImages(product.image, product.feature_image)}
+            ImageComponentStyle={styles.productImage}
+            dotColor="#663399"
+            imageLoadingColor="#663399"
+            activeOpacity={1}
+            onCurrentImagePressed={() => singleOrDoubleClick(product)}
+            pagingEnabled
+          /> */}
 
           <View style={styles.productreview}>
             <TouchableOpacity
@@ -459,7 +485,7 @@ const styles = StyleSheet.create({
     height: 400,
     width: Dimensions.get("window").width,
     resizeMode: "cover",
-    zIndex: 2,
+    zIndex: 99,
   },
   typeWrapper: {
     display: "flex",

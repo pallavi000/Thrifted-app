@@ -22,6 +22,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AuthContext } from "./Context";
 import Notification from "./notification/Notification";
 import Interest from "./Auth/Interest";
+import RentSale from "./Home/RentSale";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +39,23 @@ function HomeNavigation(props) {
         }}
         name="landing"
         component={Home}
+      />
+
+      <Stack.Screen
+        name="RentSale"
+        options={{
+          headerStyle: {
+            backgroundColor: "#fff",
+            borderWidth: 0,
+          },
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: "700",
+          },
+        }}
+        component={RentSale}
       />
 
       <Stack.Screen

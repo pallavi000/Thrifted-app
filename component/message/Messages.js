@@ -148,6 +148,7 @@ export default function Messages({ navigation }) {
             style={styles.searchText}
             keyboardType="default"
             placeholder="Search"
+            selectionColor="#663399"
             onChangeText={(text) => searchChats(text)}
           ></TextInput>
         </View>

@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Image,
   StyleSheet,
@@ -18,21 +24,25 @@ import {
   Button,
 } from "react-native";
 import axios from "axios";
-import { Ionicons, Feather, MaterialIcons, Fontisto } from "@expo/vector-icons";
+import {
+  Ionicons,
+  Feather,
+  MaterialIcons,
+  Fontisto,
+  FontAwesome,
+} from "@expo/vector-icons";
 import bbstyles from "../Styles";
 import { imageLink } from "../ImageLink";
 import { AuthContext } from "../Context";
 import { useIsFocused } from "@react-navigation/native";
 import Action from "./Action";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Header from "./Header";
+import HomepagePosts from "./HomepagePosts";
 
 export default function Home({ navigation }) {
   const [products, setProducts] = useState([]);
-  const [banners, setBanners] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [sellProducts, setSellProducts] = useState([]);
-  const [rentProducts, setRentProducts] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
   const [activePage, setActivePage] = useState(1);
   const [itemsCountPerPage, setItemsCountPerPage] = useState(10);
   const [loader, setLoader] = useState(true);
@@ -41,6 +51,8 @@ export default function Home({ navigation }) {
   const [notificationToken, setNotificationToken] = useState("");
   const [dataType, setDataType] = useState("cache");
   const [feedSetting, setFeedSetting] = useState(null);
+  const [showDropDown, setShowDropDown] = useState(false);
+
   const data = useContext(AuthContext);
   const {
     unreadMessage,
@@ -95,9 +107,7 @@ export default function Home({ navigation }) {
 
     try {
       var sendDate = new Date().getTime();
-      console.log("before", (new Date().getTime() - sendDate) / 1000);
       const response = await axios.post("/frontend/app/home", data, config);
-      console.log("after", (new Date().getTime() - sendDate) / 1000);
       console.log(response.data.product.length);
       if (!productOnly) {
         setProducts(response.data.product);
@@ -110,9 +120,6 @@ export default function Home({ navigation }) {
       } else {
         setProducts([...products, ...response.data.product]);
       }
-      var receiveDate = new Date().getTime();
-      var responseTimeMs = receiveDate - sendDate;
-      console.log(responseTimeMs / 1000);
       if (response.data.product.length != itemsCountPerPage) {
         setHasNextPage(false);
       }
@@ -122,9 +129,7 @@ export default function Home({ navigation }) {
       setLoader(false);
       setNextPage(false);
     } catch (error) {
-      console.log(error.message);
       Alert.alert("Error", error.request.response);
-      console.log(error.request.response);
       setLoader(false);
     }
   };
@@ -197,47 +202,12 @@ export default function Home({ navigation }) {
     getProducts(1, itemsCountPerPage, false);
   });
 
-  const renderItem = useCallback(
-    ({ item, index }) => originalRenderItem({ item, index }),
-    [products, categories]
-  );
-
-  const originalRenderItem = ({ item, index }) => {
-    return (
-      <View>
-        {index == 0 ? (
-          <FlatList
-            contentContainerStyle={styles.wrapper}
-            keyExtractor={(item) => item._id}
-            horizontal={true}
-            data={categories}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                key={item._id}
-                onPress={() => navigation.navigate("Category Title", item)}
-                style={styles.cateWrapper}
-              >
-                <Image
-                  style={styles.category}
-                  source={{ uri: imageLink + item.image }}
-                />
-                <Text numberOfLines={1} style={styles.cateText}>
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            )}
-          />
-        ) : null}
-        <Action
-          product={item}
-          dataType={dataType}
-          products={products}
-          setProducts={setProducts}
-          navigation={navigation}
-        />
-      </View>
-    );
+  const goToRentSalePage = (type) => {
+    setShowDropDown(false);
+    navigation.navigate("RentSale", {
+      type,
+      feedSetting,
+    });
   };
 
   return (
@@ -249,64 +219,45 @@ export default function Home({ navigation }) {
         </View>
       ) : (
         <>
-          <View style={styles.homeNav}>
-            <View style={styles.navlogo}>
-              <Feather name="instagram" size={30} color="black" />
-            </View>
-            <View style={styles.navcontent}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Search")}
-                style={styles.icons}
-              >
-                <Image
-                  source={require("../../assets/icons/Search.png")}
-                  style={styles.icon}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Notification")}
-                style={styles.icons}
-              >
-                <Fontisto name="bell" size={25} color="black" />
-                {unreadNotification > 0 ? (
-                  <Text style={styles.unreadNotification}>
-                    {unreadNotification}
-                  </Text>
-                ) : null}
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Messages")}
-                style={styles.icons}
-              >
-                <Image
-                  source={require("../../assets/icons/Messenger.png")}
-                  style={styles.icon}
-                />
-                {unreadMessage > 0 ? (
-                  <Text style={styles.unreadMessage}>{unreadMessage}</Text>
-                ) : null}
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Header
+            unreadMessage={unreadMessage}
+            unreadNotification={unreadNotification}
+            navigation={navigation}
+            showDropDown={showDropDown}
+            setShowDropDown={setShowDropDown}
+          />
 
           <View style={{ paddingBottom: 50, height: "100%" }}>
-            <FlatList
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-              removeClippedSubviews={true}
-              initialNumToRender={10}
-              contentContainerStyle={{ paddingBottom: 20 }}
-              data={products}
-              keyExtractor={(item) => item._id}
-              renderItem={renderItem}
-              onEndReached={GetNextPage}
-              onEndReachedThreshold={4}
-              ListFooterComponent={() =>
-                hasNextPage && (
-                  <ActivityIndicator size={"large"} color="#663399" />
-                )
-              }
+            {showDropDown && (
+              <View style={styles.dropDownContainer}>
+                <TouchableOpacity
+                  style={styles.dropDownItemWrapper}
+                  onPress={() => goToRentSalePage("Sale")}
+                >
+                  <Text style={styles.dropDownItem}>Sale</Text>
+                  <FontAwesome name="shopping-bag" size={16} />
+                </TouchableOpacity>
+                <View style={styles.dropDownLine}></View>
+                <TouchableOpacity
+                  style={styles.dropDownItemWrapper}
+                  onPress={() => goToRentSalePage("Rent")}
+                >
+                  <Text style={styles.dropDownItem}>Rent</Text>
+                  <FontAwesome name="recycle" size={16} />
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <HomepagePosts
+              onRefresh={onRefresh}
+              GetNextPage={GetNextPage}
+              hasNextPage={hasNextPage}
+              products={products}
+              setProducts={setProducts}
+              hasCategories={true}
+              categories={categories}
+              dataType={dataType}
+              navigation={navigation}
             />
           </View>
         </>
@@ -316,58 +267,38 @@ export default function Home({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  homeNav: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 10,
+  dropDownContainer: {
     backgroundColor: "white",
+    position: "absolute",
+    left: 10,
+    top: 0,
+    width: "100%",
+    zIndex: 99,
+    width: 150,
+    shadowColor: "#222",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  icon: {
-    height: 30,
-    width: 30,
+  dropDownItemWrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
-  smallIcon: {
-    height: 25,
-    width: 25,
-    marginRight: 5,
+  dropDownItem: {
+    fontFamily: "Raleway_600SemiBold",
+    fontSize: 16,
   },
-  navcontent: {
+  dropDownLine: { borderTopWidth: 1, borderColor: "#eee" },
+  navlogo: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  icons: {
-    marginRight: 10,
-    position: "relative",
-  },
-  unreadNotification: {
-    position: "absolute",
-    top: -3,
-    right: -5,
-    backgroundColor: "#FF2424",
-    color: "white",
-    height: 20,
-    width: 20,
-    fontSize: 10,
-    borderRadius: 10,
-    textAlign: "center",
-    lineHeight: 20,
-    fontWeight: "600",
-  },
-  unreadMessage: {
-    position: "absolute",
-    top: 0,
-    right: -6,
-    backgroundColor: "#FF2424",
-    color: "white",
-    height: 20,
-    width: 20,
-    fontSize: 10,
-    borderRadius: 10,
-    textAlign: "center",
-    lineHeight: 20,
-    fontWeight: "600",
   },
   wrapper: {
     flexDirection: "row",

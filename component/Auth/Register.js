@@ -141,6 +141,7 @@ export default function Register({ navigation }) {
                         style={styles.inputField}
                         onChangeText={handleChange("name")}
                         onBlur={handleBlur("name")}
+                        selectionColor="#663399"
                       ></TextInput>
                       {touched.name && errors.name ? (
                         <Text style={bbstyles.error}>{errors.name}</Text>
@@ -160,6 +161,7 @@ export default function Register({ navigation }) {
                         style={styles.inputField}
                         onChangeText={handleChange("email")}
                         onBlur={handleBlur("email")}
+                        selectionColor="#663399"
                       ></TextInput>
                       {touched.email && errors.email ? (
                         <Text style={bbstyles.error}>{errors.email}</Text>
@@ -181,6 +183,7 @@ export default function Register({ navigation }) {
                         onChangeText={handleChange("phone")}
                         onBlur={handleBlur("phone")}
                         placeholder="98XXXXXXXX"
+                        selectionColor="#663399"
                       ></TextInput>
                       {touched.phone && errors.phone ? (
                         <Text style={bbstyles.error}>{errors.phone}</Text>
@@ -202,6 +205,7 @@ export default function Register({ navigation }) {
                         style={styles.inputField}
                         onChangeText={handleChange("password")}
                         onBlur={handleBlur("password")}
+                        selectionColor="#663399"
                       ></TextInput>
                       {touched.password && errors.password ? (
                         <Text style={bbstyles.error}>{errors.password}</Text>

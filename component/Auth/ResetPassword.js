@@ -79,6 +79,7 @@ export default function ResetPassword({ route }) {
                       style={styles.inputField}
                       onChangeText={handleChange("newPassword")}
                       onBlur={handleBlur("newPassword")}
+                      selectionColor="#663399"
                     ></TextInput>
                     {touched.newPassword && errors.newPassword ? (
                       <Text style={bbstyles.error}>{errors.newPassword}</Text>
@@ -100,6 +101,7 @@ export default function ResetPassword({ route }) {
                       style={styles.inputField}
                       onChangeText={handleChange("confirmPassword")}
                       onBlur={handleBlur("confirmPassword")}
+                      selectionColor="#663399"
                     ></TextInput>
                     {touched.confirmPassword && errors.confirmPassword ? (
                       <Text style={bbstyles.error}>
@@ -122,6 +124,7 @@ export default function ResetPassword({ route }) {
                       style={styles.inputField}
                       onChangeText={handleChange("code")}
                       onBlur={handleBlur("code")}
+                      selectionColor="#663399"
                     ></TextInput>
                     {touched.code && errors.code ? (
                       <Text style={bbstyles.error}>{errors.code}</Text>

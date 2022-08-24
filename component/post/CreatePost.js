@@ -92,13 +92,11 @@ export default function CreatePost({ navigation }) {
   };
 
   function addPost() {
-    console.log("click");
     var errors = Object.values(formRef.current.errors);
     if (errors && errors.length > 0) {
       Alert.alert("Error", errors[0]);
       return;
     }
-    console.log("post");
     formRef.current.handleSubmit();
   }
 
@@ -369,6 +367,7 @@ export default function CreatePost({ navigation }) {
                         keyboardType="default"
                         onChangeText={handleChange("name")}
                         onBlur={handleBlur("name")}
+                        selectionColor="#663399"
                       />
                       {errors.name && touched.name ? (
                         <Text style={bbstyles.error}>{errors.name}</Text>
@@ -384,6 +383,8 @@ export default function CreatePost({ navigation }) {
                         keyboardType="default"
                         onChangeText={handleChange("detail")}
                         onBlur={handleBlur("detail")}
+                        selectionColor="#663399"
+                        multiline={true}
                       />
                       {errors.detail && touched.detail ? (
                         <Text style={bbstyles.error}>{errors.detail}</Text>
@@ -418,6 +419,7 @@ export default function CreatePost({ navigation }) {
                         style={styles.input}
                         onChangeText={handleChange("stock")}
                         onBlur={handleBlur("stock")}
+                        selectionColor="#663399"
                       ></TextInput>
                       {errors.stock && touched.stock ? (
                         <Text style={bbstyles.error}>{errors.stock}</Text>
@@ -472,6 +474,7 @@ export default function CreatePost({ navigation }) {
                             placeholder="Enter brand name"
                             onChangeText={handleChange("custombrand")}
                             onBlur={handleBlur.custombrand}
+                            selectionColor="#663399"
                           />
                           <Text style={bbstyles.error}>
                             {errors.custombrand}
@@ -511,6 +514,7 @@ export default function CreatePost({ navigation }) {
                         style={styles.input}
                         onChangeText={handleChange("original")}
                         onBlur={handleBlur("original")}
+                        selectionColor="#663399"
                       ></TextInput>
                       {touched.original && errors.original ? (
                         <Text style={bbstyles.error}>{errors.original}</Text>
@@ -523,6 +527,7 @@ export default function CreatePost({ navigation }) {
                         style={styles.input}
                         onChangeText={(value) => calcEarning(value)}
                         onBlur={handleBlur("price")}
+                        selectionColor="#663399"
                       ></TextInput>
                       {touched.price && errors.price ? (
                         <Text style={bbstyles.error}>{errors.price}</Text>
@@ -536,6 +541,7 @@ export default function CreatePost({ navigation }) {
                         value={earningPrice}
                         style={styles.input}
                         editable={false}
+                        selectionColor="#663399"
                       ></TextInput>
                     </View>
 

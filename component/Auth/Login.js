@@ -79,6 +79,7 @@ export default function Login({ navigation }) {
                       style={styles.inputField}
                       onChangeText={handleChange("email")}
                       onBlur={handleBlur("email")}
+                      selectionColor="#663399"
                     ></TextInput>
                     {touched.email && errors.email ? (
                       <Text style={bbstyles.error}>{errors.email}</Text>
@@ -100,6 +101,7 @@ export default function Login({ navigation }) {
                       secureTextEntry={true}
                       onChangeText={handleChange("password")}
                       onBlur={handleBlur("password")}
+                      selectionColor="#663399"
                     ></TextInput>
                     {touched.password && errors.password ? (
                       <Text style={bbstyles.error}>{errors.password}</Text>

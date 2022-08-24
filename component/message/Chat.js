@@ -255,6 +255,7 @@ export default function Chat({ route, navigation }) {
                 ref={messageInput}
                 value={message}
                 onChangeText={(text) => setMessage(text)}
+                selectionColor="#663399"
               ></TextInput>
             </View>
             <View style={styles.messageSend}>

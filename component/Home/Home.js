@@ -210,6 +210,28 @@ export default function Home({ navigation }) {
     });
   };
 
+  const DropDownItem = useCallback(() => {
+    return (
+      <View style={styles.dropDownContainer}>
+        <TouchableOpacity
+          style={styles.dropDownItemWrapper}
+          onPress={() => goToRentSalePage("Sale")}
+        >
+          <Text style={styles.dropDownItem}>Sale</Text>
+          <FontAwesome name="shopping-bag" size={16} />
+        </TouchableOpacity>
+        <View style={styles.dropDownLine}></View>
+        <TouchableOpacity
+          style={styles.dropDownItemWrapper}
+          onPress={() => goToRentSalePage("Rent")}
+        >
+          <Text style={styles.dropDownItem}>Rent</Text>
+          <FontAwesome name="recycle" size={16} />
+        </TouchableOpacity>
+      </View>
+    );
+  }, []);
+
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
@@ -228,26 +250,7 @@ export default function Home({ navigation }) {
           />
 
           <View style={{ paddingBottom: 50, height: "100%" }}>
-            {showDropDown && (
-              <View style={styles.dropDownContainer}>
-                <TouchableOpacity
-                  style={styles.dropDownItemWrapper}
-                  onPress={() => goToRentSalePage("Sale")}
-                >
-                  <Text style={styles.dropDownItem}>Sale</Text>
-                  <FontAwesome name="shopping-bag" size={16} />
-                </TouchableOpacity>
-                <View style={styles.dropDownLine}></View>
-                <TouchableOpacity
-                  style={styles.dropDownItemWrapper}
-                  onPress={() => goToRentSalePage("Rent")}
-                >
-                  <Text style={styles.dropDownItem}>Rent</Text>
-                  <FontAwesome name="recycle" size={16} />
-                </TouchableOpacity>
-              </View>
-            )}
-
+            {showDropDown && <DropDownItem />}
             <HomepagePosts
               onRefresh={onRefresh}
               GetNextPage={GetNextPage}

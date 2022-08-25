@@ -8,6 +8,7 @@ import {
   Dimensions,
   Alert,
   Share,
+  ScrollView,
 } from "react-native";
 import React, {
   useCallback,
@@ -39,12 +40,22 @@ import {
 
 import { SliderBox } from "react-native-image-slider-box";
 
+import {
+  InstagramProvider,
+  ElementContainer,
+} from "@postillon/react-native-instagram-zoomable";
+
+function CustomImage({ source }) {
+  return <Image source={{ uri: source }} style={styles.productImage} />;
+}
+
 export default React.memo(function Action(props) {
   const [comment, setComment] = useState("");
   const [like, setLike] = useState(false);
   const { navigation } = props;
   const [product, setProduct] = useState(props.product);
   const [doubleClick, setDoubleClick] = useState(0);
+  const [imageIndex, setImageIndex] = useState(0);
   const data = useContext(AuthContext);
   const { token, decode } = data;
   const config = {
@@ -230,6 +241,11 @@ export default React.memo(function Action(props) {
     }
   }, []);
 
+  function getCurrentImageIndex(index) {
+    if (!index && index !== 0) return imageIndex;
+    setImageIndex(index);
+  }
+
   return (
     <>
       <TouchableOpacity
@@ -251,19 +267,6 @@ export default React.memo(function Action(props) {
 
       <View style={styles.productWrapper}>
         <View style={styles.product}>
-          {/* <FlatList
-            data={parseImages(product.image, product.feature_image)}
-            keyExtractor={item=>item}
-            horizontal={true}
-            showsHorizontalScrollIndicator={true}
-            initialNumToRender={1}
-            renderItem={({item})=>(
-                <TouchableWithoutFeedback onPress={()=>singleOrDoubleClick(product)}>
-                    <Image style={styles.productImage} source={{uri:item}}></Image>
-                </TouchableWithoutFeedback>
-            )}
-            /> */}
-
           <Animated.View style={[styles.bigHeart, mStyle]}>
             <MaterialCommunityIcons
               name="cards-heart"
@@ -279,37 +282,24 @@ export default React.memo(function Action(props) {
             </View>
           ) : null}
 
-          <GestureHandlerRootView style={{ flex: 1, zIndex: 99 }}>
-            <TapGestureHandler onActivated={() => singleOrDoubleClick(product)}>
-              <View style={styles.productImage}>
-                <PinchGestureHandler
-                  onGestureEvent={pinchHandler}
-                  onHandlerStateChange={pinchHandlerStateChange}
-                >
-                  {/* <ExpoFastImage
-                        uri={imageLink+product.image} // image address
-                        cacheKey={product._id} // could be a unque id
-                        style={styles.productImage} // your custom style object
-                        // any supported props by Image
-                    /> */}
-                  <Animated.Image
-                    source={{ uri: imageLink + product.image }}
-                    style={[styles.productImage, animatedStyle]}
-                  />
-                </PinchGestureHandler>
-              </View>
-            </TapGestureHandler>
-          </GestureHandlerRootView>
-
-          {/* <SliderBox
-            images={parseImages(product.image, product.feature_image)}
-            ImageComponentStyle={styles.productImage}
-            dotColor="#663399"
-            imageLoadingColor="#663399"
-            activeOpacity={1}
-            onCurrentImagePressed={() => singleOrDoubleClick(product)}
-            pagingEnabled
-          /> */}
+          <InstagramProvider>
+            <ElementContainer>
+              <SliderBox
+                images={parseImages(product.image, product.feature_image)}
+                ImageComponentStyle={styles.productImage}
+                // ImageComponent={(data) => {
+                //   const { source: { uri } = {} } = data || {};
+                //   return <CustomImage source={uri} />;
+                // }}
+                currentImageEmitter={getCurrentImageIndex}
+                dotColor="#663399"
+                imageLoadingColor="#663399"
+                activeOpacity={1}
+                onCurrentImagePressed={() => singleOrDoubleClick(product)}
+                pagingEnabled
+              />
+            </ElementContainer>
+          </InstagramProvider>
 
           <View style={styles.productreview}>
             <TouchableOpacity
@@ -486,6 +476,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     resizeMode: "cover",
     zIndex: 99,
+    borderWidth: 1,
   },
   typeWrapper: {
     display: "flex",

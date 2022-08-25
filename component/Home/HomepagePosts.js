@@ -13,7 +13,7 @@ import { useScrollToTop } from "@react-navigation/native";
 import { imageLink } from "../ImageLink";
 import Action from "./Action";
 
-const HomepagePosts = ({
+export default React.memo(function HomepagePosts({
   onRefresh,
   GetNextPage,
   products,
@@ -23,7 +23,7 @@ const HomepagePosts = ({
   hasCategories = false,
   categories = null,
   dataType = "real",
-}) => {
+}) {
   const [refreshing, setRefreshing] = useState(false);
   const [enableScroll, setEnableScroll] = useState(true);
 
@@ -95,9 +95,7 @@ const HomepagePosts = ({
       }
     />
   );
-};
-
-export default HomepagePosts;
+});
 
 const styles = StyleSheet.create({
   wrapper: {

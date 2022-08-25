@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 10,
     backgroundColor: "white",
+    position: "relative",
   },
   navLogoText: {
     fontFamily: "Raleway_700Bold",

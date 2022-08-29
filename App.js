@@ -1,7 +1,11 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { Alert, StyleSheet, Image, Text, View } from "react-native";
-import { NavigationContainer, StackActions } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  StackActions,
+  useNavigation,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./component/Auth/Login";
 import Register from "./component/Auth/Register";
@@ -68,6 +72,7 @@ export default function App(props) {
   const [products, setProducts] = useState([]);
   const [subtotal, setSubtotal] = useState([]);
   const [loadingComplete, setLoadingComplete] = useState(false);
+  const [notificationApiCall, setNotificationApiCall] = useState(false);
 
   const [unreadMessage, setUnreadMessage] = useState(0);
   const [unreadNotification, setUnreadNotification] = useState(0);
@@ -79,6 +84,8 @@ export default function App(props) {
   const [userImage, setUserImage] = useState();
   const [appReady, setAppReady] = useState(false);
   const socket = useRef();
+  const responseListener = useRef();
+  const navigationRef = useRef();
 
   const [titleShown, setTitleShown] = useState({
     display: "flex",
@@ -210,7 +217,11 @@ export default function App(props) {
         var token = authConfig;
         var decoded = jwt_decode(token);
         setDecode(decoded);
-        registerForPushNotificationsAsync(token);
+
+        if (!notificationApiCall) {
+          registerForPushNotificationsAsync(token);
+          setNotificationApiCall(true);
+        }
         socketConnect(decoded);
         userImageSet(decoded);
         setIsLoggedIn(true);
@@ -220,6 +231,27 @@ export default function App(props) {
     } catch (error) {
       // Error Handle
     }
+  }, [notificationApiCall]);
+
+  useEffect(() => {
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        var data = response.notification.request.content.data;
+        console.log(data);
+        if (data.type == "comment") {
+          navigationRef?.current?.navigate("Comments", data.post_id);
+        }
+        if (data.type == "order") {
+          navigationRef?.current?.navigate("My Orders");
+        }
+        if (data.type == "message") {
+          navigationRef?.current?.navigate("chat", data);
+        }
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -242,7 +274,7 @@ export default function App(props) {
     <LoadingScreen />
   ) : (
     <>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <AuthContext.Provider
           value={{
             isLoggedIn,

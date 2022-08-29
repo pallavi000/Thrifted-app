@@ -30,6 +30,15 @@ const RentSale = ({ navigation, route }) => {
   const { token } = data;
   const { type, feedSetting } = route.params;
 
+  useEffect(() => {
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        var data = response.notification.request.content.data;
+        if (data.type == "comment") {
+        }
+      });
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: type,

@@ -39,19 +39,20 @@ export default function Register({ navigation }) {
   const [otpScreen, setOtpScreen] = useState(false);
   const [formData, setFormData] = useState();
   const [verificationId, setVerificationId] = useState(null);
-  const sendOTP = async () => {
+  const sendOTP = async (data) => {
     try {
       setIsSubmitting(true);
-      formData.phone = "+977" + formData.phone;
+      data.phone = "+977" + data.phone;
       const phoneProvider = new PhoneAuthProvider(firebaseAuth);
       const response = await phoneProvider.verifyPhoneNumber(
-        formData.phone,
+        data.phone,
         captchaRef.current
       );
       setVerificationId(response);
       setOtpScreen(true);
       setIsSubmitting(false);
     } catch (error) {
+      console.log(error.message);
       setIsSubmitting(false);
       Alert.alert("Error", "Some Error Occurred.");
     }
@@ -62,10 +63,10 @@ export default function Register({ navigation }) {
       setFormData(data);
       setIsSubmitting(true);
       const response = await axios.post("/user/check/email", data);
-      await sendOTP();
+      await sendOTP(data);
     } catch (error) {
-      setIsSubmitting(false);
       console.log(error.message);
+      setIsSubmitting(false);
       Alert.alert("Error", error.request.response);
     }
   }
@@ -76,9 +77,9 @@ export default function Register({ navigation }) {
       var response = await axios.post("/user/all", formData);
       if (response.data) {
         await AsyncStorage.setItem("token", response.data.token);
+        setIsSubmitting(false);
         setIsLoggedIn(true);
       }
-      setIsSubmitting(false);
     } catch (error) {
       setOtpScreen(false);
       setIsSubmitting(false);

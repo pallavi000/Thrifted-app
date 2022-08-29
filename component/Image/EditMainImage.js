@@ -67,14 +67,21 @@ const EditMainImage = (props) => {
     const result = await imagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       mediaTypes: imagePicker.MediaTypeOptions.Images,
+      base64: true,
     });
+    if (!imageIndex) return;
     if (!result.cancelled) {
-      setFieldValue(`image${imageIndex}`, result.uri);
+      setFieldValue(
+        `image${imageIndex}`,
+        `data:image/png;base64, ${result.base64}`
+      );
       if (imageIndex == 1) {
-        setMainImage(result.uri);
+        setMainImage(`data:image/png;base64, ${result.base64}`);
       } else {
         var newFeatureImages = [...featureImages];
-        newFeatureImages[imageIndex - 2] = result.uri;
+        newFeatureImages[
+          imageIndex - 2
+        ] = `data:image/png;base64, ${result.base64}`;
         setFeatureImages(newFeatureImages);
       }
       setModalVisible(false);
@@ -83,14 +90,22 @@ const EditMainImage = (props) => {
   }
 
   async function openCamera() {
-    const result = await imagePicker.launchCameraAsync();
+    const result = await imagePicker.launchCameraAsync({
+      base64: true,
+    });
+    if (!imageIndex) return;
     if (!result.cancelled) {
-      setFieldValue(`image${imageIndex}`, result.uri);
+      setFieldValue(
+        `image${imageIndex}`,
+        `data:image/png;base64, ${result.base64}`
+      );
       if (imageIndex == 1) {
-        setMainImage(result.uri);
+        setMainImage(`data:image/png;base64, ${result.base64}`);
       } else {
         var newFeatureImages = [...featureImages];
-        newFeatureImages[imageIndex - 2] = result.uri;
+        newFeatureImages[
+          imageIndex - 2
+        ] = `data:image/png;base64, ${result.base64}`;
         setFeatureImages(newFeatureImages);
       }
       setModalVisible(false);

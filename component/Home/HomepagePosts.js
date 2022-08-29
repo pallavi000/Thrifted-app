@@ -30,10 +30,7 @@ export default React.memo(function HomepagePosts({
   const scRef = useRef(null);
   useScrollToTop(scRef);
 
-  const renderItem = useCallback(
-    ({ item, index }) => originalRenderItem({ item, index }),
-    [products, categories]
-  );
+  const renderItem = ({ item, index }) => originalRenderItem({ item, index });
 
   const originalRenderItem = ({ item, index }) => {
     return (

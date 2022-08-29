@@ -75,16 +75,15 @@ const EditPost = ({ navigation, route }) => {
       name: "Sale",
     },
   ]);
+
   const [selectedCategory, setSelectedCategory] = useState(product.category_id);
   const [selectedColor, setSelectedColor] = useState(product.color_id);
   const [selectedSize, setSelectedSize] = useState(product.size_id);
-  const [selectedType, setSelectedType] = useState(
-    getProductType(product.type)
-  );
+  const [selectedType, setSelectedType] = useState({});
   const [selectedBrand, setSelectedBrand] = useState(product.brand_id);
 
   const data = useContext(AuthContext);
-  const { token } = data;
+  const { token, selectedProduct, setSelectedProduct } = data;
 
   const config = {
     headers: {
@@ -176,6 +175,7 @@ const EditPost = ({ navigation, route }) => {
         values,
         config
       );
+      setSelectedProduct(response.data);
       setIsSubmitting(false);
       navigation.goBack();
     } catch (error) {
@@ -193,6 +193,8 @@ const EditPost = ({ navigation, route }) => {
   });
 
   useEffect(() => {
+    getSelectFields();
+    setSelectedType(getProductType(product.type));
     calcEarning(product.price);
   }, []);
 
@@ -283,6 +285,7 @@ const EditPost = ({ navigation, route }) => {
           setOpenSelectField={setOpenSelectField}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
+          initChangeHeader={changeHeader}
         />
       ) : null}
 
@@ -293,6 +296,7 @@ const EditPost = ({ navigation, route }) => {
           setOpenSelectField={setOpenSelectField}
           setSelectedSelect={setSelectedColor}
           navigation={navigation}
+          initChangeHeader={changeHeader}
         />
       ) : null}
 
@@ -303,6 +307,7 @@ const EditPost = ({ navigation, route }) => {
           setOpenSelectField={setOpenSelectField}
           setSelectedSelect={setSelectedSize}
           navigation={navigation}
+          initChangeHeader={changeHeader}
         />
       ) : null}
 
@@ -313,6 +318,7 @@ const EditPost = ({ navigation, route }) => {
           setOpenSelectField={setOpenSelectField}
           setSelectedSelect={setSelectedType}
           navigation={navigation}
+          initChangeHeader={changeHeader}
         />
       ) : null}
 
@@ -323,6 +329,7 @@ const EditPost = ({ navigation, route }) => {
           setOpenSelectField={setOpenSelectField}
           setSelectedSelect={setSelectedBrand}
           navigation={navigation}
+          initChangeHeader={changeHeader}
         />
       ) : null}
 

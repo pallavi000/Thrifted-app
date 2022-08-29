@@ -73,6 +73,7 @@ export default function App(props) {
   const [subtotal, setSubtotal] = useState([]);
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [notificationApiCall, setNotificationApiCall] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState({});
 
   const [unreadMessage, setUnreadMessage] = useState(0);
   const [unreadNotification, setUnreadNotification] = useState(0);
@@ -211,7 +212,9 @@ export default function App(props) {
 
   const getToken = React.useCallback(async () => {
     try {
+      console.log("jwt");
       const authConfig = await AsyncStorage.getItem("token");
+      console.log("token set");
       if (authConfig) {
         setToken(authConfig);
         var token = authConfig;
@@ -304,6 +307,8 @@ export default function App(props) {
             getCartItems,
             setProducts,
             products,
+            selectedProduct,
+            setSelectedProduct,
           }}
         >
           {isLoggedIn ? (

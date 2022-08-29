@@ -44,13 +44,31 @@ export default function ProductDetail({ navigation, route }) {
   const [imageIndex, setImageIndex] = useState(0);
 
   const data = useContext(AuthContext);
-  const { cartCount, setCartCount, token, cartItems, decode } = data;
+  const {
+    cartCount,
+    setCartCount,
+    token,
+    cartItems,
+    decode,
+    setSelectedProduct,
+    selectedProduct,
+  } = data;
   const { getCartItems } = data;
   const config = {
     headers: {
       "access-token": token,
     },
   };
+
+  useEffect(() => {
+    setSelectedProduct(route.params);
+  }, []);
+
+  useEffect(() => {
+    if (selectedProduct._id) {
+      setProduct(selectedProduct);
+    }
+  }, [selectedProduct]);
 
   const initialize = React.useCallback(() => {
     const isInCart = cartItems.find(

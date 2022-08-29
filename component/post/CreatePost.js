@@ -12,6 +12,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -60,6 +61,7 @@ export default function CreatePost({ navigation }) {
   const fill = new Animated.Value(1);
   const [earningPrice, setEarningPrice] = useState();
   const [openSelectField, setOpenSelectField] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
   const [productTypes, setProductTypes] = useState([
     {
       _id: "rent",
@@ -99,6 +101,27 @@ export default function CreatePost({ navigation }) {
     }
     formRef.current.handleSubmit();
   }
+
+  const loadingHeader = React.useCallback(() => {
+    navigation.setOptions({
+      headerShown: true,
+      headerTitleAlign: "center",
+      headerRight: () => (
+        <View
+          style={{
+            backgroundColor: "#663399",
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            marginRight: 5,
+            borderRadius: 5,
+            opacity: 0.7,
+          }}
+        >
+          <ActivityIndicator size={"small"} color="#fff" />
+        </View>
+      ),
+    });
+  });
 
   const changeHeader = React.useCallback(() => {
     navigation.setOptions({
@@ -142,6 +165,7 @@ export default function CreatePost({ navigation }) {
   });
 
   const createPost = React.useCallback(async (values) => {
+    loadingHeader();
     try {
       const response = await axios.post("/product/create/post", values, config);
       Alert.alert("Success", "Post has been Created!");
@@ -149,6 +173,7 @@ export default function CreatePost({ navigation }) {
     } catch (error) {
       Alert.alert("Error", "Internal Server Error");
     }
+    changeHeader();
   });
 
   const calcEarning = React.useCallback((value) => {

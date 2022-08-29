@@ -90,36 +90,32 @@ export default function Comment({ navigation, route }) {
     }
   });
 
-  const addComment = React.useCallback(
-    async (com) => {
-      console.log("hello");
-      if (com.trim().length == 0) return;
-      Keyboard.dismiss();
-      setNewComment("");
-      try {
-        const data = {
-          comment: com,
-        };
-        const response = await axios.post(
-          "/post/comment/post/" + post_id,
-          data,
-          config
-        );
-        setComments([...comments, response.data]);
-        const newproducts = [...products];
-        const index = newproducts.findIndex(
-          (product) => product._id == post_id
-        );
-        if (index != -1) {
-          newproducts[index].comments_count += 1;
-          setProducts(newproducts);
-        }
-      } catch (error) {
-        console.log(error.request.response);
+  const addComment = async (com) => {
+    console.log("hello");
+    if (com.trim().length == 0) return;
+    Keyboard.dismiss();
+    setNewComment("");
+    try {
+      const data = {
+        comment: com,
+      };
+      const response = await axios.post(
+        "/post/comment/post/" + post_id,
+        data,
+        config
+      );
+      setComments([...comments, response.data]);
+      const newproducts = [...products];
+      const index = newproducts.findIndex((product) => product._id == post_id);
+      if (index != -1) {
+        newproducts[index].comments_count += 1;
+        console.log(newproducts[index].comments_count);
+        setProducts(newproducts);
       }
-    },
-    [comments, products]
-  );
+    } catch (error) {
+      console.log(error.request.response);
+    }
+  };
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>

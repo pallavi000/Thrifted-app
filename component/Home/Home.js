@@ -41,7 +41,6 @@ import Header from "./Header";
 import HomepagePosts from "./HomepagePosts";
 
 export default function Home({ navigation }) {
-  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [itemsCountPerPage, setItemsCountPerPage] = useState(10);
@@ -65,6 +64,8 @@ export default function Home({ navigation }) {
     setUnreadNormalNotificationCount,
     unreadOrderNotificationCount,
     setUnreadOrderNotificationCount,
+    products,
+    setProducts,
   } = data;
   const config = {
     headers: {
@@ -107,6 +108,7 @@ export default function Home({ navigation }) {
 
     try {
       var sendDate = new Date().getTime();
+      console.log("home api call", token);
       const response = await axios.post("/frontend/app/home", data, config);
       console.log(response.data.product.length);
       if (!productOnly) {

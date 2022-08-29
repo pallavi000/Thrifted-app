@@ -57,18 +57,26 @@ const MainImage = (props) => {
     const result = await imagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       mediaTypes: imagePicker.MediaTypeOptions.Images,
+      base64: true,
     });
     if (!result.cancelled) {
-      setFieldValue(`image${imageIndex}`, result.uri);
+      setFieldValue(
+        `image${imageIndex}`,
+        `data:image/png;base64, ${result.base64}`
+      );
       setModalVisible(false);
       props.sheetRef.current.snapTo(1);
     }
   }
-
   async function openCamera() {
-    const result = await imagePicker.launchCameraAsync();
+    const result = await imagePicker.launchCameraAsync({
+      base64: true,
+    });
     if (!result.cancelled) {
-      setFieldValue(`image${imageIndex}`, result.uri);
+      setFieldValue(
+        `image${imageIndex}`,
+        `data:image/png;base64, ${result.base64}`
+      );
       setModalVisible(false);
       props.sheetRef.current.snapTo(1);
     }

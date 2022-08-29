@@ -19,6 +19,7 @@ import { imageLink } from "../ImageLink";
 import { format } from "timeago.js";
 import { useIsFocused } from "@react-navigation/native";
 import bbstyles from "../Styles";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function Messages({ navigation }) {
   const isFocused = useIsFocused();
@@ -77,7 +78,7 @@ export default function Messages({ navigation }) {
       setOriginalChats(response.data);
       setLoader(false);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   }, []);
 

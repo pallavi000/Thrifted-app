@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthContext } from "../Context";
 import axios from "axios";
 import bbstyles from "../Styles";
 import { Formik } from "formik";
@@ -21,6 +20,7 @@ import * as Yup from "yup";
 import { firebaseAuth } from "../../firebaseConfig";
 import { PhoneAuthProvider } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import { apiErrorNotification } from "./../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string().required("Phone  is required"),
@@ -34,6 +34,8 @@ export default function ForgotPassword({ navigation }) {
   const changePassword = React.useCallback(async (data) => {
     try {
       setIsSubmitting(true);
+      // check if phone exists
+      await axios.post("/user/forgot/check/phone", data);
       data.phone = "+977" + data.phone;
       const phoneProvider = new PhoneAuthProvider(firebaseAuth);
       const verifyId = await phoneProvider.verifyPhoneNumber(
@@ -49,7 +51,7 @@ export default function ForgotPassword({ navigation }) {
       }
       setIsSubmitting(false);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
       setIsSubmitting(false);
     }
   }, []);

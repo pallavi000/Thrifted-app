@@ -12,6 +12,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import bbstyles from "../Styles";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const Search = ({ navigation }) => {
   const searchRef = useRef(null);
@@ -37,7 +38,7 @@ const Search = ({ navigation }) => {
         products: response.data,
       });
     } catch (error) {
-      Alert.alert(error.request.response);
+      apiErrorNotification(error);
     }
   }
 

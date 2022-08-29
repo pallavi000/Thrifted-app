@@ -35,6 +35,7 @@ import * as imagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function Closet(props) {
   const sheetRef = useRef(null);
@@ -107,9 +108,7 @@ export default function Closet(props) {
       );
       setSales(response.data.orders);
       setTotalSales(response.data.total);
-    } catch (error) {
-      console.log(error.request.response);
-    }
+    } catch (error) {}
   });
 
   async function nextPageCloset() {
@@ -162,7 +161,7 @@ export default function Closet(props) {
       setUser(response.data);
       setIsFollowing(true);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 
@@ -178,7 +177,7 @@ export default function Closet(props) {
       setUser(response.data);
       setIsFollowing(false);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 
@@ -248,7 +247,7 @@ export default function Closet(props) {
       setUserImage(response.data);
       await AsyncStorage.setItem("userImage", response.data);
     } catch (error) {
-      Alert.alert(error.request.response);
+      apiErrorNotification(error);
       setImageUploading(false);
     }
   });
@@ -304,7 +303,7 @@ export default function Closet(props) {
       setMessageSubmit(false);
       navigation.navigate("chat", receiver);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 
@@ -583,6 +582,7 @@ export default function Closet(props) {
             data={activeTab == "listing" ? products : sales}
             keyExtractor={(item) => item._id}
             numColumns={2}
+            onEndReachedThreshold={4}
             onEndReached={
               activeTab == "listing" ? nextPageCloset : nextPageSalesCloset
             }

@@ -57,12 +57,19 @@ export default React.memo(function Action(props) {
   const [doubleClick, setDoubleClick] = useState(0);
   const [imageIndex, setImageIndex] = useState(0);
   const data = useContext(AuthContext);
-  const { token, decode } = data;
+  const { token, decode, products } = data;
   const config = {
     headers: {
       "access-token": token,
     },
   };
+
+  useEffect(() => {
+    if (products.length) {
+      var findProduct = products.find((p) => p._id == product._id);
+      if (findProduct) setProduct(findProduct);
+    }
+  }, [products]);
 
   const handle = useRef();
 

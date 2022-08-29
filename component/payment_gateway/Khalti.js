@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { SafeAreaView, Alert } from "react-native";
 
 import { KhatiSdk } from "rn-all-nepal-payment";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const Khalti = (props) => {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -43,9 +44,8 @@ const Khalti = (props) => {
       }
       return;
     } catch (error) {
-      console.log(error);
       props.setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 

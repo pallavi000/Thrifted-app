@@ -20,6 +20,7 @@ import axios from "axios";
 import { imageLink } from "../ImageLink";
 import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function NewChat({ navigation }) {
   const [users, setUsers] = useState([]);
@@ -45,9 +46,7 @@ export default function NewChat({ navigation }) {
       setUsers(response.data);
       setOriginalUsers(response.data);
       setLoader(false);
-    } catch (error) {
-      console.log(error.request.response);
-    }
+    } catch (error) {}
   }
 
   async function startChat(user) {
@@ -63,7 +62,7 @@ export default function NewChat({ navigation }) {
       };
       navigation.navigate("chat", receiver);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   }
 

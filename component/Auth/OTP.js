@@ -16,6 +16,7 @@ import * as Yup from "yup";
 import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import bbstyles from "../Styles";
+import { apiErrorNotification } from "./../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   code: Yup.string().required("OTP Code is required."),
@@ -39,8 +40,7 @@ const OTP = ({
       setIsSubmitting(false);
       await registerForm();
     } catch (error) {
-      console.log(error)
-      Alert.alert("Error", "Some Error Occurred.");
+      apiErrorNotification(error);
       setIsSubmitting(false);
     }
   }

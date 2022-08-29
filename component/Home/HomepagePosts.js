@@ -79,7 +79,7 @@ export default React.memo(function HomepagePosts({
       ref={scRef}
       showsVerticalScrollIndicator={false}
       removeClippedSubviews={true}
-      initialNumToRender={10}
+      initialNumToRender={6}
       contentContainerStyle={{ paddingBottom: 20 }}
       data={products}
       keyExtractor={(item) => item._id}

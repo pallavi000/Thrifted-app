@@ -20,6 +20,7 @@ import bbstyles from "../Styles";
 import { AuthContext } from "../Context";
 import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   balance: Yup.number()
@@ -55,7 +56,7 @@ export default function Redeem({ navigation, route }) {
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 

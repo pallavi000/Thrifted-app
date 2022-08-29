@@ -17,6 +17,7 @@ import axios from "axios";
 import bbstyles from "../Styles";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   currentPassword: Yup.string().required("Current Password is required."),
@@ -46,7 +47,7 @@ const ChangePassword = ({ navigation }) => {
       navigation.goBack();
     } catch (error) {
       setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   }, []);
 

@@ -20,6 +20,7 @@ import * as Yup from "yup";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { AuthContext } from "../Context";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required(),
@@ -44,7 +45,7 @@ const ChangeProfile = ({ navigation, route }) => {
       setIsSubmitting(false);
       navigation.goBack();
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 

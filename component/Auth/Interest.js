@@ -11,6 +11,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import BrandCheck from "../ui/BrandCheck";
 import { AuthContext } from "../Context";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function Interest({ navigation }) {
   const [category_ids, setCategory_ids] = useState([]);
@@ -36,13 +37,9 @@ export default function Interest({ navigation }) {
       for (const category of response.data) {
         arr = [...arr, ...category.childrens];
       }
-      console.log(arr);
       setCategories(arr);
     } catch (error) {}
   }
-  useEffect(() => {
-    console.log(category_ids);
-  }, [category_ids]);
 
   useEffect(() => {
     if (
@@ -65,7 +62,9 @@ export default function Interest({ navigation }) {
     try {
       const response = await axios.get("/user/currentuser", config);
       setUser(response.data.user);
-    } catch (error) {}
+    } catch (error) {
+      apiErrorNotification(error);
+    }
   }, []);
 
   useEffect(() => {
@@ -94,7 +93,7 @@ export default function Interest({ navigation }) {
       );
       navigation.navigate(-1);
     } catch (error) {
-      Alert.alert("Error", "Server Error");
+      apiErrorNotification(error);
     }
   }
   return (

@@ -11,15 +11,12 @@ import {
   Alert,
 } from "react-native";
 import React, { useContext, useState } from "react";
-import {
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
 import axios from "axios";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   district: Yup.string().required(),
@@ -43,13 +40,13 @@ export default function AddShipping({ navigation }) {
   const add = React.useCallback(async (values) => {
     try {
       setIsSubmitting(true);
-      var response = await axios.post("/address", values, config);
+      await axios.post("/address", values, config);
       Alert.alert("Success", "Address has been added");
       setIsSubmitting(false);
       navigation.goBack();
     } catch (error) {
       setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   }, []);
 

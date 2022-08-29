@@ -212,9 +212,7 @@ export default function App(props) {
 
   const getToken = React.useCallback(async () => {
     try {
-      console.log("jwt");
       const authConfig = await AsyncStorage.getItem("token");
-      console.log("token set");
       if (authConfig) {
         setToken(authConfig);
         var token = authConfig;
@@ -240,7 +238,6 @@ export default function App(props) {
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         var data = response.notification.request.content.data;
-        console.log(data);
         if (data.type == "comment") {
           navigationRef?.current?.navigate("Comments", data.post_id);
         }
@@ -269,7 +266,6 @@ export default function App(props) {
     Raleway_500Medium,
   });
   if (!fontsLoaded) {
-    console.log("font not loaded");
     return null;
   }
 
@@ -309,6 +305,7 @@ export default function App(props) {
             products,
             selectedProduct,
             setSelectedProduct,
+            setToken,
           }}
         >
           {isLoggedIn ? (

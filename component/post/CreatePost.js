@@ -33,6 +33,7 @@ import Animated from "react-native-reanimated";
 import CategorySelect from "./selects/CategorySelect";
 import SimpleSelect from "./selects/SimpleSelect";
 import BrandSelect from "./selects/BrandSelect";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   image1: Yup.string().required("Image is required"),
@@ -171,7 +172,7 @@ export default function CreatePost({ navigation }) {
       Alert.alert("Success", "Post has been Created!");
       navigation.navigate("landing");
     } catch (error) {
-      Alert.alert("Error", "Internal Server Error");
+      apiErrorNotification(error);
     }
     changeHeader();
   });

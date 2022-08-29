@@ -11,15 +11,12 @@ import {
   Alert,
 } from "react-native";
 import React, { useContext, useState } from "react";
-import {
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { AuthContext } from "../Context";
+import { apiErrorNotification } from "./../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   district: Yup.string().required(),
@@ -54,7 +51,7 @@ export default function EditShipping({ navigation, route }) {
       navigation.goBack();
       setIsSubmitting(false);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
       setIsSubmitting(false);
     }
   }, []);

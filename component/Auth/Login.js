@@ -19,6 +19,7 @@ import bbstyles from "../Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -28,7 +29,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Login({ navigation }) {
-  const { setIsLoggedIn } = useContext(AuthContext);
+  const { setIsLoggedIn, setToken } = useContext(AuthContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loginForm = React.useCallback(async (data) => {
@@ -36,11 +37,12 @@ export default function Login({ navigation }) {
       setIsSubmitting(true);
       const response = await axios.post("/user", data);
       await AsyncStorage.setItem("token", response.data.token);
+      setToken(response.data.token);
       setIsSubmitting(false);
       setIsLoggedIn(true);
     } catch (error) {
       setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 

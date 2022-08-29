@@ -36,6 +36,7 @@ import CategorySelect from "./selects/CategorySelect";
 import SimpleSelect from "./selects/SimpleSelect";
 import BrandSelect from "./selects/BrandSelect";
 import EditMainImage from "../Image/EditMainImage";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Product Name is required"),
@@ -180,7 +181,7 @@ const EditPost = ({ navigation, route }) => {
       navigation.goBack();
     } catch (error) {
       setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 

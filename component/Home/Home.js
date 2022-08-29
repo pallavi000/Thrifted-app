@@ -108,7 +108,6 @@ export default function Home({ navigation }) {
 
     try {
       var sendDate = new Date().getTime();
-      console.log("home api call", token);
       const response = await axios.post("/frontend/app/home", data, config);
       console.log(response.data.product.length);
       if (!productOnly) {

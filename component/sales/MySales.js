@@ -1,234 +1,146 @@
 import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  SafeAreaView,
   StyleSheet,
   Text,
-  View,
-  SafeAreaView,
-  ScrollView,
   TouchableOpacity,
-  Dimensions,
-  ActivityIndicator,
-  FlatList,
+  View,
 } from "react-native";
-import React, { useContext, useState, useEffect } from "react";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
-import { AuthContext } from "../Context";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import bbstyles from "../Styles";
-import OrderHistory from "./OrderHistory";
-import { apiErrorNotification } from "../ErrorHandle";
+import axios from "axios";
+import { apiErrorNotification } from "./../ErrorHandle";
+import OrderHistory from "../Order/OrderHistory";
 
-export default function MyOrder({ navigation }) {
-  const [items, setItems] = useState([]);
-  const data = useContext(AuthContext);
-  const { token } = data;
+const MySales = ({ route, navigation }) => {
+  const [sales, setSales] = useState([]);
   const [loader, setLoader] = useState(true);
-  const [tab, setTab] = useState("processing");
-  const [delivered, setDelivered] = useState([]);
-  const [processing, setProcessing] = useState([]);
-  const [cancelled, setCancelled] = useState([]);
-
+  const [totalSales, setTotalSales] = useState(0);
   const [totalProcessing, setTotalProcessing] = useState(0);
   const [totalDelivered, setTotalDelivered] = useState(0);
   const [totalCancelled, setTotalCancelled] = useState(0);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [orderPageNo, setOrderPageNo] = useState(1);
-  const [orderHasNextPage, setOrderHasNextPage] = useState(true);
+  const [salePageNo, setSalePageNo] = useState(1);
+  const [salesHasNextPage, setSalesHasNextPage] = useState(true);
+  const [delivered, setDelivered] = useState([]);
+  const [processing, setProcessing] = useState([]);
+  const [cancelled, setCancelled] = useState([]);
+  const [tab, setTab] = useState("processing");
+  const user = route.params;
 
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
-
-  useEffect(() => {
-    getOrder();
-  }, []);
-
-  const getOrder = React.useCallback(async () => {
+  const getSales = React.useCallback(async () => {
     try {
       const data = {
-        pageno: orderPageNo,
+        pageno: salePageNo,
       };
-      var response = await axios.post("/order/transaction/app", data, config);
-      const deliveredItems = [];
-      const cancelledItems = [];
-      const processingItems = [];
-      let deliveredItemsCount = 0;
-      let cancelledItemsCount = 0;
-      let processingItemsCount = 0;
-      for (const transaction of response.data.transaction) {
-        var transaction_copy = { ...transaction };
-        var di = transaction_copy.orders.filter(
-          (o) => o.order_status == "completed"
-        );
-        if (di.length) {
-          deliveredItemsCount += di.length;
-          deliveredItems.push({ ...transaction, orders: di });
-        }
-        var pi = transaction_copy.orders.filter(
-          (order) => order.order_status == "processing"
-        );
-        if (pi.length) {
-          processingItemsCount += pi.length;
-          processingItems.push({ ...transaction, orders: pi });
-        }
-        var ci = transaction_copy.orders.filter(
-          (order) => order.order_status == "cancelled"
-        );
-        if (ci.length) {
-          cancelledItemsCount += ci.length;
-          cancelledItems.push({ ...transaction, orders: ci });
-        }
-      }
-
-      if (response.data.transaction?.length >= response.data.total) {
-        setOrderHasNextPage(false);
-      }
-
-      if (
-        tab === "processing" &&
-        processingItemsCount >= response.data.processing
-      ) {
-        setOrderHasNextPage(false);
-      }
-      if (
-        tab === "delivered" &&
-        deliveredItemsCount >= response.data.completed
-      ) {
-        setOrderHasNextPage(false);
-      }
-      if (
-        tab === "cancelled" &&
-        cancelledItemsCount >= response.data.cancelled
-      ) {
-        setOrderHasNextPage(false);
-      }
-
-      setTotalTransaction(response.data.total);
+      const response = await axios.post("/order/sales/get/" + user._id, data);
+      const processing_items = response.data?.orders.filter(
+        (o) => o.order_status == "processing"
+      );
+      const completed_items = response.data?.orders.filter(
+        (o) => o.order_status == "completed"
+      );
+      const cancelled_items = response.data?.orders.filter(
+        (o) => o.order_status == "cancelled"
+      );
+      setSales(processing_items);
+      setProcessing(processing_items);
+      setDelivered(completed_items);
+      setCancelled(cancelled_items);
+      setTotalSales(response.data.total);
       setTotalProcessing(response.data.processing);
       setTotalDelivered(response.data.completed);
       setTotalCancelled(response.data.cancelled);
 
-      setItems(processingItems);
-      setProcessing(processingItems);
-      setDelivered(deliveredItems);
-      setCancelled(cancelledItems);
       setLoader(false);
     } catch (error) {
+      setLoader(false);
       apiErrorNotification(error);
     }
-  }, []);
+  });
 
-  async function nextPageOrder() {
-    if (!orderHasNextPage) return;
+  async function nextPageSalesCloset() {
+    if (!salesHasNextPage) return;
     try {
       const data = {
-        pageno: orderPageNo + 1,
+        pageno: salePageNo + 1,
         orderOnly: true,
       };
-      setOrderPageNo(orderPageNo + 1);
-
-      var response = await axios.post("/order/transaction/app", data, config);
-      const deliveredItems = [];
-      const cancelledItems = [];
-      const processingItems = [];
-      let deliveredItemsCount = 0;
-      let cancelledItemsCount = 0;
-      let processingItemsCount = 0;
-      for (const transaction of response.data.transaction) {
-        var transaction_copy = { ...transaction };
-        var di = transaction_copy.orders.filter(
-          (o) => o.order_status == "completed"
-        );
-        if (di.length) {
-          deliveredItemsCount += di.length;
-          deliveredItems.push({ ...transaction, orders: di });
-        }
-        var pi = transaction_copy.orders.filter(
-          (order) => order.order_status == "processing"
-        );
-        if (pi.length) {
-          processingItemsCount += pi.length;
-          processingItems.push({ ...transaction, orders: pi });
-        }
-        var ci = transaction_copy.orders.filter(
-          (order) => order.order_status == "cancelled"
-        );
-        if (ci.length) {
-          cancelledItemsCount += ci.length;
-          cancelledItems.push({ ...transaction, orders: ci });
-        }
+      setSalePageNo(salePageNo + 1);
+      const response = await axios.post("/order/sales/get/" + user._id, data);
+      const processing_items = response.data.filter(
+        (o) => o.order_status == "processing"
+      );
+      const completed_items = response.data.filter(
+        (o) => o.order_status == "completed"
+      );
+      const cancelled_items = response.data.filter(
+        (o) => o.order_status == "cancelled"
+      );
+      if (processing_items.length) {
+        setProcessing([...processing, ...processing_items]);
       }
-
-      if (!response.data.transaction.length) {
-        setOrderHasNextPage(false);
+      if (completed_items.length) {
+        setDelivered([...delivered, ...completed_items]);
       }
-
+      if (cancelled_items.length) {
+        setCancelled([...cancelled, ...cancelled_items]);
+      }
+      if (!response.data.length) {
+        setSalesHasNextPage(false);
+      }
       if (tab === "processing") {
-        if (processingItemsCount + processing.length >= totalProcessing) {
-          setOrderHasNextPage(false);
+        if (processing.length + processing_items.length >= totalProcessing) {
+          setSalesHasNextPage(false);
         }
-        setItems([...items, ...processingItems]);
-      }
-      if (tab === "delivered") {
-        if (deliveredItemsCount + delivered.length >= totalDelivered) {
-          setOrderHasNextPage(false);
+        setSales([...sales, ...processing_items]);
+      } else if (tab === "delivered") {
+        if (delivered.length + completed_items.length >= totalDelivered) {
+          setSalesHasNextPage(false);
         }
-        setItems([...items, deliveredItems]);
-      }
-      if (tab === "cancelled") {
-        if (cancelledItemsCount + cancelled.length >= totalCancelled) {
-          setOrderHasNextPage(false);
+        setSales([...sales, ...completed_items]);
+      } else {
+        if (cancelled.length + cancelled_items.length >= totalCancelled) {
+          setSalesHasNextPage(false);
         }
-        setItems([...items, cancelledItems]);
+        setSales([...sales, ...cancelled_items]);
       }
-
-      setProcessing([...processing, ...processingItems]);
-      setDelivered([...delivered, ...deliveredItems]);
-      setCancelled([...cancelled, ...cancelledItems]);
     } catch (error) {}
   }
+
+  useEffect(() => {
+    getSales();
+  }, []);
 
   const changeDate = React.useCallback((createdAt) => {
     var arr = createdAt.split("T");
     return arr[0];
   });
 
-  const orderQuantity = React.useCallback((orders) => {
-    var total = orders.reduce((total, order) => {
-      return (total += order.quantity);
-    }, 0);
-    return total;
-  });
-
   const toggleTab = React.useCallback((action) => {
     setTab(action);
     if (action == "delivered") {
       if (delivered.length >= totalDelivered) {
-        setOrderHasNextPage(false);
+        setSalesHasNextPage(false);
       } else {
-        setOrderHasNextPage(true);
+        setSalesHasNextPage(true);
       }
-      setItems(delivered);
+      setSales(delivered);
     } else if (action == "processing") {
       if (processing.length >= totalProcessing) {
-        setOrderHasNextPage(false);
+        setSalesHasNextPage(false);
       } else {
-        setOrderHasNextPage(true);
+        setSalesHasNextPage(true);
       }
-      setItems(processing);
+      setSales(processing);
     } else {
       if (cancelled.length >= totalCancelled) {
-        setOrderHasNextPage(false);
+        setSalesHasNextPage(false);
       } else {
-        setOrderHasNextPage(true);
+        setSalesHasNextPage(true);
       }
-      setItems(cancelled);
+      setSales(cancelled);
     }
   });
 
@@ -238,16 +150,14 @@ export default function MyOrder({ navigation }) {
         <View style={bbstyles.loaderContainer}>
           <ActivityIndicator size={"large"} color="#663399" />
         </View>
-      ) : delivered.length == 0 &&
-        processing.length == 0 &&
-        cancelled.length == 0 ? (
-        <OrderHistory navigation={navigation} />
+      ) : !delivered.length && !processing.length && !cancelled.length ? (
+        <OrderHistory navigation={navigation} title="No Sales Yet." />
       ) : (
         <View style={styles.container}>
           <FlatList
-            data={items}
+            data={sales}
             keyExtractor={(item) => item._id}
-            onEndReached={nextPageOrder}
+            onEndReached={nextPageSalesCloset}
             ListHeaderComponent={() => (
               <View style={[styles.row, { marginBottom: 30 }]}>
                 <TouchableOpacity onPress={() => toggleTab("processing")}>
@@ -283,6 +193,7 @@ export default function MyOrder({ navigation }) {
                 </TouchableOpacity>
               </View>
             )}
+            onEndReachedThreshold={5}
             initialNumToRender={6}
             renderItem={({ item }) => (
               <View style={styles.addressCard} key={item._id}>
@@ -295,6 +206,16 @@ export default function MyOrder({ navigation }) {
                   </Text>
                 </View>
                 <View style={styles.itemDetail}>
+                  <View style={{ marginBottom: 5 }}>
+                    <View style={styles.dFlex}>
+                      <Text style={styles.orderDate}>Product:</Text>
+                      <Text style={styles.orderNo} numberOfLines={1}>
+                        {" "}
+                        {item.product_id?.name}
+                      </Text>
+                    </View>
+                  </View>
+
                   <View>
                     <View style={styles.dFlex}>
                       <Text style={styles.orderDate}>Tracking number:</Text>
@@ -307,21 +228,21 @@ export default function MyOrder({ navigation }) {
                   <View style={styles.row}>
                     <View style={styles.dFlex}>
                       <Text style={styles.orderDate}>Quantity:</Text>
-                      <Text style={styles.itemValue}>
-                        {" "}
-                        {orderQuantity(item.orders)}
-                      </Text>
+                      <Text style={styles.itemValue}> {item.quantity}</Text>
                     </View>
                     <View style={styles.dFlex}>
                       <Text style={styles.orderDate}>Total Amount:</Text>
-                      <Text style={styles.itemValue}> Rs.{item.total}</Text>
+                      <Text style={styles.itemValue}>
+                        {" "}
+                        Rs.{item.price * item.quantity}
+                      </Text>
                     </View>
                   </View>
                 </View>
                 <View style={styles.row}>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate("Order Details", {
+                      navigation.navigate("Sale Details", {
                         ...item,
                         status: tab,
                       })
@@ -333,9 +254,8 @@ export default function MyOrder({ navigation }) {
                 </View>
               </View>
             )}
-            onEndReachedThreshold={5}
             ListFooterComponent={() =>
-              orderHasNextPage ? (
+              salesHasNextPage ? (
                 <View style={{ padding: 20 }}>
                   <ActivityIndicator size={"large"} color="#663399" />
                 </View>
@@ -346,7 +266,9 @@ export default function MyOrder({ navigation }) {
       )}
     </SafeAreaView>
   );
-}
+};
+
+export default MySales;
 
 const styles = StyleSheet.create({
   container: {

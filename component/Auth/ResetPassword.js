@@ -17,6 +17,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { firebaseAuth } from "../../firebaseConfig";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   newPassword: Yup.string().required(),
@@ -36,7 +37,7 @@ export default function ResetPassword({ route }) {
       var response = await axios.post("/user/reset/password", data);
       Alert.alert("Your password has been successfully updated");
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 

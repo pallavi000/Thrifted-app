@@ -16,7 +16,6 @@ import {
   Ionicons,
   FontAwesome,
 } from "@expo/vector-icons";
-import { Raleway_700Bold } from "@expo-google-fonts/raleway";
 import { AuthContext } from "../Context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -124,6 +123,23 @@ export default function Setting({ navigation }) {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Feather name="shopping-bag" size={20}></Feather>
               <Text style={styles.pageName}>My Purchases</Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <MaterialCommunityIcons
+                name="chevron-double-right"
+                size={20}
+                color="#CDCDCD"
+              ></MaterialCommunityIcons>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate("My Sales", decode)}
+            style={styles.pagesWrapper}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Feather name="truck" size={20}></Feather>
+              <Text style={styles.pageName}>My Sales</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <MaterialCommunityIcons

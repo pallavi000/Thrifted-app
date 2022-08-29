@@ -18,6 +18,7 @@ import { format } from "timeago.js";
 import { AuthContext } from "../Context";
 import axios from "axios";
 import bbstyles from "../Styles";
+import { apiErrorNotification } from "./../ErrorHandle";
 
 export default function Comment({ navigation, route }) {
   const [newComment, setNewComment] = useState("");
@@ -109,11 +110,10 @@ export default function Comment({ navigation, route }) {
       const index = newproducts.findIndex((product) => product._id == post_id);
       if (index != -1) {
         newproducts[index].comments_count += 1;
-        console.log(newproducts[index].comments_count);
         setProducts(newproducts);
       }
     } catch (error) {
-      console.log(error.request.response);
+      apiErrorNotification(error);
     }
   };
 

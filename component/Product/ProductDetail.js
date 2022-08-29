@@ -31,6 +31,7 @@ import {
   ElementContainer,
   InstagramProvider,
 } from "@postillon/react-native-instagram-zoomable";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function ProductDetail({ navigation, route }) {
   const [showFullDesc, setShowFullDesc] = useState(false);
@@ -153,7 +154,7 @@ export default function ProductDetail({ navigation, route }) {
         setProduct({ ...product, stock: 0 });
       }
       setIsSubmitting(false);
-      Alert.alert("Error", err.request.response);
+      apiErrorNotification(error);
     }
   };
 

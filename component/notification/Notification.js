@@ -123,9 +123,7 @@ export default function Notification({ navigation }) {
       const noti = groupNotification(response.data);
       setNotifications(noti);
       setNotificationLoader(false);
-    } catch (error) {
-      console.log(error.message);
-    }
+    } catch (error) {}
   });
 
   const getOrderNotification = React.useCallback(async () => {
@@ -143,9 +141,7 @@ export default function Notification({ navigation }) {
       var response = await axios.get("/notification/read", config);
       setUnreadNotification(unreadNotification - unreadNormalNotificationCount);
       setUnreadNormalNotificationCount(0);
-    } catch (error) {
-      console.log(error.request.response);
-    }
+    } catch (error) {}
   });
 
   const readOrderNotification = React.useCallback(async () => {
@@ -153,9 +149,7 @@ export default function Notification({ navigation }) {
       await axios.get("/order-notification/read", config);
       setUnreadNotification(unreadNotification - unreadOrderNotificationCount);
       setUnreadOrderNotificationCount(0);
-    } catch (error) {
-      console.log(error.request.response);
-    }
+    } catch (error) {}
   });
 
   const getDisplayDate = React.useCallback((date) => {

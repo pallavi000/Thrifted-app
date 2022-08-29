@@ -3,6 +3,7 @@ import { SafeAreaView, Alert } from "react-native";
 import axios from "axios";
 
 import { EsewaSdk } from "rn-all-nepal-payment";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const Esewa = (props) => {
   const [isVisible, setisVisible] = React.useState(false);
@@ -34,7 +35,7 @@ const Esewa = (props) => {
         props.orderSuccess();
       } catch (error) {
         props.setIsSubmitting(false);
-        Alert.alert("Error", error.request.response);
+        apiErrorNotification(error);
       }
     } else {
       props.setIsSubmitting(false);

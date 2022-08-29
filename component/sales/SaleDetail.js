@@ -8,7 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { imageLink } from "../ImageLink";
 import {
   Feather,
@@ -17,20 +17,23 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 
-export default function OrderDetail({ navigation, route }) {
+const SaleDetail = ({ navigation, route }) => {
   const item = route.params;
+  const [shippingAddress, setShippingAddress] = useState({});
 
   const changeDate = React.useCallback((createdAt) => {
     var arr = createdAt.split("T");
     return arr[0];
   });
 
-  const orderQuantity = React.useCallback((orders) => {
-    var total = orders.reduce((total, order) => {
-      return (total += order.quantity);
-    }, 0);
-    return total;
-  });
+  useEffect(() => {
+    if (item.addresses?.length) {
+      const addr = item.addresses.find((add) => add.type === "shipping");
+      if (addr) {
+        setShippingAddress(addr);
+      }
+    }
+  }, []);
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
@@ -52,88 +55,82 @@ export default function OrderDetail({ navigation, route }) {
             <Text style={styles.delivered}>{item.status}</Text>
           </View>
 
-          <Text style={styles.orderValue}>{item.orders.length} items</Text>
-
-          {item.orders.map((order) => {
-            return (
-              <View style={styles.addressCard} key={order._id}>
-                <View style={styles.row}>
-                  <Image
-                    source={{ uri: imageLink + order.product_id?.image }}
-                    style={styles.image}
-                  ></Image>
-                  <View>
-                    <View style={{ flexDirection: "row" }}>
-                      <View
-                        style={[
-                          styles.row,
-                          {
-                            justifyContent: "space-between",
-                            width: Dimensions.get("window").width - 180,
-                          },
-                        ]}
-                      >
-                        <View>
-                          <Text style={styles.name} ellipsizeMode="tail">
-                            {order.product_id?.name}
-                          </Text>
-                        </View>
-                        {order.order_status == "processing" ? (
-                          <View style={styles.pendingAction}>
-                            <MaterialCommunityIcons
-                              style={styles.icon}
-                              name="timer-sand-empty"
-                              size={20}
-                            ></MaterialCommunityIcons>
-                          </View>
-                        ) : order.order_status == "shipped" ? (
-                          <View style={styles.pendingAction}>
-                            <MaterialIcons
-                              style={styles.icon}
-                              name="local-shipping"
-                              size={20}
-                            ></MaterialIcons>
-                          </View>
-                        ) : (
-                          <View style={styles.successAction}>
-                            <Feather
-                              name="check"
-                              style={styles.icon}
-                              size={20}
-                            ></Feather>
-                          </View>
-                        )}
-                      </View>
+          <View style={styles.addressCard}>
+            <View style={styles.row}>
+              <Image
+                source={{ uri: imageLink + item.product_id?.image }}
+                style={styles.image}
+              ></Image>
+              <View>
+                <View style={{ flexDirection: "row" }}>
+                  <View
+                    style={[
+                      styles.row,
+                      {
+                        justifyContent: "space-between",
+                        width: Dimensions.get("window").width - 180,
+                      },
+                    ]}
+                  >
+                    <View>
+                      <Text style={styles.name} ellipsizeMode="tail">
+                        {item.product_id?.name}
+                      </Text>
                     </View>
-                    <Text style={styles.brand}>Nike</Text>
-                    <View style={styles.row}>
-                      <View style={[styles.row, { marginRight: 5 }]}>
-                        <Text style={styles.brand}>Color: </Text>
-                        <Text style={styles.value}>{order.color}</Text>
+                    {item.order_status == "processing" ? (
+                      <View style={styles.pendingAction}>
+                        <MaterialCommunityIcons
+                          style={styles.icon}
+                          name="timer-sand-empty"
+                          size={20}
+                        ></MaterialCommunityIcons>
                       </View>
-                      <View style={styles.row}>
-                        <Text style={styles.brand}>Size: </Text>
-                        <Text style={styles.value}>{order.size}</Text>
+                    ) : item.order_status == "shipped" ? (
+                      <View style={styles.pendingAction}>
+                        <MaterialIcons
+                          style={styles.icon}
+                          name="local-shipping"
+                          size={20}
+                        ></MaterialIcons>
                       </View>
-                    </View>
-                    <View style={styles.spaceBtwn}>
-                      <View style={styles.row}>
-                        <Text style={styles.brand}>Quantity: </Text>
-                        <Text style={styles.value}>{order.quantity}</Text>
+                    ) : (
+                      <View style={styles.successAction}>
+                        <Feather
+                          name="check"
+                          style={styles.icon}
+                          size={20}
+                        ></Feather>
                       </View>
-                      <Text style={styles.orderValue}>Rs.{order.price}</Text>
-                    </View>
-                    <TouchableOpacity
-                      style={styles.loginBtn}
-                      onPress={() => navigation.navigate("Track Order", order)}
-                    >
-                      <Text style={styles.login}>Track</Text>
-                    </TouchableOpacity>
+                    )}
                   </View>
                 </View>
+                <Text style={styles.brand}>Nike</Text>
+                <View style={styles.row}>
+                  <View style={[styles.row, { marginRight: 5 }]}>
+                    <Text style={styles.brand}>Color: </Text>
+                    <Text style={styles.value}>{item.color}</Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.brand}>Size: </Text>
+                    <Text style={styles.value}>{item.size}</Text>
+                  </View>
+                </View>
+                <View style={styles.spaceBtwn}>
+                  <View style={styles.row}>
+                    <Text style={styles.brand}>Quantity: </Text>
+                    <Text style={styles.value}>{item.quantity}</Text>
+                  </View>
+                  <Text style={styles.orderValue}>Rs.{item.price}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.loginBtn}
+                  onPress={() => navigation.navigate("Track Order", item)}
+                >
+                  <Text style={styles.login}>Track</Text>
+                </TouchableOpacity>
               </View>
-            );
-          })}
+            </View>
+          </View>
 
           <View style={styles.shipping}>
             <Text style={styles.orderTitle}>Order Information</Text>
@@ -143,7 +140,8 @@ export default function OrderDetail({ navigation, route }) {
               </View>
               <View style={styles.half}>
                 <Text style={styles.shippingValue}>
-                  Hetauda-1, Hetauda, Makwanpur, 44107, Nepal
+                  {shippingAddress.street}, {shippingAddress.city},{" "}
+                  {shippingAddress.district}, {shippingAddress.zipcode}, Nepal
                 </Text>
               </View>
             </View>
@@ -153,7 +151,9 @@ export default function OrderDetail({ navigation, route }) {
                 <Text style={styles.shippingTitle}>Payment method:</Text>
               </View>
               <View style={styles.half}>
-                <Text style={styles.shippingValue}>Esewa</Text>
+                <Text style={styles.shippingValue}>
+                  {item.payment_method || "Direct"}
+                </Text>
               </View>
             </View>
 
@@ -163,7 +163,7 @@ export default function OrderDetail({ navigation, route }) {
               </View>
               <View style={styles.half}>
                 <Text style={styles.shippingValue}>
-                  Express, 2 days, Rs. 200
+                  Express, 2 days, Rs. {item.shipping || 0}
                 </Text>
               </View>
             </View>
@@ -184,7 +184,9 @@ export default function OrderDetail({ navigation, route }) {
                 <Text style={styles.shippingTitle}>Total Amount</Text>
               </View>
               <View style={styles.half}>
-                <Text style={styles.shippingValue}>Rs. 500</Text>
+                <Text style={styles.shippingValue}>
+                  Rs. {item.price * item.quantity}
+                </Text>
               </View>
             </View>
           </View>
@@ -203,7 +205,9 @@ export default function OrderDetail({ navigation, route }) {
       </View>
     </SafeAreaView>
   );
-}
+};
+
+export default SaleDetail;
 
 const styles = StyleSheet.create({
   container: {

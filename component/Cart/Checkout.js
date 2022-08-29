@@ -24,6 +24,7 @@ import Khalti from "../payment_gateway/Khalti";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import bbstyles from "../Styles";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function Checkout({ navigation }) {
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -104,8 +105,7 @@ export default function Checkout({ navigation }) {
       setAddresses(response.data);
       setLoader(false);
     } catch (error) {
-      setLoader(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 

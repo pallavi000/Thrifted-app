@@ -23,7 +23,7 @@ import { firebaseAuth, firebaseApp } from "../../firebaseConfig";
 import { PhoneAuthProvider } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import OTP from "./OTP";
-import { NIL } from "uuid";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email("Email is required."),
@@ -33,12 +33,13 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Register({ navigation }) {
-  const { setIsLoggedIn } = useContext(AuthContext);
+  const { setIsLoggedIn, setToken } = useContext(AuthContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const captchaRef = useRef(null);
   const [otpScreen, setOtpScreen] = useState(false);
   const [formData, setFormData] = useState();
   const [verificationId, setVerificationId] = useState(null);
+
   const sendOTP = async (data) => {
     try {
       setIsSubmitting(true);
@@ -52,9 +53,8 @@ export default function Register({ navigation }) {
       setOtpScreen(true);
       setIsSubmitting(false);
     } catch (error) {
-      console.log(error.message);
+      apiErrorNotification(error);
       setIsSubmitting(false);
-      Alert.alert("Error", "Some Error Occurred.");
     }
   };
 
@@ -65,9 +65,8 @@ export default function Register({ navigation }) {
       const response = await axios.post("/user/check/email", data);
       await sendOTP(data);
     } catch (error) {
-      console.log(error.message);
       setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   }
 
@@ -78,12 +77,13 @@ export default function Register({ navigation }) {
       if (response.data) {
         await AsyncStorage.setItem("token", response.data.token);
         setIsSubmitting(false);
+        setToken(response.data.token);
         setIsLoggedIn(true);
       }
     } catch (error) {
       setOtpScreen(false);
       setIsSubmitting(false);
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   };
 

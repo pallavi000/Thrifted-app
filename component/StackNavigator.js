@@ -23,6 +23,8 @@ import { AuthContext } from "./Context";
 import Notification from "./notification/Notification";
 import Interest from "./Auth/Interest";
 import RentSale from "./Home/RentSale";
+import MySales from "./sales/MySales";
+import SaleDetail from "./sales/SaleDetail";
 
 const Stack = createNativeStackNavigator();
 
@@ -376,6 +378,40 @@ function ProfileNavigation({ navigation }) {
           },
         }}
         component={MyOrder}
+      />
+
+      <Stack.Screen
+        name="My Sales"
+        options={{
+          headerStyle: {
+            backgroundColor: "#fff",
+            borderWidth: 0,
+          },
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: "700",
+          },
+        }}
+        component={MySales}
+      />
+
+      <Stack.Screen
+        name="Sale Details"
+        options={{
+          headerStyle: {
+            backgroundColor: "#fff",
+            borderWidth: 0,
+          },
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: "700",
+          },
+        }}
+        component={SaleDetail}
       />
 
       <Stack.Screen

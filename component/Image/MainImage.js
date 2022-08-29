@@ -59,6 +59,7 @@ const MainImage = (props) => {
       mediaTypes: imagePicker.MediaTypeOptions.Images,
       base64: true,
     });
+    if (!imageIndex) return;
     if (!result.cancelled) {
       setFieldValue(
         `image${imageIndex}`,
@@ -72,6 +73,7 @@ const MainImage = (props) => {
     const result = await imagePicker.launchCameraAsync({
       base64: true,
     });
+    if (!imageIndex) return;
     if (!result.cancelled) {
       setFieldValue(
         `image${imageIndex}`,

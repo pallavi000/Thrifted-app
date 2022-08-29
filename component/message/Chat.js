@@ -25,10 +25,6 @@ import React, {
   useState,
 } from "react";
 import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-} from "@expo-google-fonts/raleway";
-import {
   Feather,
   Octicons,
   Ionicons,
@@ -40,9 +36,8 @@ import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
 import { format } from "timeago.js";
 import { imageLink } from "../ImageLink";
-// import Emoticons from 'react-native-emoticons';
-
-import { io } from "socket.io-client";
+import Emoticons from "react-native-emoticons";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
@@ -52,6 +47,8 @@ export default function Chat({ route, navigation }) {
   const flatListRef = useRef(null);
   const [showTimer, setShowTimer] = useState(0);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [hasNextPageMessage, setHasNextPageMessage] = useState(true);
+  const [pageNo, setPageNo] = useState(1);
 
   const data = useContext(AuthContext);
   const { token, decode, unreadMessage, setUnreadMessage, socket } = data;
@@ -66,7 +63,7 @@ export default function Chat({ route, navigation }) {
   useEffect(() => {
     if (socket.current) {
       socket.current.on("receiveMessage", (message) => {
-        setMessages([...messages, message]);
+        setMessages([message, ...messages]);
       });
     }
   }, [socket, messages]);
@@ -89,9 +86,9 @@ export default function Chat({ route, navigation }) {
       );
       socket.current.emit("sendMessage", response.data);
 
-      setMessages([...messages, response.data]);
+      setMessages([response.data, ...messages]);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   }, [messages, message]);
 
@@ -152,17 +149,41 @@ export default function Chat({ route, navigation }) {
 
   const getMessages = React.useCallback(async () => {
     try {
-      const response = await axios.get(
-        "/chat/message/" + receiver.conversation._id,
+      const data = {
+        pageNo,
+      };
+      const response = await axios.post(
+        "/chat/message/get/" + receiver.conversation._id,
+        data,
         config
       );
       setMessages(response.data);
       setLoader(false);
       setUnreadMessage(unreadMessage - receiver.conversation.unread_count);
     } catch (error) {
-      console.log(error.request.response);
+      apiErrorNotification(error);
     }
   }, []);
+
+  const nextPageMessage = async () => {
+    if (!hasNextPageMessage) return;
+    try {
+      const data = {
+        pageNo: pageNo + 1,
+      };
+      setPageNo(pageNo + 1);
+      const response = await axios.post(
+        "/chat/message/get/" + receiver.conversation._id,
+        data,
+        config
+      );
+      if (!response.data.length) {
+        setHasNextPageMessage(false);
+      } else {
+        setMessages([...messages, ...response.data]);
+      }
+    } catch (error) {}
+  };
 
   const changeShowTimer = React.useCallback((id) => {
     setShowTimer(id);
@@ -175,14 +196,16 @@ export default function Chat({ route, navigation }) {
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
-      {/* <Emoticons
-     onEmoticonPress={(emoji)=>setMessage(message+emoji.code)}
-     onBackspacePress={()=>setShowEmoji(false)}
-     show={showEmoji}
-     concise={true}
-     showHistoryBar={true}
-     showPlusBar={false}
- /> */}
+      <Emoticons
+        onEmoticonPress={(emoji) =>
+          message ? setMessage(message + emoji.code) : setMessage(emoji.code)
+        }
+        onBackspacePress={() => setShowEmoji(false)}
+        show={showEmoji}
+        concise={true}
+        showHistoryBar={true}
+        showPlusBar={false}
+      />
 
       <KeyboardAvoidingView
         keyboardVerticalOffset={-500}
@@ -200,9 +223,19 @@ export default function Chat({ route, navigation }) {
               contentContainerStyle={{ padding: 10 }}
               keyExtractor={(item) => item._id}
               ref={flatListRef}
-              onContentSizeChange={() =>
-                flatListRef.current.scrollToEnd({ animated: true })
+              initialNumToRender={10}
+              inverted
+              onEndReached={nextPageMessage}
+              ListFooterComponent={() =>
+                hasNextPageMessage ? (
+                  <View style={{ padding: 20 }}>
+                    <ActivityIndicator size={"large"} color="#663399" />
+                  </View>
+                ) : null
               }
+              // onContentSizeChange={() =>
+              //   flatListRef.current.scrollToEnd({ animated: true })
+              // }
               renderItem={({ item }) =>
                 item.sender_id != decode._id ? (
                   <View style={styles.dFlex}>
@@ -217,8 +250,8 @@ export default function Chat({ route, navigation }) {
                       <View style={{ flexGrow: 1 }}>
                         <Text style={styles.message}>{item.message}</Text>
                         {showTimer == item._id ? (
-                          <Text style={styles.sentTime}>
-                            {format(item.updatedAt)}
+                          <Text style={styles.sentTimeReceiver}>
+                            {format(item.createdAt)}
                           </Text>
                         ) : null}
                       </View>
@@ -233,7 +266,7 @@ export default function Chat({ route, navigation }) {
                       <Text style={styles.senderMessage}>{item.message}</Text>
                       {showTimer == item._id ? (
                         <Text style={styles.sentTime}>
-                          {format(item.updatedAt)}
+                          {format(item.createdAt)}
                         </Text>
                       ) : null}
                     </View>
@@ -300,6 +333,12 @@ const styles = StyleSheet.create({
   },
   sentTime: {
     textAlign: "right",
+    paddingHorizontal: 10,
+    fontSize: 10,
+    color: "#8E8E93",
+  },
+  sentTimeReceiver: {
+    textAlign: "left",
     paddingHorizontal: 10,
     fontSize: 10,
     color: "#8E8E93",

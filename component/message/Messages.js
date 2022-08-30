@@ -28,6 +28,10 @@ export default function Messages({ navigation }) {
   const { token, titleShown, setTitleShown, decode, socket } = data;
   const [chats, setChats] = useState([]);
   const [originalChats, setOriginalChats] = useState([]);
+
+  const [hasNextPageMessage, setHasNextPageMessage] = useState(true);
+  const [pageNo, setPageNo] = useState(1);
+
   const config = {
     headers: {
       "access-token": token,
@@ -73,7 +77,10 @@ export default function Messages({ navigation }) {
 
   const getMessage = React.useCallback(async () => {
     try {
-      const response = await axios.get("/chat/conversation", config);
+      const data = {
+        pageNo,
+      };
+      const response = await axios.post("/chat/conversation", data, config);
       setChats(response.data);
       setOriginalChats(response.data);
       setLoader(false);
@@ -81,6 +88,27 @@ export default function Messages({ navigation }) {
       apiErrorNotification(error);
     }
   }, []);
+
+  function chatnextPage(){
+    if(!hasNextPageMessage) return;
+    try {
+      setPageNo(pageNo+1)
+      const data = {
+        pageNo:pageNo+1,
+      };
+      const response = await axios.post("/chat/conversation", data, config);
+      if(!response.data.length) {
+        setHasNextPageMessage(false)
+      }
+      setChats([...chats , ...response.data]);
+      setOriginalChats([...originalChats, ...response.data]);
+     
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+  
+
+  }
 
   const startChat = React.useCallback(async (conversation) => {
     if (decode._id == conversation.sender_id._id) {
@@ -160,7 +188,15 @@ export default function Messages({ navigation }) {
         ) : chats && chats.length > 0 ? (
           <FlatList
             data={chats}
+            onEndReached={()=>chatnextPage()}
             keyExtractor={(item) => item._id}
+            ListFooterComponent={() =>
+                hasNextPageMessage ? (
+                  <View style={{ padding: 20 }}>
+                    <ActivityIndicator size={"large"} color="#663399" />
+                  </View>
+                ) : null
+              }
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[styles.dFlex, styles.marginTop]}

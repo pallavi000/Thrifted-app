@@ -179,13 +179,13 @@ export default function MyOrder({ navigation }) {
         if (deliveredItemsCount + delivered.length >= totalDelivered) {
           setOrderHasNextPage(false);
         }
-        setItems([...items, deliveredItems]);
+        setItems([...items, ...deliveredItems]);
       }
       if (tab === "cancelled") {
         if (cancelledItemsCount + cancelled.length >= totalCancelled) {
           setOrderHasNextPage(false);
         }
-        setItems([...items, cancelledItems]);
+        setItems([...items, ...cancelledItems]);
       }
 
       setProcessing([...processing, ...processingItems]);

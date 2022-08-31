@@ -8,7 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { imageLink } from "../ImageLink";
 import {
   Feather,
@@ -19,6 +19,18 @@ import {
 
 export default function OrderDetail({ navigation, route }) {
   const item = route.params;
+  const [shippingAddress, setShippingAddress] = useState({});
+
+  useEffect(() => {
+    if (item.addresses.length) {
+      var shipping_address = item.addresses.find(
+        (address) => address.type == "shipping"
+      );
+      if (shipping_address) {
+        setShippingAddress(shipping_address);
+      }
+    }
+  }, []);
 
   const changeDate = React.useCallback((createdAt) => {
     var arr = createdAt.split("T");
@@ -105,7 +117,7 @@ export default function OrderDetail({ navigation, route }) {
                         )}
                       </View>
                     </View>
-                    <Text style={styles.brand}>Nike</Text>
+                    <Text style={styles.brand}>{order.brand}</Text>
                     <View style={styles.row}>
                       <View style={[styles.row, { marginRight: 5 }]}>
                         <Text style={styles.brand}>Color: </Text>
@@ -143,7 +155,8 @@ export default function OrderDetail({ navigation, route }) {
               </View>
               <View style={styles.half}>
                 <Text style={styles.shippingValue}>
-                  Hetauda-1, Hetauda, Makwanpur, 44107, Nepal
+                  {shippingAddress.street}, {shippingAddress.city},
+                  {shippingAddress.district}, {shippingAddress.zipcode}, Nepal
                 </Text>
               </View>
             </View>
@@ -153,7 +166,7 @@ export default function OrderDetail({ navigation, route }) {
                 <Text style={styles.shippingTitle}>Payment method:</Text>
               </View>
               <View style={styles.half}>
-                <Text style={styles.shippingValue}>Esewa</Text>
+                <Text style={styles.shippingValue}>{item.payment_method}</Text>
               </View>
             </View>
 
@@ -163,7 +176,7 @@ export default function OrderDetail({ navigation, route }) {
               </View>
               <View style={styles.half}>
                 <Text style={styles.shippingValue}>
-                  Express, 2 days, Rs. 200
+                  Express, 2 days, Rs. {item.shipping || 0}
                 </Text>
               </View>
             </View>
@@ -184,7 +197,7 @@ export default function OrderDetail({ navigation, route }) {
                 <Text style={styles.shippingTitle}>Total Amount</Text>
               </View>
               <View style={styles.half}>
-                <Text style={styles.shippingValue}>Rs. 500</Text>
+                <Text style={styles.shippingValue}>Rs.{item.total}</Text>
               </View>
             </View>
           </View>

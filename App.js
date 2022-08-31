@@ -51,7 +51,7 @@ import * as Notifications from "expo-notifications";
 import FeedSetting from "./component/setting/FeedSetting";
 
 // axios.defaults.baseURL = "http://localhost:5000/api";
-axios.defaults.baseURL = "https://thrifted.jcloudia.com/api";
+axios.defaults.baseURL = process.env.API_URL;
 
 const Stack = createNativeStackNavigator();
 
@@ -242,7 +242,7 @@ export default function App(props) {
           navigationRef?.current?.navigate("Comments", data.post_id);
         }
         if (data.type == "order") {
-          navigationRef?.current?.navigate("My Orders");
+          navigationRef?.current?.navigate("My Sales");
         }
         if (data.type == "message") {
           navigationRef?.current?.navigate("chat", data);

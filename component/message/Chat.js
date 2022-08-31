@@ -361,6 +361,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     maxWidth: "70%",
     alignSelf: "flex-start",
+    overflow: "hidden",
   },
   senderMessage: {
     fontSize: 16,
@@ -377,6 +378,7 @@ const styles = StyleSheet.create({
     maxWidth: "90%",
     alignSelf: "flex-end",
     flexGrow: 1,
+    overflow: "hidden",
   },
   self: {
     alignItems: "flex-start",

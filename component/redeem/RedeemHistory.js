@@ -17,10 +17,14 @@ import axios from "axios";
 import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
 import EmptyRedeem from "./EmptyRedeem";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function RedeemHistory({ navigation }) {
   const [payments, setPayments] = useState([]);
   const [loader, setLoader] = useState(true);
+
+  const [pageNo, setPageNo] = useState(1);
+  const [hasNextPage, setNextPage] = useState(true);
 
   const data = useContext(AuthContext);
   const { token } = data;
@@ -37,7 +41,10 @@ export default function RedeemHistory({ navigation }) {
 
   const getHistory = React.useCallback(async () => {
     try {
-      var response = await axios.get("/user/withdraw/all", config);
+      const data = {
+        pageNo,
+      };
+      var response = await axios.post("/user/withdraw/all", data, config);
       setPayments(response.data);
       setLoader(false);
     } catch (error) {}
@@ -54,6 +61,24 @@ export default function RedeemHistory({ navigation }) {
     return time[0];
   });
 
+  async function getNextReedem() {
+    if (!hasNextPage) return;
+    try {
+      setPageNo(pageNo + 1);
+      const data = {
+        pageNo: pageNo + 1,
+      };
+      const response = await axios.post("/user/withdraw/all", data, config);
+      if (response.data.length) {
+        setPayments([...payments, ...response.data]);
+      } else {
+        setNextPage(false);
+      }
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+  }
+
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
       {loader ? (
@@ -66,13 +91,23 @@ export default function RedeemHistory({ navigation }) {
             data={payments}
             keyExtractor={(item) => item._id}
             initialNumToRender={6}
+            ListFooterComponent={() => {
+              return hasNextPage ? (
+                <View style={{ padding: 20 }}>
+                  <ActivityIndicator size={"large"} color="#663399" />
+                </View>
+              ) : null;
+            }}
+            onEndReachedThreshold={5}
+            onEndReached={() => getNextReedem()}
             renderItem={({ item }) => (
               <View>
                 {item.status == "pending" ? (
                   <View style={styles.pendingCard} key={item._id}>
                     <View>
                       <Text styles={styles.title}>
-                        {item.payment_method} . {item.account_detail}
+                        Rs.{item.amount} . {item.payment_method} .{" "}
+                        {item.account_detail}
                       </Text>
                       <View style={styles.row}>
                         <Text style={styles.subtitle}>
@@ -95,10 +130,17 @@ export default function RedeemHistory({ navigation }) {
                 ) : item.status == "completed" ? (
                   <View style={styles.successCard} key={item._id}>
                     <View>
-                      <Text styles={styles.title}>Esewa . 9845534234</Text>
+                      <Text styles={styles.title}>
+                        Rs.{item.amount} . {item.payment_method} .{" "}
+                        {item.account_detail}
+                      </Text>
                       <View style={styles.row}>
-                        <Text style={styles.subtitle}>02/03/2022</Text>
-                        <Text style={styles.subtitle}>05:30:21</Text>
+                        <Text style={styles.subtitle}>
+                          {dateConvert(item.createdAt)}
+                        </Text>
+                        <Text style={styles.subtitle}>
+                          {timeConvert(item.createdAt)}
+                        </Text>
                       </View>
                     </View>
 
@@ -113,10 +155,17 @@ export default function RedeemHistory({ navigation }) {
                 ) : (
                   <View style={styles.cancelledCard} key={item._id}>
                     <View>
-                      <Text styles={styles.title}>Esewa . 9845534234</Text>
+                      <Text styles={styles.title}>
+                        Rs.{item.amount} . {item.payment_method} .{" "}
+                        {item.account_detail}
+                      </Text>
                       <View style={styles.row}>
-                        <Text style={styles.subtitle}>02/03/2022</Text>
-                        <Text style={styles.subtitle}>05:30:21</Text>
+                        <Text style={styles.subtitle}>
+                          {dateConvert(item.createdAt)}
+                        </Text>
+                        <Text style={styles.subtitle}>
+                          {timeConvert(item.createdAt)}
+                        </Text>
                       </View>
                     </View>
 

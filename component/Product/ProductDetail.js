@@ -160,9 +160,11 @@ export default function ProductDetail({ navigation, route }) {
 
   const parseImages = useCallback((image, images) => {
     var arr = [imageLink + image];
-    images.forEach((image) => {
-      arr.push(imageLink + image);
-    });
+    if (images && images.length) {
+      images.forEach((image) => {
+        arr.push(imageLink + image);
+      });
+    }
     return arr;
   });
 
@@ -234,20 +236,23 @@ export default function ProductDetail({ navigation, route }) {
             opacity: Animated.add(0.3, Animated.multiply(fall, 1.0)),
           }}
         >
-          <InstagramProvider>
-            <View style={styles.detailImage}>
-              <ElementContainer>
-                <SliderBox
-                  images={parseImages(product.image, product.feature_image)}
-                  ImageComponentStyle={styles.productImage}
-                  dotColor="#663399"
-                  imageLoadingColor="#663399"
-                  currentImageEmitter={getCurrentImageIndex}
-                  pagingEnabled
-                />
-              </ElementContainer>
-            </View>
-          </InstagramProvider>
+          <View style={{ zIndex: 7 }}>
+            <InstagramProvider>
+              <View style={styles.detailImage}>
+                <ElementContainer>
+                  <SliderBox
+                    images={parseImages(product.image, product.feature_image)}
+                    ImageComponentStyle={styles.productImage}
+                    dotColor="#663399"
+                    resizeMode="contain"
+                    imageLoadingColor="#663399"
+                    currentImageEmitter={getCurrentImageIndex}
+                    pagingEnabled
+                  />
+                </ElementContainer>
+              </View>
+            </InstagramProvider>
+          </View>
 
           <View style={styles.detailContainer}>
             <View style={styles.productName}>
@@ -520,11 +525,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   product: {},
-  productImage: {
-    height: 400,
-    width: "100%",
-    resizeMode: "cover",
-  },
+
   typeWrapper: {
     display: "flex",
     flexDirection: "row",
@@ -578,11 +579,13 @@ const styles = StyleSheet.create({
   detailImage: {
     backgroundColor: "#f5f5ff",
     paddingVertical: 30,
+    zIndex: 8,
   },
   productImage: {
     width: Dimensions.get("window").width,
     height: 300,
     resizeMode: "contain",
+    flex: 1,
   },
   detailContainer: {
     flex: 1,

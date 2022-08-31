@@ -171,6 +171,7 @@ export default React.memo(function Action(props) {
   }, []);
 
   function getCurrentImageIndex(index) {
+    console.log(imageIndex);
     if (!index && index !== 0) return imageIndex;
     setImageIndex(index);
   }
@@ -211,24 +212,22 @@ export default React.memo(function Action(props) {
             </View>
           ) : null}
 
-          <InstagramProvider>
-            <ElementContainer>
-              <SliderBox
-                images={parseImages(product.image, product.feature_image)}
-                ImageComponentStyle={styles.productImage}
-                // ImageComponent={(data) => {
-                //   const { source: { uri } = {} } = data || {};
-                //   return <CustomImage source={uri} />;
-                // }}
-                currentImageEmitter={getCurrentImageIndex}
-                dotColor="#663399"
-                imageLoadingColor="#663399"
-                activeOpacity={1}
-                onCurrentImagePressed={() => singleOrDoubleClick(product)}
-                pagingEnabled
-              />
-            </ElementContainer>
-          </InstagramProvider>
+          <View style={{ zIndex: 8 }}>
+            <InstagramProvider>
+              <ElementContainer>
+                <SliderBox
+                  images={parseImages(product.image, product.feature_image)}
+                  ImageComponentStyle={styles.productImage}
+                  currentImageEmitter={getCurrentImageIndex}
+                  dotColor="#663399"
+                  imageLoadingColor="#663399"
+                  activeOpacity={1}
+                  onCurrentImagePressed={() => singleOrDoubleClick(product)}
+                  pagingEnabled
+                />
+              </ElementContainer>
+            </InstagramProvider>
+          </View>
 
           <View style={styles.productreview}>
             <TouchableOpacity
@@ -405,7 +404,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     resizeMode: "cover",
     zIndex: 99,
-    borderWidth: 1,
   },
   typeWrapper: {
     display: "flex",

@@ -104,7 +104,7 @@ const SaleDetail = ({ navigation, route }) => {
                     )}
                   </View>
                 </View>
-                <Text style={styles.brand}>Nike</Text>
+                <Text style={styles.brand}>{item.brand}</Text>
                 <View style={styles.row}>
                   <View style={[styles.row, { marginRight: 5 }]}>
                     <Text style={styles.brand}>Color: </Text>
@@ -140,7 +140,7 @@ const SaleDetail = ({ navigation, route }) => {
               </View>
               <View style={styles.half}>
                 <Text style={styles.shippingValue}>
-                  {shippingAddress.street}, {shippingAddress.city},{" "}
+                  {shippingAddress.street}, {shippingAddress.city},
                   {shippingAddress.district}, {shippingAddress.zipcode}, Nepal
                 </Text>
               </View>

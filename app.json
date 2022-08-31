@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Luga Ghar",
-    "slug": "LugaGhar",
+    "name": "Hamro Closet",
+    "slug": "HamroCloset",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,14 +23,23 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "enableDangerousExperimentalLeanBuilds": true,
+      "package": "com.hamrocloset.HamroCloset"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "build": {
         "babel": {
-          "include": ["rn-all-nepal-payment"]
+          "include": [
+            "rn-all-nepal-payment"
+          ]
         }
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4d8cd9da-afaa-4a7d-a4a6-bb4f375c84f9"
       }
     }
   }

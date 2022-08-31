@@ -62,7 +62,7 @@ const Khalti = (props) => {
         productIdentity={props.pid} // Unique product identifier at merchant
         onPaymentComplete={_onPaymentComplete} // Callback from Khalti Web Sdk
         productUrl="https://google.com" // Url of product
-        publicKey={"test_public_key_9846f443b0934e37877c01b1ae4a4311"} // Test or live public key which identifies the merchant
+        publicKey={process.env.KHALTI_PUBLIC_KEY} // Test or live public key which identifies the merchant
       />
     </SafeAreaView>
   );

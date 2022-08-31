@@ -9,8 +9,11 @@ import {
   StatusBar,
 } from "react-native";
 import React from "react";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Raleway_400Regular } from "@expo-google-fonts/raleway";
+import { Entypo, Feather } from "@expo/vector-icons";
+import {
+  Raleway_500Medium,
+  Raleway_600SemiBold,
+} from "@expo-google-fonts/raleway";
 
 export default function OrderTrack({ route }) {
   const order = route.params;
@@ -145,11 +148,26 @@ export default function OrderTrack({ route }) {
               </View>
             )}
 
-            <View style={styles.mapContainer}>
-              <Image
-                source={require("../../assets/map.png")}
-                style={styles.map}
-              ></Image>
+            <View>
+              <Text style={styles.tracking}>Tracking Information</Text>
+              <View style={styles.trackWrapper}>
+                <Entypo name="dot-single" size={24} color="black" />
+                <Text style={styles.trackDetail}>
+                  Package delivered to reception.
+                </Text>
+              </View>
+              <View style={styles.trackWrapper}>
+                <Entypo name="dot-single" size={24} color="black" />
+                <Text style={styles.trackDetail}>
+                  Package delivered to reception.
+                </Text>
+              </View>
+              <View style={styles.trackWrapper}>
+                <Entypo name="dot-single" size={24} color="black" />
+                <Text style={styles.trackDetail}>
+                  Package delivered to reception.
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -159,8 +177,26 @@ export default function OrderTrack({ route }) {
 }
 
 const styles = StyleSheet.create({
+  tracking: {
+    fontSize: 24,
+    marginVertical: 10,
+    fontFamily: "Raleway_600SemiBold",
+  },
   container: {
     backgroundColor: "#663399",
+  },
+  trackWrapper: {
+    display: "flex",
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  trackDetail: {
+    fontSize: 16,
+    fontFamily: "Raleway_500Medium",
+    marginLeft: 10,
+    color: "#4d4d4d",
   },
 
   title: {

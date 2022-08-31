@@ -320,7 +320,7 @@ export default function Checkout({ navigation }) {
           </View>
           <View style={styles.card}>
             <View style={styles.userWrapper}>
-              <RadioButton
+              <RadioButton.Android
                 color="#663399"
                 value="esewa"
                 status={paymentMethod === "esewa" ? "checked" : "unchecked"}
@@ -336,7 +336,7 @@ export default function Checkout({ navigation }) {
               </View>
             </View>
             <View style={styles.userWrapper}>
-              <RadioButton
+              <RadioButton.Android
                 color="#663399"
                 value="khalti"
                 status={paymentMethod === "khalti" ? "checked" : "unchecked"}

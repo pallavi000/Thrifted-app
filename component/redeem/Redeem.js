@@ -43,6 +43,7 @@ export default function Redeem({ navigation, route }) {
   };
 
   const RedeemForm = React.useCallback(async (data) => {
+    setIsSubmitting(true);
     try {
       if (user.balance < data.balance) {
         return Alert.alert(

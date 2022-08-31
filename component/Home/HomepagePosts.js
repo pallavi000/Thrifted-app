@@ -12,6 +12,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { useScrollToTop } from "@react-navigation/native";
 import { imageLink } from "../ImageLink";
 import Action from "./Action";
+import { OptimizedFlatList } from "react-native-optimized-flatlist";
 
 export default React.memo(function HomepagePosts({
   onRefresh,
@@ -78,8 +79,11 @@ export default React.memo(function HomepagePosts({
       }
       ref={scRef}
       showsVerticalScrollIndicator={false}
-      removeClippedSubviews={true}
       initialNumToRender={6}
+      removeClippedSubviews={true} // Unmount components when outside of window
+      maxToRenderPerBatch={1} // Reduce number in each render batch
+      updateCellsBatchingPeriod={100} // Increase time between renders
+      windowSize={7} // Reduce the window size
       contentContainerStyle={{ paddingBottom: 20 }}
       data={products}
       keyExtractor={(item) => item._id}

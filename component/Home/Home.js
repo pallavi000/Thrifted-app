@@ -8,7 +8,6 @@ import React, {
 import {
   Image,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -24,6 +23,7 @@ import {
   Button,
 } from "react-native";
 import axios from "axios";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Ionicons,
   Feather,
@@ -234,7 +234,12 @@ export default function Home({ navigation }) {
   }, []);
 
   return (
-    <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+    <SafeAreaView
+      style={{
+        backgroundColor: "white",
+        flex: 1,
+      }}
+    >
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       {loader ? (
         <View style={bbstyles.loaderContainer}>

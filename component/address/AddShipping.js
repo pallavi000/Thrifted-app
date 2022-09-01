@@ -74,23 +74,9 @@ export default function AddShipping({ navigation }) {
   }, [selectedDistrict]);
 
   useEffect(() => {
+    if (selectedZipCode.zipcode == "Select Zip Code") return;
     formRef.current.setFieldValue("zipcode", selectedZipCode.zipcode);
   }, [selectedZipCode]);
-
-  // useEffect(() => {
-  //   var a = [];
-  //   districts.map((district) => {
-  //     var zipcodesFilter = zipcodes.filter(
-  //       (zip) => zip.district == district.name
-  //     );
-  //     if (!zipcodesFilter.length) {
-  //       console.log(district);
-  //     } else {
-  //       a.push("success");
-  //     }
-  //   });
-  //   console.log(a.length);
-  // }, []);
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>

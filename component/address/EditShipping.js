@@ -37,6 +37,7 @@ export default function EditShipping({ navigation, route }) {
 
   const [selectedDistrict, setSelectedDistrict] = useState({
     name: address.district,
+    id: 1,
   });
   const [filterZipCodes, setFilterZipCodes] = useState(zipcodes);
   const [selectedZipCode, setSelectedZipCode] = useState({
@@ -51,16 +52,6 @@ export default function EditShipping({ navigation, route }) {
     },
   };
 
-  useEffect(() => {
-    setSelectedDistrict({
-      id: 1,
-      name: address.district,
-    });
-    setSelectedZipCode({
-      zipcode: address.zipcode,
-    });
-  }, []);
-
   const Edit = React.useCallback(async (data) => {
     try {
       setIsSubmitting(true);
@@ -70,8 +61,8 @@ export default function EditShipping({ navigation, route }) {
         config
       );
       Alert.alert("Success", "Address has been updated");
-      navigation.goBack();
       setIsSubmitting(false);
+      navigation.goBack();
     } catch (error) {
       apiErrorNotification(error);
       setIsSubmitting(false);
@@ -85,12 +76,9 @@ export default function EditShipping({ navigation, route }) {
         (zip) => zip.district == selectedDistrict.name
       );
       var find = zipcodesFilter.find(
-        (zip) => zip.zipcode === selectedZipCode.zipcode
+        (zip) => zip.zipcode == selectedZipCode.zipcode
       );
-      console.log(selectedZipCode);
-      if (find && find.zipcode) {
-      } else {
-        console.log("hello");
+      if (!find) {
         formRef.current.setFieldValue("zipcode", "");
         setSelectedZipCode({ zipcode: "Select Zip Code" });
       }
@@ -100,6 +88,7 @@ export default function EditShipping({ navigation, route }) {
   }, [selectedDistrict]);
 
   useEffect(() => {
+    if (selectedZipCode.zipcode == "Select Zip Code") return;
     formRef.current.setFieldValue("zipcode", selectedZipCode.zipcode);
   }, [selectedZipCode]);
 

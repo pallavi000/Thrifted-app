@@ -48,7 +48,7 @@ const ZipCodePicker = (props) => {
         headerRight: () => null,
       });
     };
-  }, [selectedSelect]);
+  }, []);
 
   function doneSelect() {
     if (!selectedSelect) return;
@@ -76,7 +76,7 @@ const ZipCodePicker = (props) => {
                       : styles.name
                   }
                 >
-                  {item.zipcode}
+                  {item.zipcode} ({item.city})
                 </Text>
               </TouchableOpacity>
             )}

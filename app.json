@@ -24,7 +24,6 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "enableDangerousExperimentalLeanBuilds": true,
       "package": "com.snlbaral.HamroCloset2"
     },
     "web": {

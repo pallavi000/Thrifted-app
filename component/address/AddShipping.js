@@ -33,10 +33,11 @@ export default function AddShipping({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef();
   const [showPicker, setShowPicker] = useState(null);
+
   const [selectedDistrict, setSelectedDistrict] = useState({
     name: "Select District",
   });
-  const [filterZipCodes, setFilterZipCodes] = useState([]);
+  const [filterZipCodes, setFilterZipCodes] = useState(zipcodes);
   const [selectedZipCode, setSelectedZipCode] = useState({
     zipcode: "Select Zip Code",
   });
@@ -49,13 +50,8 @@ export default function AddShipping({ navigation }) {
     },
   };
 
-  const add = async (values) => {
+  const add = React.useCallback(async (values) => {
     try {
-      var errors = Object.values(formRef.current.errors);
-      if (errors && errors.length > 0) {
-        Alert.alert("Error", errors[0]);
-        return;
-      }
       setIsSubmitting(true);
       await axios.post("/address", values, config);
       Alert.alert("Success", "Address has been added");
@@ -65,15 +61,36 @@ export default function AddShipping({ navigation }) {
       setIsSubmitting(false);
       apiErrorNotification(error);
     }
-  };
+  });
 
   useEffect(() => {
-    formRef.current.setFieldValue("district", selectedDistrict.name);
-    var zipcodesFilter = zipcodes.filter(
-      (zip) => zip.district == selectedDistrict.name
-    );
-    setFilterZipCodes(zipcodesFilter);
+    if (selectedDistrict.id) {
+      formRef.current.setFieldValue("district", selectedDistrict.name);
+      var zipcodesFilter = zipcodes.filter(
+        (zip) => zip.district == selectedDistrict.name
+      );
+      setFilterZipCodes(zipcodesFilter);
+    }
   }, [selectedDistrict]);
+
+  useEffect(() => {
+    formRef.current.setFieldValue("zipcode", selectedZipCode.zipcode);
+  }, [selectedZipCode]);
+
+  // useEffect(() => {
+  //   var a = [];
+  //   districts.map((district) => {
+  //     var zipcodesFilter = zipcodes.filter(
+  //       (zip) => zip.district == district.name
+  //     );
+  //     if (!zipcodesFilter.length) {
+  //       console.log(district);
+  //     } else {
+  //       a.push("success");
+  //     }
+  //   });
+  //   console.log(a.length);
+  // }, []);
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
@@ -175,27 +192,25 @@ export default function AddShipping({ navigation }) {
                   ) : null}
                 </View>
 
-                {selectedDistrict.id && (
-                  <View style={styles.formGroup}>
-                    <Text style={styles.label}>Zip Code (Postal Code)</Text>
-                    <TouchableOpacity onPress={() => setShowPicker("zipcodes")}>
-                      <View style={styles.selectField}>
-                        <Text
-                          style={{
-                            color: "black",
-                            textTransform: "capitalize",
-                            fontSize: 16,
-                          }}
-                        >
-                          {selectedZipCode.zipcode}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                    {errors.zipcode && touched.zipcode ? (
-                      <Text style={bbstyles.error}>{errors.zipcode}</Text>
-                    ) : null}
-                  </View>
-                )}
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>Zip Code (Postal Code)</Text>
+                  <TouchableOpacity onPress={() => setShowPicker("zipcodes")}>
+                    <View style={styles.selectField}>
+                      <Text
+                        style={{
+                          color: "black",
+                          textTransform: "capitalize",
+                          fontSize: 16,
+                        }}
+                      >
+                        {selectedZipCode.zipcode}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {errors.zipcode && touched.zipcode ? (
+                    <Text style={bbstyles.error}>{errors.zipcode}</Text>
+                  ) : null}
+                </View>
 
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>Phone</Text>

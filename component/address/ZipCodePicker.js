@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -57,28 +58,31 @@ const ZipCodePicker = (props) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{ paddingHorizontal: 20 }}>
+      <View style={{ paddingHorizontal: 20 }}>
         <View style={styles.categoryWrapper}>
-          {selects.map((select) => {
-            return (
+          <FlatList
+            key={uuidv4()}
+            data={selects}
+            initialNumToRender={10}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => setSelectedSelect(select)}
+                onPress={() => setSelectedSelect(item)}
                 key={uuidv4()}
               >
                 <Text
                   style={
-                    selectedSelect.zipcode == select.zipcode
+                    selectedSelect.zipcode == item.zipcode
                       ? styles.selectedName
                       : styles.name
                   }
                 >
-                  {select.zipcode}
+                  {item.zipcode}
                 </Text>
               </TouchableOpacity>
-            );
-          })}
+            )}
+          />
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };

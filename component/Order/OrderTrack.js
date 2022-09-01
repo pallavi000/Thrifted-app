@@ -18,7 +18,7 @@ import {
 export default function OrderTrack({ route }) {
   const order = route.params;
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar backgroundColor="#663399" barStyle="light-content" />
       <ScrollView>
         <View style={styles.container}>

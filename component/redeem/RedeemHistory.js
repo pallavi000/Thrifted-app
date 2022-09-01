@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   pendingCard: {
     backgroundColor: "#f5f5ff",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 1,
     shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: {
       width: 0,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   cancelledCard: {
     backgroundColor: "rgba(255, 36, 36, 0.25)",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 1,
     shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: {
       width: 0,
@@ -230,8 +230,7 @@ const styles = StyleSheet.create({
   successCard: {
     backgroundColor: "rgba(76, 217, 100, 0.25)",
     padding: 20,
-    borderRadius: 10,
-
+    borderRadius: 1,
     shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: {
       width: 0,

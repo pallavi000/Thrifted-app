@@ -49,7 +49,7 @@ const validationSchema = Yup.object().shape({
   type: Yup.string().required("Product Type is required"),
 });
 
-export default function CreatePost({ navigation }) {
+function CreatePost({ navigation }) {
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -328,12 +328,14 @@ export default function CreatePost({ navigation }) {
         >
           <BottomSheet
             ref={sheetRef}
+            enablePanDownToClose
             snapPoints={[300, 0]}
             borderRadius={10}
             initialSnap={1}
             enabledContentTapInteraction={false}
             renderHeader={renderHeader}
             renderContent={renderContent}
+            enabledGestureInteraction={true}
             callbackNode={fill}
           />
 
@@ -602,6 +604,8 @@ export default function CreatePost({ navigation }) {
     </>
   );
 }
+
+export default CreatePost;
 
 const styles = StyleSheet.create({
   container: {

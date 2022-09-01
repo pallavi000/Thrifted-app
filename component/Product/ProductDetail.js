@@ -32,7 +32,7 @@ import {
   InstagramProvider,
 } from "@postillon/react-native-instagram-zoomable";
 import { apiErrorNotification } from "../ErrorHandle";
-import FastImage from "react-native-fast-image";
+// import FastImage from "react-native-fast-image";
 
 export default function ProductDetail({ navigation, route }) {
   const [showFullDesc, setShowFullDesc] = useState(false);
@@ -243,7 +243,7 @@ export default function ProductDetail({ navigation, route }) {
                 <ElementContainer>
                   <SliderBox
                     images={parseImages(product.image, product.feature_image)}
-                    ImageComponent={FastImage}
+                    // ImageComponent={FastImage}
                     ImageComponentStyle={styles.productImage}
                     dotColor="#663399"
                     resizeMode="contain"
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#E3E3E3",
-    borderRadius: 7,
+    borderRadius: 1,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3,
-    elevation: 0.8,
+    elevation: 0.3,
     width: Dimensions.get("window").width - 60,
     alignItems: "center",
     justifyContent: "center",
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#E3E3E3",
-    borderRadius: 7,
+    borderRadius: 1,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3,
-    elevation: 0.8,
+    elevation: 0.3,
     width: (Dimensions.get("window").width - 60) / 3,
     alignItems: "center",
   },

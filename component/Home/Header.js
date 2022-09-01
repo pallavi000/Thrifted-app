@@ -25,7 +25,7 @@ const Header = ({
             source={require("../../assets/app-logo.png")}
             style={{ width: 30, height: 30 }}
           />
-          <Text style={styles.navLogoText}>LugaGhar</Text>
+          <Text style={styles.navLogoText}>हाम्रोCloset</Text>
           <Feather name="chevron-down" size={20} style={styles.navLogoArrow} />
         </View>
       </TouchableWithoutFeedback>

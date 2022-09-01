@@ -47,6 +47,7 @@ import OrderTrack from "./component/Order/OrderTrack";
 import OrderSuccess from "./component/Order/OrderSuccess";
 import Interest from "./component/Auth/Interest";
 import * as Notifications from "expo-notifications";
+import { gestureHandlerRootHOC } from "react-native-gesture-handler";
 
 import FeedSetting from "./component/setting/FeedSetting";
 
@@ -63,7 +64,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function App(props) {
+export default gestureHandlerRootHOC(function App(props) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [token, setToken] = useState("");
@@ -162,12 +163,7 @@ export default function App(props) {
         setUnreadNormalNotificationCount(unreadNormalNotificationCount + 1);
       });
     }
-  }, [
-    socket,
-    unreadMessage,
-    unreadNotification,
-    unreadNormalNotificationCount,
-  ]);
+  }, [socket, unreadMessage, unreadNotification, unreadNormalNotificationCount]);
 
   const socketConnect = (decoded) => {
     socket.current = io("http://167.86.77.80", {
@@ -545,7 +541,7 @@ export default function App(props) {
       </NavigationContainer>
     </>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

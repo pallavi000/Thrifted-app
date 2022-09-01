@@ -56,7 +56,7 @@ export default function Checkout({ navigation }) {
   });
 
   useEffect(() => {
-    if (addresses && addresses.length > 0 && selectedId) {
+    if (addresses && addresses.length && selectedId) {
       var shippingAddress = addresses.find(
         (address) => address._id == selectedId
       );
@@ -65,6 +65,8 @@ export default function Checkout({ navigation }) {
       } else {
         setShippingAddresses(addresses[0]);
       }
+    } else if (addresses && addresses.length) {
+      setShippingAddresses(addresses[0]);
     } else {
       setShippingAddresses();
     }
@@ -229,22 +231,32 @@ export default function Checkout({ navigation }) {
                 <Text>Same as Shipping Address</Text>
               </View>
               {!sameBilling && !billingAddress ? (
-                <Picker
-                  style={styles.formcontrol}
-                  selectedValue={billingAddress?._id}
-                  onValueChange={(itemValue) => changeBillingAddress(itemValue)}
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#E5e5e5",
+                    marginTop: 10,
+                  }}
                 >
-                  <Picker.Item label="Select Billing Address" value="" />
-                  {addresses.map((address) => {
-                    return (
-                      <Picker.Item
-                        key={address._id}
-                        label={`${address.street}, ${address.city}, ${address.district}, ${address.zipcode}, Nepal`}
-                        value={address._id}
-                      />
-                    );
-                  })}
-                </Picker>
+                  <Picker
+                    style={styles.formcontrol}
+                    selectedValue={billingAddress?._id}
+                    onValueChange={(itemValue) =>
+                      changeBillingAddress(itemValue)
+                    }
+                  >
+                    <Picker.Item label="Select Billing Address" value="" />
+                    {addresses.map((address) => {
+                      return (
+                        <Picker.Item
+                          key={address._id}
+                          label={`${address.street}, ${address.city}, ${address.district}, ${address.zipcode}, Nepal`}
+                          value={address._id}
+                        />
+                      );
+                    })}
+                  </Picker>
+                </View>
               ) : null}
               {!sameBilling && billingAddress ? (
                 <>
@@ -404,11 +416,10 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#e5e5e5",
+    borderColor: "#000",
     width: "100%",
     paddingHorizontal: 12,
     paddingVertical: 10,
-    marginTop: 10,
   },
 
   card: {

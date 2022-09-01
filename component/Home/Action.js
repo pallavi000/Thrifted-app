@@ -31,7 +31,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { SliderBox } from "react-native-image-slider-box";
-import FastImage from "react-native-fast-image";
+// import FastImage from "react-native-fast-image";
 import {
   InstagramProvider,
   ElementContainer,
@@ -205,7 +205,7 @@ export default React.memo(function Action(props) {
               <ElementContainer>
                 <SliderBox
                   images={parseImages(product.image, product.feature_image)}
-                  ImageComponent={FastImage}
+                  // ImageComponent={FastImage}
                   ImageComponentStyle={styles.productImage}
                   currentImageEmitter={getCurrentImageIndex}
                   dotColor="#663399"
@@ -311,12 +311,13 @@ const styles = StyleSheet.create({
     shadowRadius: 35,
     elevation: 20,
     shadowColor: "#000",
+    zIndex: 100,
   },
   bigHeart: {
     position: "absolute",
     left: Dimensions.get("window").width / 2 - 70,
     top: 130,
-    zIndex: 3,
+    zIndex: 1000,
   },
   isSold: {
     shadowOffset: {

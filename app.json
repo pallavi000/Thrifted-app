@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Hamro Closet",
-    "slug": "HamroCloset",
+    "name": "Hamro Closet2",
+    "slug": "HamroCloset2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,7 +25,7 @@
         "backgroundColor": "#ffffff"
       },
       "enableDangerousExperimentalLeanBuilds": true,
-      "package": "com.hamrocloset.HamroCloset"
+      "package": "com.snlbaral.HamroCloset2"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -39,7 +39,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "4d8cd9da-afaa-4a7d-a4a6-bb4f375c84f9"
+        "projectId": "0bebb3b7-96d5-4ed1-ad2b-fdf9f3aca771"
       }
     }
   }

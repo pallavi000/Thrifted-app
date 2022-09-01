@@ -32,6 +32,7 @@ import {
   InstagramProvider,
 } from "@postillon/react-native-instagram-zoomable";
 import { apiErrorNotification } from "../ErrorHandle";
+import FastImage from "react-native-fast-image";
 
 export default function ProductDetail({ navigation, route }) {
   const [showFullDesc, setShowFullDesc] = useState(false);
@@ -242,6 +243,7 @@ export default function ProductDetail({ navigation, route }) {
                 <ElementContainer>
                   <SliderBox
                     images={parseImages(product.image, product.feature_image)}
+                    ImageComponent={FastImage}
                     ImageComponentStyle={styles.productImage}
                     dotColor="#663399"
                     resizeMode="contain"

@@ -23,31 +23,19 @@ import axios from "axios";
 import { AuthContext } from "../Context";
 import { imageLink } from "../ImageLink";
 import { Raleway_500Medium } from "@expo-google-fonts/raleway";
-// import { SliderBox } from "react-native-image-slider-box";
 import Animated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import ExpoFastImage from "expo-fast-image";
-import {
-  GestureHandlerRootView,
-  PinchGestureHandler,
-  State,
-  TapGestureHandler,
-} from "react-native-gesture-handler";
 
 import { SliderBox } from "react-native-image-slider-box";
-
+import FastImage from "react-native-fast-image";
 import {
   InstagramProvider,
   ElementContainer,
 } from "@postillon/react-native-instagram-zoomable";
-
-function CustomImage({ source }) {
-  return <Image source={{ uri: source }} style={styles.productImage} />;
-}
 
 export default React.memo(function Action(props) {
   const [comment, setComment] = useState("");
@@ -217,6 +205,7 @@ export default React.memo(function Action(props) {
               <ElementContainer>
                 <SliderBox
                   images={parseImages(product.image, product.feature_image)}
+                  ImageComponent={FastImage}
                   ImageComponentStyle={styles.productImage}
                   currentImageEmitter={getCurrentImageIndex}
                   dotColor="#663399"

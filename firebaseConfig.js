@@ -11,7 +11,7 @@ import { getReactNativePersistence } from "firebase/auth/react-native";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
+  apiKey: "AIzaSyC4SAwbzoRtxGWv_HnjR9Wk9Mu6Ts8PALg",
   authDomain: "thrifted-1be13.firebaseapp.com",
   projectId: "thrifted-1be13",
   storageBucket: "thrifted-1be13.appspot.com",

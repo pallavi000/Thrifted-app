@@ -51,7 +51,7 @@ import * as Notifications from "expo-notifications";
 import FeedSetting from "./component/setting/FeedSetting";
 
 // axios.defaults.baseURL = "http://localhost:5000/api";
-axios.defaults.baseURL = process.env.API_URL;
+axios.defaults.baseURL = "https://thrifted.jcloudia.com/api";
 
 const Stack = createNativeStackNavigator();
 

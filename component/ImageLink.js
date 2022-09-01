@@ -1,1 +1,1 @@
-export const imageLink = "http://167.86.77.80:3000"
+export const imageLink = "https://thrifted.jcloudia.com";

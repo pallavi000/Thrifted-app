@@ -27,19 +27,10 @@ const Search = ({ navigation }) => {
     setLoading(true);
     Keyboard.dismiss();
     if (query.trim().length == 0) return;
-    const data = {
+    navigation.navigate("Search Result", {
       search: query,
-    };
-    try {
-      const response = await axios.post("/frontend/search-request", data);
-      setLoading(false);
-      navigation.navigate("Search Result", {
-        search: query,
-        products: response.data,
-      });
-    } catch (error) {
-      apiErrorNotification(error);
-    }
+    });
+    setLoading(false);
   }
 
   return (

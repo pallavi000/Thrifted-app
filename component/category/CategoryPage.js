@@ -42,16 +42,13 @@ export default function CategoryPage({ navigation, route }) {
   const [color_id, setColor_id] = useState([]);
   const [minprice, setMinprice] = useState([]);
   const [maxprice, setMaxprice] = useState([]);
+  const category = route.params;
 
   const [category_id, setCategory_id] = useState([]);
-  const [currentcatId, setCurrentcatId] = useState(null);
+  const [currentcatId, setCurrentcatId] = useState(category._id);
   const [itemsPerPage, setItemsPerPage] = useState(24);
-  const [nextPage, setNextPage] = useState(true);
   const fall = new Animated.Value(1);
-  const [nextPageProducts, setNextPageProducts] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(true);
-
-  const category = route.params;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -70,55 +67,43 @@ export default function CategoryPage({ navigation, route }) {
     } else {
       getProducts();
     }
-  }, [pageNo, sorting, brand_id, color_id, category_id, minprice]);
+  }, [sorting, brand_id, color_id, category_id, minprice]);
 
-  const getProducts = React.useCallback(async () => {
-    if (!nextPageProducts) {
-      setLoader(true);
-    }
-
-    console.log(category.slug);
+  const getProducts = async () => {
+    setLoader(true);
+    setHasNextPage(true);
+    setPageNo(1);
     try {
       const data = {
         category_slug: category.slug,
-        pageNo,
+        pageNo: 1,
         sorting,
       };
       var response = await axios.post("/category/filter", data);
-      console.log(response.data.products.length);
-
-      var currentPageNo = response.data.count / itemsPerPage;
-      currentPageNo = Math.ceil(currentPageNo);
-      if (currentPageNo == pageNo) {
-        setHasNextPage(false);
-      }
-      if (nextPageProducts) {
-        setProducts([...products, ...response.data.products]);
-      } else {
-        setProducts(response.data.products);
-        setBrands(response.data.brands);
-        setColors(response.data.colors);
-        setCurrentcatId(response.data.category._id);
-        setTotalProduct(response.data.count);
-      }
+      var x = response.data.products.filter(
+        (v, i, a) => a.findIndex((t) => t._id === v._id) === i
+      );
+      setProducts(x);
+      setBrands(response.data.brands);
+      setColors(response.data.colors);
+      setTotalProduct(response.data.count);
       setLoader(false);
-      setNextPage(false);
     } catch (error) {
       setLoader(false);
     }
-  }, [pageNo, sorting, nextPageProducts]);
+  };
 
   async function filterProducts() {
-    if (!nextPageProducts) {
-      setLoader(true);
-    }
+    setLoader(true);
+    setHasNextPage(true);
+    setPageNo(1);
     var data = {
       brand_id,
       color_id,
       minprice,
       maxprice,
       category_id,
-      pageNo,
+      pageNo: 1,
       sorting,
     };
     if (category_id && category_id.length > 0) {
@@ -129,7 +114,7 @@ export default function CategoryPage({ navigation, route }) {
         minprice,
         maxprice,
         category_id: [currentcatId],
-        pageNo,
+        pageNo: 1,
         sorting,
       };
     }
@@ -138,34 +123,55 @@ export default function CategoryPage({ navigation, route }) {
       var x = response.data.products.filter(
         (v, i, a) => a.findIndex((t) => t._id === v._id) === i
       );
-      if (nextPageProducts) {
-        setProducts([...products, x]);
-      } else {
-        setProducts(x);
-        setTotalProduct(response.data.total);
-      }
-
-      var currentPageNo = response.data.total / itemsPerPage;
-      currentPageNo = Math.ceil(currentPageNo);
-      if (currentPageNo == pageNo) {
-        setHasNextPage(false);
-      }
-
+      setProducts(x);
       setLoader(false);
-      setNextPage(false);
     } catch (error) {
       setLoader(false);
     }
   }
 
+  async function getNextPageProducts() {
+    var data = {
+      brand_id,
+      color_id,
+      minprice,
+      maxprice,
+      category_id,
+      pageNo: pageNo + 1,
+      sorting,
+    };
+    if (category_id && category_id.length > 0) {
+    } else {
+      data = {
+        brand_id,
+        color_id,
+        minprice,
+        maxprice,
+        category_id: [currentcatId],
+        pageNo: pageNo + 1,
+        sorting,
+      };
+    }
+    try {
+      var response = await axios.post("/category/checkfilter", data);
+      if (!response.data.products.length) {
+        setHasNextPage(false);
+      }
+      var x = response.data.products.filter(
+        (v, i, a) => a.findIndex((t) => t._id === v._id) === i
+      );
+      setProducts([...products, ...x]);
+    } catch (error) {}
+  }
+
   const getSortingInfo = React.useCallback(() => {
-    if (sorting == "popular") {
+    if (sorting == "-likes_count") {
       return "Popular";
     } else if (sorting == "-_id") {
       return "Newest";
-    } else if (sorting === "lowest") {
+    } else if (sorting === "price") {
       return "Price: lowest to high";
-    } else if (sorting === "highest") {
+    } else if (sorting === "-price") {
       return "Price: highest to low";
     } else {
       return "Newest";
@@ -173,9 +179,8 @@ export default function CategoryPage({ navigation, route }) {
   }, [sorting]);
 
   const GetNextPage = useCallback(() => {
-    if (!nextPage && hasNextPage) {
-      setNextPageProducts(true);
-      setNextPage(true);
+    if (hasNextPage) {
+      getNextPageProducts();
       setPageNo(pageNo + 1);
     }
   });
@@ -246,7 +251,8 @@ export default function CategoryPage({ navigation, route }) {
               contentContainerStyle={styles.container}
               data={products}
               numColumns={2}
-              keyExtractor={(item) => item._id}
+              keyExtractor={(item) => item._id + "" + new Date().getTime()}
+              onEndReachedThreshold={4}
               onEndReached={GetNextPage}
               renderItem={({ item, index }) => (
                 <>
@@ -263,14 +269,10 @@ export default function CategoryPage({ navigation, route }) {
                       <Text style={styles.productName} numberOfLines={1}>
                         {item.name}
                       </Text>
-                      {/* <View style={{flexDirection:'row',alignItems:'center'}}>
-                <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1, marginRight:5}}>Brands</Text>
-                <Text>{item.brand_id?.name}</Text>
-            </View> */}
+
                       <View
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
-                        {/* <Text style={{fontWeight:'700',fontFamily:'Raleway_700Bold',marginVertical:1,marginRight:5}}>Price</Text> */}
                         <Text
                           style={{
                             fontWeight: "700",
@@ -278,7 +280,7 @@ export default function CategoryPage({ navigation, route }) {
                             marginVertical: 1,
                           }}
                         >
-                          रु {item.price}
+                          Rs. {item.price}
                         </Text>
                       </View>
                     </View>

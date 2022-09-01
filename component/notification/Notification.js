@@ -275,51 +275,55 @@ export default function Notification({ navigation }) {
         (orderNotifications && orderNotifications.length > 0) ? (
         <>
           {tab === "normal" ? (
-            <FlatList
-              data={notifications}
-              keyExtractor={(item) => item.id}
-              onEndReached={() => NormalNextData()}
-              ListFooterComponent={() => {
-                return hasNormalNextPage ? (
-                  <View style={{ padding: 20 }}>
-                    <ActivityIndicator size={"large"} color="#663399" />
-                  </View>
-                ) : null;
-              }}
-              renderItem={({ item }) => (
-                <>
-                  <Text style={styles.heading}>
-                    {getDisplayDate(item.date)}
-                  </Text>
-                  <FlatList
-                    data={item.items}
-                    keyExtractor={(item) => uuidv4()}
-                    renderItem={({ item }) =>
-                      item.type == "like" ? (
-                        <LikeNotification
-                          key={item.id}
-                          item={item}
-                          navigation={navigation}
-                        />
-                      ) : item.type == "comment" ? (
-                        <CommentNotification
-                          key={item.id}
-                          item={item}
-                          navigation={navigation}
-                        />
-                      ) : item.type == "follow" ? (
-                        <FollowNotification
-                          key={item.id}
-                          item={item}
-                          navigation={navigation}
-                        />
-                      ) : null
-                    }
-                  />
-                </>
-              )}
-            />
-          ) : (
+            notifications.length ? (
+              <FlatList
+                data={notifications}
+                keyExtractor={(item) => item.id}
+                onEndReached={() => NormalNextData()}
+                ListFooterComponent={() => {
+                  return hasNormalNextPage ? (
+                    <View style={{ padding: 20 }}>
+                      <ActivityIndicator size={"large"} color="#663399" />
+                    </View>
+                  ) : null;
+                }}
+                renderItem={({ item }) => (
+                  <>
+                    <Text style={styles.heading}>
+                      {getDisplayDate(item.date)}
+                    </Text>
+                    <FlatList
+                      data={item.items}
+                      keyExtractor={(item) => uuidv4()}
+                      renderItem={({ item }) =>
+                        item.type == "like" ? (
+                          <LikeNotification
+                            key={item.id}
+                            item={item}
+                            navigation={navigation}
+                          />
+                        ) : item.type == "comment" ? (
+                          <CommentNotification
+                            key={item.id}
+                            item={item}
+                            navigation={navigation}
+                          />
+                        ) : item.type == "follow" ? (
+                          <FollowNotification
+                            key={item.id}
+                            item={item}
+                            navigation={navigation}
+                          />
+                        ) : null
+                      }
+                    />
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyNotification navigation={navigation} showButton={false} />
+            )
+          ) : orderNotifications.length ? (
             <FlatList
               data={orderNotifications}
               keyExtractor={(item) => item.id}
@@ -350,10 +354,12 @@ export default function Notification({ navigation }) {
                 </>
               )}
             />
+          ) : (
+            <EmptyNotification navigation={navigation} showButton={false} />
           )}
         </>
       ) : (
-        <EmptyNotification navigation={navigation} />
+        <EmptyNotification navigation={navigation} showButton={true} />
       )}
     </SafeAreaView>
   );

@@ -38,8 +38,9 @@ export default function Checkout({ navigation }) {
   const [esewaVisible, setEsewaVisible] = useState(false);
   const [khaltiVisible, setKhaltiVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shippings, setShippings] = useState([]);
   const data = useContext(AuthContext);
-  const { token, subtotal, getCartItems } = data;
+  const { token, subtotal, getCartItems, cartItems } = data;
   const config = {
     headers: {
       "access-token": token,
@@ -54,6 +55,20 @@ export default function Checkout({ navigation }) {
       setSelectedId(addressId);
     }
   });
+
+  useEffect(() => {
+    if (shippings && shippings.length && shippingAddress?.district) {
+      var shipAddress = shippings.find(
+        (ship) =>
+          ship.location.toLowerCase() == shippingAddress.district.toLowerCase()
+      );
+      if (shipAddress) {
+        setShippingFee(shipAddress.fee);
+      } else {
+        setShippingFee(0);
+      }
+    }
+  }, [shippingAddress, shippings]);
 
   useEffect(() => {
     if (addresses && addresses.length && selectedId) {
@@ -74,6 +89,7 @@ export default function Checkout({ navigation }) {
 
   useEffect(() => {
     getaddress();
+    getShippingRates();
     loadSelectedCheckBox();
   }, [IsFocused]);
 
@@ -106,6 +122,15 @@ export default function Checkout({ navigation }) {
       var response = await axios.get("/address", config);
       setAddresses(response.data);
       setLoader(false);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+  });
+
+  const getShippingRates = React.useCallback(async () => {
+    try {
+      const resp = await axios.get("/shipping", config);
+      setShippings(resp.data);
     } catch (error) {
       apiErrorNotification(error);
     }
@@ -364,13 +389,44 @@ export default function Checkout({ navigation }) {
               </View>
             </View>
           </View>
+
+          <View style={styles.headerWrapper}>
+            <Text style={styles.header}>
+              Order Summary ({cartItems.length} items)
+            </Text>
+          </View>
+          <View style={styles.card}>
+            <View style={styles.priceSummary}>
+              <Text>Subtotal</Text>
+              <Text>Rs. {subtotal}</Text>
+            </View>
+            <View style={styles.priceSummary}>
+              <Text>Shipping Fee</Text>
+              <Text>Rs. {shippingFee}</Text>
+            </View>
+            <View style={styles.priceSummary}>
+              <Text>Tax</Text>
+              <Text>Rs. 0.00</Text>
+            </View>
+            <View
+              style={[
+                styles.priceSummary,
+                { borderTopWidth: 1, borderTopColor: "#ddd", marginTop: 10 },
+              ]}
+            >
+              <Text style={styles.priceHeader}>Total</Text>
+              <Text style={styles.priceHeader}>
+                Rs. {subtotal + shippingFee}
+              </Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
       <View style={{ paddingHorizontal: 20 }}>
         <View style={styles.cartTotal}>
           <Text style={styles.total}>Total</Text>
-          <Text style={styles.totalValue}>Rs. {subtotal}</Text>
+          <Text style={styles.totalValue}>Rs. {subtotal + shippingFee}</Text>
         </View>
         {shippingAddress && paymentMethod ? (
           <TouchableOpacity style={styles.loginBtn} onPress={() => payment()}>
@@ -394,6 +450,16 @@ const styles = StyleSheet.create({
   cardWrapper: {
     padding: 20,
     paddingHorizontal: 30,
+  },
+  priceSummary: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  priceHeader: {
+    fontSize: 16,
+    fontFamily: "Raleway_700Bold",
+    marginTop: 5,
   },
   payProcessing: {
     fontWeight: "700",

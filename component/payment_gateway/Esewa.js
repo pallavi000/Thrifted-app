@@ -52,7 +52,7 @@ const Esewa = (props) => {
       <EsewaSdk
         amt={props.total} // Amount of product or item or ticket etc
         taxAmt={0} // Tax amount on product or item or ticket etc
-        totalAmt={props.total} // Total payment amount including tax, service and deliver charge. [i.e tAmt = amt + txAmt + psc + tAmt]
+        totalAmt={props.total + props.shippingFee} // Total payment amount including tax, service and deliver charge. [i.e tAmt = amt + txAmt + psc + tAmt]
         env={process.env.ESEWA_PUBLIC_KEY} // Merchant code provided by eSewa
         testMode={false} // Boolean value for enabling test endpoint and real payment gateway
         isVisible={isVisible} // Bool to show modal

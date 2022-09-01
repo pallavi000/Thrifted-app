@@ -176,7 +176,7 @@ export default function Setting({ navigation }) {
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               {user ? (
-                <Text>रु {user.balance}</Text>
+                <Text>Rs. {user.balance}</Text>
               ) : (
                 <ActivityIndicator size={"small"} color="#fa4a0c" />
               )}
@@ -192,7 +192,7 @@ export default function Setting({ navigation }) {
             </View>
             <View style={{ flexDirection: "row" }}>
               {user ? (
-                <Text>रु 0</Text>
+                <Text>Rs. 0</Text>
               ) : (
                 <ActivityIndicator size={"small"} color="#fa4a0c" />
               )}

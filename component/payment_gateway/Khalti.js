@@ -52,7 +52,7 @@ const Khalti = (props) => {
   return (
     <SafeAreaView style={styles.container}>
       <KhatiSdk
-        amount={props.total * 100} // Number in paisa
+        amount={(props.total + props.shippingFee) * 100} // Number in paisa
         isVisible={isVisible} // Bool to show model
         paymentPreference={[
           // Array of services needed from Khalti

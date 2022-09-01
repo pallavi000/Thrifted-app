@@ -249,39 +249,52 @@ export default function MyOrder({ navigation }) {
             keyExtractor={(item) => item._id}
             onEndReached={nextPageOrder}
             ListHeaderComponent={() => (
-              <View style={[styles.row, { marginBottom: 30 }]}>
-                <TouchableOpacity onPress={() => toggleTab("processing")}>
-                  <Text
-                    style={
-                      tab == "processing"
-                        ? styles.processActive
-                        : styles.process
-                    }
-                  >
-                    Processing
-                  </Text>
-                </TouchableOpacity>
+              <>
+                <View style={[styles.row, { marginBottom: 30 }]}>
+                  <TouchableOpacity onPress={() => toggleTab("processing")}>
+                    <Text
+                      style={
+                        tab == "processing"
+                          ? styles.processActive
+                          : styles.process
+                      }
+                    >
+                      Processing
+                    </Text>
+                  </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => toggleTab("delivered")}>
-                  <Text
-                    style={
-                      tab == "delivered" ? styles.processActive : styles.process
-                    }
-                  >
-                    Delivered
-                  </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity onPress={() => toggleTab("delivered")}>
+                    <Text
+                      style={
+                        tab == "delivered"
+                          ? styles.processActive
+                          : styles.process
+                      }
+                    >
+                      Delivered
+                    </Text>
+                  </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => toggleTab("cancelled")}>
-                  <Text
-                    style={
-                      tab == "cancelled" ? styles.processActive : styles.process
-                    }
-                  >
-                    Cancelled
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                  <TouchableOpacity onPress={() => toggleTab("cancelled")}>
+                    <Text
+                      style={
+                        tab == "cancelled"
+                          ? styles.processActive
+                          : styles.process
+                      }
+                    >
+                      Cancelled
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                {!items.length && (
+                  <OrderHistory
+                    navigation={navigation}
+                    title={`No ${tab} orders yet.`}
+                    buttonShow={false}
+                  />
+                )}
+              </>
             )}
             initialNumToRender={6}
             renderItem={({ item }) => (
@@ -394,6 +407,9 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontFamily: "Raleway_400Regular",
     color: "black",
+    padding: 8,
+    paddingHorizontal: 20,
+    borderRadius: 18,
   },
   dFlex: {
     flexDirection: "row",

@@ -88,7 +88,7 @@ export default function Redeem({ navigation, route }) {
               <>
                 <View style={styles.loginForm}>
                   <Text style={styles.balance}>
-                    Balance:&nbsp; रु {user.balance}
+                    Balance:&nbsp; Rs. {user.balance}
                   </Text>
 
                   <View style={styles.formgroup}>

@@ -10,13 +10,15 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { AuthContext } from "../Context";
+import { AuthContext, districts, zipcodes } from "../Context";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { apiErrorNotification } from "../ErrorHandle";
+import AddressPicker from "./AddressPicker";
+import ZipCodePicker from "./ZipCodePicker";
 
 const validationSchema = Yup.object().shape({
   district: Yup.string().required(),
@@ -29,6 +31,16 @@ const validationSchema = Yup.object().shape({
 
 export default function AddShipping({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef();
+  const [showPicker, setShowPicker] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState({
+    name: "Select District",
+  });
+  const [filterZipCodes, setFilterZipCodes] = useState([]);
+  const [selectedZipCode, setSelectedZipCode] = useState({
+    zipcode: "Select Zip Code",
+  });
+
   const data = useContext(AuthContext);
   const { token } = data;
   const config = {
@@ -37,8 +49,13 @@ export default function AddShipping({ navigation }) {
     },
   };
 
-  const add = React.useCallback(async (values) => {
+  const add = async (values) => {
     try {
+      var errors = Object.values(formRef.current.errors);
+      if (errors && errors.length > 0) {
+        Alert.alert("Error", errors[0]);
+        return;
+      }
       setIsSubmitting(true);
       await axios.post("/address", values, config);
       Alert.alert("Success", "Address has been added");
@@ -48,10 +65,37 @@ export default function AddShipping({ navigation }) {
       setIsSubmitting(false);
       apiErrorNotification(error);
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    formRef.current.setFieldValue("district", selectedDistrict.name);
+    var zipcodesFilter = zipcodes.filter(
+      (zip) => zip.district == selectedDistrict.name
+    );
+    setFilterZipCodes(zipcodesFilter);
+  }, [selectedDistrict]);
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+      {showPicker === "districts" && (
+        <AddressPicker
+          navigation={navigation}
+          selectedSelect={selectedDistrict}
+          setSelectedSelect={setSelectedDistrict}
+          setShowAddressPicker={setShowPicker}
+          selects={districts}
+        />
+      )}
+      {showPicker === "zipcodes" && (
+        <ZipCodePicker
+          navigation={navigation}
+          selectedSelect={selectedZipCode}
+          setSelectedSelect={setSelectedZipCode}
+          setShowAddressPicker={setShowPicker}
+          selects={filterZipCodes}
+        />
+      )}
+
       <ScrollView>
         <View style={styles.container}>
           <Formik
@@ -63,6 +107,7 @@ export default function AddShipping({ navigation }) {
               name: "",
               zipcode: "",
             }}
+            innerRef={formRef}
             onSubmit={(values) => add(values)}
             validationSchema={validationSchema}
           >
@@ -84,18 +129,24 @@ export default function AddShipping({ navigation }) {
 
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>District</Text>
-                  <TextInput
-                    keyboardType="default"
-                    style={styles.input}
-                    onChangeText={handleChange("district")}
-                    onBlur={handleBlur("district")}
-                    selectionColor="#663399"
-                  ></TextInput>
-
-                  {touched.district && errors.district ? (
+                  <TouchableOpacity onPress={() => setShowPicker("districts")}>
+                    <View style={styles.selectField}>
+                      <Text
+                        style={{
+                          color: "black",
+                          textTransform: "capitalize",
+                          fontSize: 16,
+                        }}
+                      >
+                        {selectedDistrict.name}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {errors.district && touched.district ? (
                     <Text style={bbstyles.error}>{errors.district}</Text>
                   ) : null}
                 </View>
+
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>City</Text>
                   <TextInput
@@ -123,20 +174,28 @@ export default function AddShipping({ navigation }) {
                     <Text style={bbstyles.error}>{errors.street}</Text>
                   ) : null}
                 </View>
-                <View style={styles.formGroup}>
-                  <Text style={styles.label}>Zip Code(Postal Code)</Text>
-                  <TextInput
-                    keyboardType="numeric"
-                    style={styles.input}
-                    onChangeText={handleChange("zipcode")}
-                    onBlur={handleBlur("zipcode")}
-                    selectionColor="#663399"
-                  ></TextInput>
 
-                  {touched.zipcode && errors.zipcode ? (
-                    <Text style={bbstyles.error}>{errors.zipcode}</Text>
-                  ) : null}
-                </View>
+                {selectedDistrict.id && (
+                  <View style={styles.formGroup}>
+                    <Text style={styles.label}>Zip Code (Postal Code)</Text>
+                    <TouchableOpacity onPress={() => setShowPicker("zipcodes")}>
+                      <View style={styles.selectField}>
+                        <Text
+                          style={{
+                            color: "black",
+                            textTransform: "capitalize",
+                            fontSize: 16,
+                          }}
+                        >
+                          {selectedZipCode.zipcode}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                    {errors.zipcode && touched.zipcode ? (
+                      <Text style={bbstyles.error}>{errors.zipcode}</Text>
+                    ) : null}
+                  </View>
+                )}
 
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>Phone</Text>
@@ -177,6 +236,12 @@ export default function AddShipping({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+  },
+  selectField: {
+    borderBottomColor: "#C4C4C4BF",
+    borderBottomWidth: 1,
+    justifyContent: "center",
+    height: 30,
   },
   formGroup: {
     paddingBottom: 5,

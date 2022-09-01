@@ -14,7 +14,11 @@ import {
   Raleway_700Bold,
 } from "@expo-google-fonts/raleway";
 
-export default function OrderHistory({ navigation, title = "No Orders Yet" }) {
+export default function OrderHistory({
+  navigation,
+  title = "No Orders Yet",
+  buttonShow = true,
+}) {
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1, padding: 20 }}>
       <View
@@ -35,14 +39,16 @@ export default function OrderHistory({ navigation, title = "No Orders Yet" }) {
         <Text style={styles.subtitle}>
           When you do, their status will appear here
         </Text>
-        <TouchableOpacity
-          style={styles.loginBtn}
-          onPress={() => navigation.goBack()}
-        >
-          <View>
-            <Text style={styles.loginText}>Go Back</Text>
-          </View>
-        </TouchableOpacity>
+        {buttonShow && (
+          <TouchableOpacity
+            style={styles.loginBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <View>
+              <Text style={styles.loginText}>Go Back</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );

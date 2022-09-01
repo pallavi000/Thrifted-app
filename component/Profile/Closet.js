@@ -80,6 +80,9 @@ export default function Closet(props) {
         "/frontend/closet/" + props.route.params._id
       );
       setProducts(response.data.product);
+      if (!response.data.product.length) {
+        setHasNextPage(false);
+      }
       setUser(response.data.user);
       setTotalProducts(response.data.total);
       if (response.data.user.followers.includes(decode._id)) {
@@ -107,6 +110,9 @@ export default function Closet(props) {
         config
       );
       setSales(response.data.orders);
+      if (!response.data.orders.length) {
+        setSalesHasNextPage(false);
+      }
       setTotalSales(response.data.total);
     } catch (error) {}
   });
@@ -547,6 +553,24 @@ export default function Closet(props) {
             </TouchableWithoutFeedback>
           </View>
         </View>
+        {activeTab === "listing" && !products.length && (
+          <View style={styles.emptyProducts}>
+            <Image
+              source={require("../../assets/empty-order.png")}
+              style={styles.emptyImage}
+            />
+            <Text style={styles.emptyProductsText}>No Listing Yet.</Text>
+          </View>
+        )}
+        {activeTab === "sold" && !sales.length && (
+          <View style={styles.emptyProducts}>
+            <Image
+              source={require("../../assets/empty-order.png")}
+              style={styles.emptyImage}
+            />
+            <Text style={styles.emptyProductsText}>No Sales Yet.</Text>
+          </View>
+        )}
       </>
     );
   };
@@ -633,6 +657,22 @@ export default function Closet(props) {
 }
 
 const styles = StyleSheet.create({
+  emptyProducts: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 50,
+  },
+  emptyProductsText: {
+    fontFamily: "Raleway_700Bold",
+    fontSize: 24,
+  },
+  emptyImage: {
+    width: Dimensions.get("window").width - 40,
+    height: 200,
+    resizeMode: "contain",
+    marginBottom: 20,
+  },
   cameraContainer: {
     padding: 25,
     borderColor: "#C4C4C4BF",

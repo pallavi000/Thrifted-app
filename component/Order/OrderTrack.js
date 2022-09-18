@@ -8,15 +8,46 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Entypo, Feather } from "@expo/vector-icons";
 import {
   Raleway_500Medium,
   Raleway_600SemiBold,
 } from "@expo-google-fonts/raleway";
+import axios from "axios";
+import { AuthContext } from "../Context";
+import { apiErrorNotification } from "../ErrorHandle";
 
 export default function OrderTrack({ route }) {
   const order = route.params;
+
+  const data = useContext(AuthContext);
+  const { token } = data;
+
+  const [events, setEvents] = useState([]);
+
+  const config = {
+    headers: {
+      "access-token": token,
+    },
+  };
+
+  useEffect(() => {
+    getTrackRecord();
+  }, []);
+
+  async function getTrackRecord() {
+    try {
+      const response = await axios.get(
+        "/order-track/order/" + order._id,
+        config
+      );
+      setEvents(response.data);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar backgroundColor="#663399" barStyle="light-content" />
@@ -150,24 +181,14 @@ export default function OrderTrack({ route }) {
 
             <View>
               <Text style={styles.tracking}>Tracking Information</Text>
-              <View style={styles.trackWrapper}>
-                <Entypo name="dot-single" size={24} color="black" />
-                <Text style={styles.trackDetail}>
-                  Package delivered to reception.
-                </Text>
-              </View>
-              <View style={styles.trackWrapper}>
-                <Entypo name="dot-single" size={24} color="black" />
-                <Text style={styles.trackDetail}>
-                  Package delivered to reception.
-                </Text>
-              </View>
-              <View style={styles.trackWrapper}>
-                <Entypo name="dot-single" size={24} color="black" />
-                <Text style={styles.trackDetail}>
-                  Package delivered to reception.
-                </Text>
-              </View>
+              {events.map((event) => {
+                return (
+                  <View key={event._id} style={styles.trackWrapper}>
+                    <Entypo name="dot-single" size={24} color="black" />
+                    <Text style={styles.trackDetail}>{event.message}</Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
         </View>
@@ -197,6 +218,7 @@ const styles = StyleSheet.create({
     fontFamily: "Raleway_500Medium",
     marginLeft: 10,
     color: "#4d4d4d",
+    textTransform: "capitalize",
   },
 
   title: {

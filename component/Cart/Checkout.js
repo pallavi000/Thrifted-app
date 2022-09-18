@@ -138,7 +138,9 @@ export default function Checkout({ navigation }) {
 
   const changeBillingAddress = React.useCallback(
     (id) => {
+      console.log("hello");
       var billing = addresses.find((address) => address._id == id);
+      console.log(billing);
       if (billing) {
         setBillingAddress(billing);
       }
@@ -298,9 +300,7 @@ export default function Checkout({ navigation }) {
                         size={20}
                         color={"#200E32"}
                       ></Feather>
-                      <Text style={styles.userName}>
-                        {shippingAddress.name}
-                      </Text>
+                      <Text style={styles.userName}>{billingAddress.name}</Text>
                     </View>
                     <View style={styles.userWrapper}>
                       <Feather
@@ -309,8 +309,8 @@ export default function Checkout({ navigation }) {
                         color={"#200E32"}
                       ></Feather>
                       <Text style={styles.userName}>
-                        {shippingAddress.street}, {shippingAddress.city},{" "}
-                        {shippingAddress.district}, {shippingAddress.zipcode},
+                        {billingAddress.street}, {billingAddress.city},{" "}
+                        {billingAddress.district}, {billingAddress.zipcode},
                         Nepal
                       </Text>
                     </View>
@@ -321,7 +321,7 @@ export default function Checkout({ navigation }) {
                         color={"#200E32"}
                       ></Feather>
                       <Text style={styles.userName}>
-                        {shippingAddress.phone}
+                        {billingAddress.phone}
                       </Text>
                     </View>
                   </View>

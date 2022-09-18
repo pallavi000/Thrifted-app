@@ -52,7 +52,7 @@ import { gestureHandlerRootHOC } from "react-native-gesture-handler";
 import FeedSetting from "./component/setting/FeedSetting";
 
 // axios.defaults.baseURL = "http://localhost:5000/api";
-axios.defaults.baseURL = "http://167.86.77.80/api";
+axios.defaults.baseURL = "https://thrifted.jcloudia.com/api";
 
 const Stack = createNativeStackNavigator();
 
@@ -166,7 +166,7 @@ export default gestureHandlerRootHOC(function App(props) {
   }, [socket, unreadMessage, unreadNotification, unreadNormalNotificationCount]);
 
   const socketConnect = (decoded) => {
-    socket.current = io("http://167.86.77.80", {
+    socket.current = io("https://thrifted.jcloudia.com", {
       reconnection: true,
       reconnectionAttempts: "Infinity",
       reconnectionDelay: 1000,

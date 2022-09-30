@@ -7,8 +7,10 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { imageLink } from "../ImageLink";
 import {
   Feather,
@@ -16,10 +18,21 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
+import { apiErrorNotification } from "../ErrorHandle";
+import axios from "axios";
+import { AuthContext } from "../Context";
+import * as Linking from "expo-linking";
 
 const SaleDetail = ({ navigation, route }) => {
   const item = route.params;
   const [shippingAddress, setShippingAddress] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { token } = useContext(AuthContext);
+  const config = {
+    headers: {
+      "access-token": token,
+    },
+  };
 
   const changeDate = React.useCallback((createdAt) => {
     var arr = createdAt.split("T");
@@ -34,6 +47,24 @@ const SaleDetail = ({ navigation, route }) => {
       }
     }
   }, []);
+
+  async function downloadInvoice() {
+    setIsSubmitting(true);
+    const data = {
+      transaction_id: item.transaction_id,
+    };
+    try {
+      const response = await axios.post(
+        "/order/generate/invoice",
+        data,
+        config
+      );
+      Linking.openURL(response.data);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+    setIsSubmitting(false);
+  }
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
@@ -197,11 +228,28 @@ const SaleDetail = ({ navigation, route }) => {
           paddingHorizontal: 20,
           borderTopWidth: 1,
           borderTopColor: "#ddd",
+          paddingVertical: 10,
         }}
       >
-        <TouchableOpacity style={styles.loginBtn}>
-          <Text style={styles.login}>Download Invoice</Text>
+        <TouchableOpacity
+          style={[styles.loginBtn, { marginBottom: 5 }]}
+          onPress={() => Alert.alert("Oops", "Not Yet Implemented.")}
+        >
+          <Text style={styles.login}>Download Shipping Label</Text>
         </TouchableOpacity>
+
+        {isSubmitting ? (
+          <TouchableOpacity style={styles.loginBtn}>
+            <ActivityIndicator size={24} color="#fff" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.loginBtn}
+            onPress={() => downloadInvoice()}
+          >
+            <Text style={styles.login}>Download Invoice</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -254,8 +302,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: "#663399",
     borderRadius: 5,
-    marginTop: 20,
-    marginBottom: 20,
     borderWidth: 1,
     borderColor: "#663399",
     flexDirection: "row",

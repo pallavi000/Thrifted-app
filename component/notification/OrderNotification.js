@@ -10,12 +10,18 @@ export default function OrderNotification(props) {
 
   const data = useContext(AuthContext);
   const { decode } = data;
+  console.log(item.order_id);
 
   return props.item.type == "order" ? (
     props.item.user_id._id == decode._id ? (
       <View>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Order Track", item.order_id)}
+          onPress={() =>
+            navigation.navigate("account", {
+              screen: "Sale Details",
+              params: { ...item.order_id, status: "processing" },
+            })
+          }
           style={styles.wrapper}
         >
           <Image
@@ -24,14 +30,14 @@ export default function OrderNotification(props) {
           ></Image>
           <View style={styles.detailView}>
             <Text style={styles.detail}>
-              <Text style={styles.userName}>{item.post_id.name}</Text> has been
+              <Text style={styles.userName}>{item.post_id?.name}</Text> has been
               ordered.
             </Text>
             <Text style={styles.time}>{format(item.createdAt)}</Text>
           </View>
           <View>
             <Image
-              source={{ uri: imageLink + item.post_id.image }}
+              source={{ uri: imageLink + item.post_id?.image }}
               style={styles.postImage}
             ></Image>
           </View>
@@ -54,13 +60,13 @@ export default function OrderNotification(props) {
           <View style={styles.detailView}>
             <Text style={styles.detail}>
               <Text style={styles.userName}>{item.user_id.name}</Text> has order{" "}
-              {item.post_id.name}.
+              {item.post_id?.name}.
             </Text>
             <Text style={styles.time}>{format(item.createdAt)}</Text>
           </View>
           <View>
             <Image
-              source={{ uri: imageLink + item.post_id.image }}
+              source={{ uri: imageLink + item.post_id?.image }}
               style={styles.postImage}
             ></Image>
           </View>
@@ -80,14 +86,14 @@ export default function OrderNotification(props) {
           ></Image>
           <View style={styles.detailView}>
             <Text style={styles.detail}>
-              <Text style={styles.userName}>{item.post_id.name}</Text> has
+              <Text style={styles.userName}>{item.post_id?.name}</Text> has
               shipped.
             </Text>
             <Text style={styles.time}>{format(item.createdAt)}</Text>
           </View>
           <View>
             <Image
-              source={{ uri: imageLink + item.post_id.image }}
+              source={{ uri: imageLink + item.post_id?.image }}
               style={styles.postImage}
             ></Image>
           </View>
@@ -123,13 +129,13 @@ export default function OrderNotification(props) {
         <View style={styles.detailView}>
           <Text style={styles.detail}>
             Your order is complete. (
-            <Text style={styles.userName}>{item.post_id.name}</Text>)
+            <Text style={styles.userName}>{item.post_id?.name}</Text>)
           </Text>
           <Text style={styles.time}>{format(item.createdAt)}</Text>
         </View>
         <View>
           <Image
-            source={{ uri: imageLink + item.post_id.image }}
+            source={{ uri: imageLink + item.post_id?.image }}
             style={styles.postImage}
           ></Image>
         </View>

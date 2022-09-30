@@ -38,21 +38,25 @@ export default function Shipping(props) {
   const loadSelectedCheckBox = React.useCallback(async () => {
     var addressId = await AsyncStorage.getItem("shippingId");
     setSelection(addressId);
+    return addressId ? true : false;
   }, []);
 
   useEffect(() => {
-    loadSelectedCheckBox();
+    if (isSelected) {
+      loadSelectedCheckBox();
+    }
   }, [isSelected]);
 
   useEffect(() => {
     getaddress();
   }, [IsFocused]);
 
-  const getaddress = React.useCallback(async () => {
+  const getaddress = async () => {
     try {
+      const hasId = await loadSelectedCheckBox();
       var response = await axios.get("/address", config);
       setAddresses(response.data);
-      if (!isSelected && response.data && response.data.length > 0) {
+      if (!hasId && response.data && response.data.length > 0) {
         setSelection(response.data[0]._id);
         await AsyncStorage.setItem("shippingId", response.data[0]._id);
       }
@@ -60,7 +64,7 @@ export default function Shipping(props) {
     } catch (error) {
       Alert.alert("Error", error.request.response);
     }
-  }, []);
+  };
 
   const removeAddress = React.useCallback(
     async (id) => {
@@ -103,7 +107,7 @@ export default function Shipping(props) {
                 <Text style={styles.userName}>{item.name}</Text>
                 <Text style={styles.street}> {item.street} </Text>
                 <Text style={styles.street}>
-                  {item.city}, {item.district}, {item.zipcode}, Nepal
+                  {item.city}, {item.district}, Nepal
                 </Text>
                 <View style={styles.addressCheck}>
                   <CustomCheckBox

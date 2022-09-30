@@ -34,6 +34,7 @@ import CategorySelect from "./selects/CategorySelect";
 import SimpleSelect from "./selects/SimpleSelect";
 import BrandSelect from "./selects/BrandSelect";
 import { apiErrorNotification } from "../ErrorHandle";
+import MakeSeller from "./MakeSeller";
 
 const validationSchema = Yup.object().shape({
   image1: Yup.string().required("Image is required"),
@@ -50,6 +51,10 @@ const validationSchema = Yup.object().shape({
 });
 
 function CreatePost({ navigation }) {
+  const { isSeller } = useContext(AuthContext);
+
+  if (!isSeller) return <MakeSeller navigation={navigation} />;
+
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -151,9 +156,11 @@ function CreatePost({ navigation }) {
   });
 
   useEffect(() => {
-    changeHeader();
-    getSelectFields();
-  }, []);
+    if (isSeller) {
+      changeHeader();
+      getSelectFields();
+    }
+  }, [isSeller]);
 
   const getSelectFields = React.useCallback(async () => {
     try {

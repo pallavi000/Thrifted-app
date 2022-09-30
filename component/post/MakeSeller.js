@@ -13,11 +13,11 @@ import {
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { AuthContext } from "../Context";
+import { AuthContext, districts, zipcodes } from "../Context";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { apiErrorNotification } from "../ErrorHandle";
-import AddressPicker from "./AddressPicker";
+import AddressPicker from "../address/AddressPicker";
 
 const validationSchema = Yup.object().shape({
   district: Yup.string().required(),
@@ -27,35 +27,30 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required().required(),
 });
 
-export default function AddShipping({ navigation }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const MakeSeller = ({ navigation }) => {
   const formRef = useRef();
   const [showPicker, setShowPicker] = useState(null);
   const [locations, setLocations] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [cities, setCities] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   const [selectedDistrict, setSelectedDistrict] = useState("Select District");
   const [selectedCity, setSelectedCity] = useState("Select City");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(true);
   const data = useContext(AuthContext);
-  const { token } = data;
+  const { token, setIsSeller } = data;
   const config = {
     headers: {
       "access-token": token,
     },
   };
 
-  useEffect(() => {
-    getLocations();
-  }, []);
-
   async function getLocations() {
     try {
       const response = await axios.get("/location", config);
       setLocations(response.data);
-      let district_array = response.data.map((a) => a.district);
+      const district_array = response.data.map((a) => a.district);
       setDistricts([...new Set(district_array)]);
       setIsLoading(false);
     } catch (error) {
@@ -63,19 +58,9 @@ export default function AddShipping({ navigation }) {
     }
   }
 
-  const add = React.useCallback(async (values) => {
-    try {
-      setIsSubmitting(true);
-      values.zipcode = 0;
-      await axios.post("/address", values, config);
-      Alert.alert("Success", "Address has been added");
-      setIsSubmitting(false);
-      navigation.goBack();
-    } catch (error) {
-      setIsSubmitting(false);
-      apiErrorNotification(error);
-    }
-  });
+  useEffect(() => {
+    getLocations();
+  }, []);
 
   useEffect(() => {
     if (selectedDistrict != "Select District") {
@@ -96,6 +81,26 @@ export default function AddShipping({ navigation }) {
     }
   }, [selectedCity]);
 
+  function gotoMaterialBuySection() {
+    setIsSeller(true);
+    navigation.navigate("Packing Materials");
+  }
+
+  async function add(values) {
+    try {
+      setIsSubmitting(true);
+      await axios.post("/user/make-seller", values, config);
+      setIsSubmitting(false);
+      Alert.alert("Packing Materials", "Do you have packing materials?", [
+        { text: "Yes", onPress: setIsSeller },
+        { text: "No", onPress: gotoMaterialBuySection },
+      ]);
+    } catch (error) {
+      apiErrorNotification(error);
+      setIsSubmitting(false);
+    }
+  }
+
   if (isLoading)
     return (
       <View style={bbstyles.loaderContainer}>
@@ -105,6 +110,21 @@ export default function AddShipping({ navigation }) {
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+      <Text
+        style={{
+          fontWeight: "800",
+          fontSize: 20,
+          fontFamily: "Raleway_800ExtraBold",
+          padding: 20,
+          paddingBottom: 10,
+          marginBottom: 20,
+          borderBottomWidth: 1,
+          borderBottomColor: "#ddd",
+        }}
+      >
+        Become a Seller
+      </Text>
+
       {showPicker === "districts" && (
         <AddressPicker
           navigation={navigation}
@@ -114,6 +134,7 @@ export default function AddShipping({ navigation }) {
           selects={districts}
         />
       )}
+
       {showPicker === "cities" && (
         <AddressPicker
           navigation={navigation}
@@ -125,6 +146,9 @@ export default function AddShipping({ navigation }) {
       )}
 
       <ScrollView>
+        <Text style={bbstyles.alertSuccess}>
+          Fill up your pickup location(Your Location)
+        </Text>
         <View style={styles.container}>
           <Formik
             initialValues={{
@@ -133,7 +157,6 @@ export default function AddShipping({ navigation }) {
               street: "",
               phone: "",
               name: "",
-              zipcode: 0,
             }}
             innerRef={formRef}
             onSubmit={(values) => add(values)}
@@ -237,7 +260,7 @@ export default function AddShipping({ navigation }) {
                     style={styles.loginBtn}
                     onPress={handleSubmit}
                   >
-                    <Text style={styles.login}>Save Address</Text>
+                    <Text style={styles.login}>Submit</Text>
                   </TouchableOpacity>
                 )}
               </>
@@ -247,7 +270,9 @@ export default function AddShipping({ navigation }) {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
+
+export default MakeSeller;
 
 const styles = StyleSheet.create({
   container: {

@@ -25,6 +25,7 @@ import Interest from "./Auth/Interest";
 import RentSale from "./Home/RentSale";
 import MySales from "./sales/MySales";
 import SaleDetail from "./sales/SaleDetail";
+import BuyMaterial from "./material/BuyMaterial";
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +59,23 @@ function HomeNavigation(props) {
           },
         }}
         component={RentSale}
+      />
+
+      <Stack.Screen
+        name="Packing Materials"
+        options={{
+          headerStyle: {
+            backgroundColor: "#fff",
+            borderWidth: 0,
+          },
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: "700",
+          },
+        }}
+        component={BuyMaterial}
       />
 
       <Stack.Screen
@@ -293,12 +311,13 @@ function CategoryNavigation(props) {
 
 function ProfileNavigation({ navigation }) {
   const data = useContext(AuthContext);
-  const { setIsLoggedIn } = data;
+  const { setIsLoggedIn, setIsSeller } = data;
 
   async function Logout() {
     await AsyncStorage.removeItem("token");
     await AsyncStorage.removeItem("userImage");
     setIsLoggedIn(false);
+    setIsSeller(false);
   }
 
   return (

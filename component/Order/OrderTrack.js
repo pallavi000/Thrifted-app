@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { Entypo, Feather } from "@expo/vector-icons";
+import { Entypo, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   Raleway_500Medium,
   Raleway_600SemiBold,
@@ -17,6 +17,7 @@ import {
 import axios from "axios";
 import { AuthContext } from "../Context";
 import { apiErrorNotification } from "../ErrorHandle";
+import { v4 as uuidv4 } from "uuid";
 
 export default function OrderTrack({ route }) {
   const order = route.params;
@@ -25,6 +26,8 @@ export default function OrderTrack({ route }) {
   const { token } = data;
 
   const [events, setEvents] = useState([]);
+
+  const [groupedEvents, setGroupedEvents] = useState([]);
 
   const config = {
     headers: {
@@ -43,10 +46,63 @@ export default function OrderTrack({ route }) {
         config
       );
       setEvents(response.data);
+      setGroupedEvents(groupNotification(response.data));
     } catch (error) {
       apiErrorNotification(error);
     }
   }
+
+  const groupNotification = React.useCallback((data) => {
+    // this gives an object with dates as keys
+    const items = data.reduce((items, item) => {
+      if (item) {
+        let date = item.createdAt ? item.createdAt : new Date().toJSON();
+        date = date.split("T")[0];
+        if (!items[date]) {
+          items[date] = [];
+        }
+        items[date].push(item);
+        return items;
+      }
+    }, {});
+    // Edit: to add it in the array format instead
+    let itemsArray = Object.keys(items).map((date) => {
+      return {
+        id: uuidv4(),
+        date,
+        items: items[date].length
+          ? items[date].sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            )
+          : items[date],
+      };
+    });
+    itemsArray = itemsArray.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return itemsArray;
+  });
+
+  const getDisplayDate = React.useCallback((date) => {
+    const dateArr = date.split("-");
+
+    const year = dateArr[0];
+    const month = dateArr[1];
+    const day = dateArr[2];
+
+    const today = new Date();
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+
+    const compDate = new Date(year, month - 1, day); // month - 1 because January == 0
+    return compDate.toDateString(); // or format it what ever way you want
+  });
+
+  const changeDate = React.useCallback((createdAt) => {
+    var arr = createdAt.split("T");
+    if (!arr.length) return createdAt;
+    return arr[1].split(".")[0];
+  });
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -113,11 +169,12 @@ export default function OrderTrack({ route }) {
                   }}
                 >
                   <Text style={styles.phoneTick}>
-                    <Feather
-                      name="phone-call"
-                      size={15}
+                    <MaterialCommunityIcons
+                      style={styles.icon}
+                      name="timer-sand-empty"
+                      size={20}
                       color="white"
-                    ></Feather>
+                    ></MaterialCommunityIcons>
                   </Text>
                 </View>
               </View>
@@ -144,11 +201,12 @@ export default function OrderTrack({ route }) {
                   }}
                 >
                   <Text style={styles.phoneTick}>
-                    <Feather
-                      name="phone-call"
-                      size={15}
+                    <MaterialCommunityIcons
+                      style={styles.icon}
+                      name="timer-sand-empty"
+                      size={20}
                       color="white"
-                    ></Feather>
+                    ></MaterialCommunityIcons>
                   </Text>
                 </View>
               </View>
@@ -181,11 +239,22 @@ export default function OrderTrack({ route }) {
 
             <View>
               <Text style={styles.tracking}>Tracking Information</Text>
-              {events.map((event) => {
+              {groupedEvents.map((item) => {
                 return (
-                  <View key={event._id} style={styles.trackWrapper}>
-                    <Entypo name="dot-single" size={24} color="black" />
-                    <Text style={styles.trackDetail}>{event.message}</Text>
+                  <View key={item.id}>
+                    <Text style={styles.heading}>
+                      {getDisplayDate(item.date)}
+                    </Text>
+                    {item.items.map((event) => {
+                      return (
+                        <View key={event._id} style={styles.trackWrapper}>
+                          <Text>{changeDate(event.createdAt)}</Text>
+                          <Text style={styles.trackDetail}>
+                            {event.message}
+                          </Text>
+                        </View>
+                      );
+                    })}
                   </View>
                 );
               })}
@@ -202,6 +271,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginVertical: 10,
     fontFamily: "Raleway_600SemiBold",
+    borderBottomWidth: 1,
+    paddingBottom: 10,
+    borderBottomColor: "#ddd",
+  },
+  heading: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#262626",
+    paddingTop: 10,
+    marginBottom: 10,
   },
   container: {
     backgroundColor: "#663399",
@@ -219,6 +298,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: "#4d4d4d",
     textTransform: "capitalize",
+    paddingLeft: 10,
+    borderLeftWidth: 1,
+    borderLeftColor: "#ddd",
   },
 
   title: {

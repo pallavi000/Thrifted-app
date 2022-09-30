@@ -27,7 +27,7 @@ const AddressPicker = (props) => {
               marginRight: 10,
             }}
           >
-            Done{" "}
+            Done
             <MaterialCommunityIcons
               name="check-bold"
               size={16}
@@ -67,12 +67,10 @@ const AddressPicker = (props) => {
               >
                 <Text
                   style={
-                    selectedSelect.name == select.name
-                      ? styles.selectedName
-                      : styles.name
+                    selectedSelect == select ? styles.selectedName : styles.name
                   }
                 >
-                  {select.name}
+                  {select}
                 </Text>
               </TouchableOpacity>
             );

@@ -73,7 +73,8 @@
     "socket.io-client": "^4.5.0",
     "timeago.js": "^4.0.2",
     "uuid": "^8.3.2",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "expo-linking": "~3.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

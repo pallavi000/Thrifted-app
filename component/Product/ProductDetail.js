@@ -74,7 +74,7 @@ export default function ProductDetail({ navigation, route }) {
 
   const initialize = React.useCallback(() => {
     const isInCart = cartItems.find(
-      (item) => item.product_id._id == product._id
+      (item) => item.product_id?._id == product._id
     );
     if (isInCart) {
       setProduct({ ...product, stock: product.stock - isInCart.quantity });

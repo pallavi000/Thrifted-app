@@ -1,5 +1,7 @@
 import {
+  ActivityIndicator,
   Alert,
+  Dimensions,
   FlatList,
   SafeAreaView,
   StyleSheet,
@@ -12,11 +14,14 @@ import axios from "axios";
 import BrandCheck from "../ui/BrandCheck";
 import { AuthContext } from "../Context";
 import { apiErrorNotification } from "../ErrorHandle";
+import bbstyles from "../Styles";
 
 export default function Interest({ navigation }) {
   const [category_ids, setCategory_ids] = useState([]);
   const [categories, setCategories] = useState([]);
   const [user, setUser] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getCategories();
@@ -31,6 +36,7 @@ export default function Interest({ navigation }) {
   };
 
   async function getCategories() {
+    setIsLoading(true);
     try {
       let arr = [];
       const response = await axios.get("/category");
@@ -38,7 +44,10 @@ export default function Interest({ navigation }) {
         arr = [...arr, ...category.childrens];
       }
       setCategories(arr);
-    } catch (error) {}
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -82,6 +91,7 @@ export default function Interest({ navigation }) {
   }
 
   async function submitInterests() {
+    setIsSubmitting(true);
     try {
       const data = {
         interests: category_ids,
@@ -91,12 +101,17 @@ export default function Interest({ navigation }) {
         data,
         config
       );
-      navigation.navigate(-1);
+      navigation.goBack();
     } catch (error) {
       apiErrorNotification(error);
+      setIsSubmitting(false);
     }
   }
-  return (
+  return isLoading ? (
+    <View style={bbstyles.loaderContainer}>
+      <ActivityIndicator size={"large"} color="#663399" />
+    </View>
+  ) : (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
       <View style={styles.container}>
         <FlatList
@@ -110,7 +125,7 @@ export default function Interest({ navigation }) {
               <View style={styles.brandCheck}>
                 <BrandCheck
                   brand={item}
-                  brand_ids={user.interests}
+                  brand_ids={user.interests ? user.interests : []}
                   brand_filter={category_check}
                 />
               </View>
@@ -119,9 +134,15 @@ export default function Interest({ navigation }) {
         />
       </View>
       <View style={styles.filterApplySection}>
-        <TouchableOpacity onPress={() => submitInterests()}>
-          <Text style={styles.apply}>Save</Text>
-        </TouchableOpacity>
+        {isSubmitting ? (
+          <TouchableOpacity style={styles.apply}>
+            <ActivityIndicator size={18} color="#fff" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => submitInterests()}>
+            <Text style={styles.apply}>Save</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -175,7 +196,8 @@ const styles = StyleSheet.create({
   },
   apply: {
     paddingVertical: 10,
-    paddingHorizontal: 60,
+    width: Dimensions.get("window").width / 2,
+    textAlign: "center",
     fontSize: 14,
     fontFamily: "Raleway_500Medium",
     fontWeight: "500",
@@ -199,15 +221,7 @@ const styles = StyleSheet.create({
   },
   filterApplySection: {
     backgroundColor: "#f5f5ff",
-    padding: 10,
-    shadowColor: "rgba(0, 0, 0, 0.3)",
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 1,
+    padding: 5,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",
@@ -216,6 +230,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
   },
   activeBrand: {
     color: "#663399",

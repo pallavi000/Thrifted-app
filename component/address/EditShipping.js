@@ -15,7 +15,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import bbstyles from "../Styles";
 import axios from "axios";
-import { AuthContext, zipcodes, districts } from "../Context";
+import { AuthContext } from "../Context";
 import { apiErrorNotification } from "./../ErrorHandle";
 import AddressPicker from "./AddressPicker";
 import ZipCodePicker from "./ZipCodePicker";
@@ -26,7 +26,6 @@ const validationSchema = Yup.object().shape({
   street: Yup.string().required(),
   phone: Yup.string().required(),
   name: Yup.string().required().required(),
-  zipcode: Yup.number().required(),
 });
 
 export default function EditShipping({ navigation, route }) {
@@ -34,15 +33,13 @@ export default function EditShipping({ navigation, route }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef();
   const [showPicker, setShowPicker] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [locations, setLocations] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [cities, setCities] = useState([]);
 
-  const [selectedDistrict, setSelectedDistrict] = useState({
-    name: address.district,
-    id: 1,
-  });
-  const [filterZipCodes, setFilterZipCodes] = useState(zipcodes);
-  const [selectedZipCode, setSelectedZipCode] = useState({
-    zipcode: address.zipcode,
-  });
+  const [selectedDistrict, setSelectedDistrict] = useState(address.district);
+  const [selectedCity, setSelectedCity] = useState(address.city);
 
   const data = useContext(AuthContext);
   const { token } = data;
@@ -51,6 +48,29 @@ export default function EditShipping({ navigation, route }) {
       "access-token": token,
     },
   };
+
+  useEffect(() => {
+    getLocations();
+  }, []);
+
+  async function getLocations() {
+    try {
+      const response = await axios.get("/location", config);
+      setLocations(response.data);
+      const district_array = response.data.map((a) => a.district);
+      setDistricts([...new Set(district_array)]);
+
+      const filtered_cities = response.data.filter(
+        (loc) => loc.district == address.district
+      );
+      const cities_array = filtered_cities.map((a) => a.city);
+      setCities(cities_array);
+
+      setIsLoading(false);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+  }
 
   const Edit = React.useCallback(async (data) => {
     try {
@@ -70,27 +90,30 @@ export default function EditShipping({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    if (selectedDistrict.id) {
-      formRef.current.setFieldValue("district", selectedDistrict.name);
-      var zipcodesFilter = zipcodes.filter(
-        (zip) => zip.district == selectedDistrict.name
+    if (formRef.current && selectedDistrict != "Select District") {
+      formRef.current.setFieldValue("district", selectedDistrict);
+      formRef.current.setFieldValue("city", "");
+      const filtered_cities = locations.filter(
+        (loc) => loc.district == selectedDistrict
       );
-      var find = zipcodesFilter.find(
-        (zip) => zip.zipcode == selectedZipCode.zipcode
-      );
-      if (!find) {
-        formRef.current.setFieldValue("zipcode", "");
-        setSelectedZipCode({ zipcode: "Select Zip Code" });
-      }
-
-      setFilterZipCodes(zipcodesFilter);
+      const cities_array = filtered_cities.map((a) => a.city);
+      setCities(cities_array);
+      setSelectedCity("Select City");
     }
   }, [selectedDistrict]);
 
   useEffect(() => {
-    if (selectedZipCode.zipcode == "Select Zip Code") return;
-    formRef.current.setFieldValue("zipcode", selectedZipCode.zipcode);
-  }, [selectedZipCode]);
+    if (formRef.current && selectedCity != "Select City") {
+      formRef.current.setFieldValue("city", selectedCity);
+    }
+  }, [selectedCity]);
+
+  if (isLoading)
+    return (
+      <View style={bbstyles.loaderContainer}>
+        <ActivityIndicator size={"large"} color="#663399" />
+      </View>
+    );
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
@@ -103,15 +126,16 @@ export default function EditShipping({ navigation, route }) {
           selects={districts}
         />
       )}
-      {showPicker === "zipcodes" && (
-        <ZipCodePicker
+      {showPicker === "cities" && (
+        <AddressPicker
           navigation={navigation}
-          selectedSelect={selectedZipCode}
-          setSelectedSelect={setSelectedZipCode}
+          selectedSelect={selectedCity}
+          setSelectedSelect={setSelectedCity}
           setShowAddressPicker={setShowPicker}
-          selects={filterZipCodes}
+          selects={cities}
         />
       )}
+
       <ScrollView>
         <View style={styles.container}>
           <Formik
@@ -156,7 +180,7 @@ export default function EditShipping({ navigation, route }) {
                           fontSize: 16,
                         }}
                       >
-                        {selectedDistrict.name}
+                        {selectedDistrict}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -167,18 +191,24 @@ export default function EditShipping({ navigation, route }) {
 
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>City</Text>
-                  <TextInput
-                    keyboardType="default"
-                    style={styles.input}
-                    onChangeText={handleChange("city")}
-                    onBlur={handleBlur("city")}
-                    defaultValue={address.city}
-                    selectionColor="#663399"
-                  ></TextInput>
-                  {touched.city && errors.city ? (
+                  <TouchableOpacity onPress={() => setShowPicker("cities")}>
+                    <View style={styles.selectField}>
+                      <Text
+                        style={{
+                          color: "black",
+                          textTransform: "capitalize",
+                          fontSize: 16,
+                        }}
+                      >
+                        {selectedCity}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {errors.city && touched.city ? (
                     <Text style={bbstyles.error}>{errors.city}</Text>
                   ) : null}
                 </View>
+
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>Street</Text>
                   <TextInput
@@ -192,25 +222,6 @@ export default function EditShipping({ navigation, route }) {
 
                   {touched.street && errors.street ? (
                     <Text style={bbstyles.error}>{errors.street}</Text>
-                  ) : null}
-                </View>
-                <View style={styles.formGroup}>
-                  <Text style={styles.label}>Zip Code (Postal Code)</Text>
-                  <TouchableOpacity onPress={() => setShowPicker("zipcodes")}>
-                    <View style={styles.selectField}>
-                      <Text
-                        style={{
-                          color: "black",
-                          textTransform: "capitalize",
-                          fontSize: 16,
-                        }}
-                      >
-                        {selectedZipCode.zipcode}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                  {errors.zipcode && touched.zipcode ? (
-                    <Text style={bbstyles.error}>{errors.zipcode}</Text>
                   ) : null}
                 </View>
 

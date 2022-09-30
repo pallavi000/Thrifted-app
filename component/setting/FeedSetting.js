@@ -1,4 +1,11 @@
-import { StyleSheet, Switch, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+  TouchableOpacity,
+  SafeAreaView,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import {
   MaterialCommunityIcons,
@@ -44,59 +51,62 @@ export default function FeedSetting({ navigation }) {
   }
 
   return (
-    <View>
-      <View style={styles.pagesWrapper}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <MaterialIcons name="notifications-none" size={20}></MaterialIcons>
-          <Text style={styles.pageName}>Followings</Text>
+    <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.pagesWrapper}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <MaterialIcons name="notifications-none" size={20}></MaterialIcons>
+            <Text style={styles.pageName}>Followings</Text>
+          </View>
+          <View
+            style={{ flexDirection: "row", alignItems: "center", height: 10 }}
+          >
+            <Switch
+              trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
+              thumbColor={followings ? "#4CD964" : "#868686"}
+              ios_backgroundColor="#EBEDF3"
+              onValueChange={() => toggleSwitch("followings")}
+              value={followings}
+            />
+          </View>
         </View>
-        <View
-          style={{ flexDirection: "row", alignItems: "center", height: 10 }}
-        >
-          <Switch
-            trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
-            thumbColor={followings ? "#4CD964" : "#868686"}
-            ios_backgroundColor="#EBEDF3"
-            onValueChange={() => toggleSwitch("followings")}
-            value={followings}
-          />
-        </View>
-      </View>
 
-      <View style={styles.pagesWrapper}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <MaterialIcons name="notifications-none" size={20}></MaterialIcons>
-          <Text style={styles.pageName}>Interests</Text>
+        <View style={styles.pagesWrapper}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <MaterialIcons name="notifications-none" size={20}></MaterialIcons>
+            <Text style={styles.pageName}>Interests</Text>
+          </View>
+          <View
+            style={{ flexDirection: "row", alignItems: "center", height: 10 }}
+          >
+            <Switch
+              trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
+              thumbColor={interests ? "#4CD964" : "#868686"}
+              ios_backgroundColor="#EBEDF3"
+              onValueChange={() => toggleSwitch("interests")}
+              value={interests}
+            />
+          </View>
         </View>
-        <View
-          style={{ flexDirection: "row", alignItems: "center", height: 10 }}
-        >
-          <Switch
-            trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
-            thumbColor={interests ? "#4CD964" : "#868686"}
-            ios_backgroundColor="#EBEDF3"
-            onValueChange={() => toggleSwitch("interests")}
-            value={interests}
-          />
-        </View>
-      </View>
 
-      <View style={styles.pagesWrapper}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Interest Setting")}
-          style={{ flexDirection: "row", alignItems: "center" }}
-        >
-          <MaterialIcons name="notifications-none" size={20}></MaterialIcons>
-          <Text style={styles.pageName}>Interests Setting</Text>
-        </TouchableOpacity>
+        <View style={styles.pagesWrapper}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Interest Setting")}
+            style={{ flexDirection: "row", alignItems: "center" }}
+          >
+            <MaterialIcons name="notifications-none" size={20}></MaterialIcons>
+            <Text style={styles.pageName}>Interests Setting</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    paddingHorizontal: 10,
   },
   card: {
     padding: 10,

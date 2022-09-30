@@ -292,7 +292,9 @@ export default function Setting({ navigation }) {
               ></MaterialIcons>
               <Text style={styles.pageName}>New Arrivals</Text>
             </View>
-            <View style={{ flexDirection: "row" }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", height: 10 }}
+            >
               <Switch
                 trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
                 thumbColor={newArrival ? "#4CD964" : "#868686"}
@@ -310,7 +312,9 @@ export default function Setting({ navigation }) {
               ></MaterialIcons>
               <Text style={styles.pageName}>Delivery Status Changes</Text>
             </View>
-            <View style={{ flexDirection: "row" }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", height: 10 }}
+            >
               <Switch
                 trackColor={{ false: "#EBEDF3", true: "#EBEDF3" }}
                 thumbColor={dsc ? "#4CD964" : "#868686"}

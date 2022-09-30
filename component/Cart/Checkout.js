@@ -233,7 +233,7 @@ export default function Checkout({ navigation }) {
                   <Feather name="map-pin" size={20} color={"#200E32"}></Feather>
                   <Text style={styles.userName}>
                     {shippingAddress.street}, {shippingAddress.city},{" "}
-                    {shippingAddress.district}, {shippingAddress.zipcode}, Nepal
+                    {shippingAddress.district}, Nepal
                   </Text>
                 </View>
                 <View style={styles.userWrapper}>
@@ -277,7 +277,7 @@ export default function Checkout({ navigation }) {
                       return (
                         <Picker.Item
                           key={address._id}
-                          label={`${address.street}, ${address.city}, ${address.district}, ${address.zipcode}, Nepal`}
+                          label={`${address.street}, ${address.city}, ${address.district}, Nepal`}
                           value={address._id}
                         />
                       );
@@ -310,8 +310,7 @@ export default function Checkout({ navigation }) {
                       ></Feather>
                       <Text style={styles.userName}>
                         {billingAddress.street}, {billingAddress.city},{" "}
-                        {billingAddress.district}, {billingAddress.zipcode},
-                        Nepal
+                        {billingAddress.district}, Nepal
                       </Text>
                     </View>
                     <View style={styles.userWrapper}>

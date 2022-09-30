@@ -84,6 +84,7 @@ export default gestureHandlerRootHOC(function App(props) {
     useState(0);
 
   const [userImage, setUserImage] = useState();
+  const [isSeller, setIsSeller] = useState(false);
   const [appReady, setAppReady] = useState(false);
   const socket = useRef();
   const responseListener = useRef();
@@ -214,10 +215,12 @@ export default gestureHandlerRootHOC(function App(props) {
         var token = authConfig;
         var decoded = jwt_decode(token);
         setDecode(decoded);
-
         if (!notificationApiCall) {
           registerForPushNotificationsAsync(token);
           setNotificationApiCall(true);
+        }
+        if (decoded.is_seller) {
+          setIsSeller(true);
         }
         socketConnect(decoded);
         userImageSet(decoded);
@@ -302,6 +305,8 @@ export default gestureHandlerRootHOC(function App(props) {
             selectedProduct,
             setSelectedProduct,
             setToken,
+            isSeller,
+            setIsSeller,
           }}
         >
           {isLoggedIn ? (
@@ -446,8 +451,16 @@ export default gestureHandlerRootHOC(function App(props) {
               <Stack.Screen
                 name="Feed Setting"
                 options={{
+                  headerStyle: {
+                    backgroundColor: "#fff",
+                    borderWidth: 0,
+                  },
                   headerTitleAlign: "center",
-                  headerShadowVisible: false,
+                  headerShadowVisible: true,
+                  headerTitleStyle: {
+                    fontSize: 18,
+                    fontWeight: "700",
+                  },
                 }}
                 component={FeedSetting}
               />

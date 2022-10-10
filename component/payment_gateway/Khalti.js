@@ -64,7 +64,7 @@ const Khalti = (props) => {
         productUrl="https://google.com" // Url of product
         publicKey={
           process.env.KHALTI_PUBLIC_KEY ||
-          "test_public_key_9846f443b0934e37877c01b1ae4a4311"
+          "test_public_key_5d44393aa81947c79d4f1671128b0cd8"
         } // Test or live public key which identifies the merchant
       />
     </SafeAreaView>

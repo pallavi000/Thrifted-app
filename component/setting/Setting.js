@@ -192,13 +192,12 @@ export default function Setting({ navigation }) {
             </View>
             <View style={{ flexDirection: "row" }}>
               {user ? (
-                <Text>Rs. 0</Text>
+                <Text>Rs. {user.pendingBalance}</Text>
               ) : (
                 <ActivityIndicator size={"small"} color="#fa4a0c" />
               )}
             </View>
           </View>
-
           <TouchableOpacity
             onPress={() => navigation.navigate("Redeem", user)}
             style={styles.pagesWrapper}

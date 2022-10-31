@@ -174,6 +174,7 @@ export default function ProductDetail({ navigation, route }) {
   }, []);
 
   const getFollowersCount = useCallback((user) => {
+    console.log(user);
     if (user.followers && user.followers.length > 0) {
       const num = user.followers.length;
       if (num >= 1000000) {

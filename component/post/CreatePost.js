@@ -282,7 +282,6 @@ function CreatePost({ navigation }) {
           initChangeHeader={changeHeader}
         />
       ) : null}
-
       {openSelectField === "color" ? (
         <SimpleSelect
           selects={colors}

@@ -105,7 +105,7 @@ export default function Redeem({ navigation, route }) {
                       }
                     >
                       <Picker.Item label="Selelct Payment Method" value="" />
-                      <Picker.Item label="FonePay" value="fonepay" />
+                      <Picker.Item label="Khalti" value="khalti" />
                       <Picker.Item label="Esewa" value="esewa" />
                     </Picker>
                     {touched.payment_method & errors.payment_method ? (

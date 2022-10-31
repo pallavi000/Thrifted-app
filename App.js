@@ -52,7 +52,7 @@ import { gestureHandlerRootHOC } from "react-native-gesture-handler";
 import FeedSetting from "./component/setting/FeedSetting";
 
 // axios.defaults.baseURL = "http://localhost:5000/api";
-axios.defaults.baseURL = "https://thrifted.jcloudia.com/api";
+axios.defaults.baseURL = "https://hamrocloset.com/api";
 
 const Stack = createNativeStackNavigator();
 

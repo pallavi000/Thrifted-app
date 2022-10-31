@@ -29,7 +29,11 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().required().email("Email is required."),
   password: Yup.string().required("Password is Required."),
   name: Yup.string().required("Full Name is Required."),
-  phone: Yup.string().required("Phone Number is required."),
+  phone: Yup.string()
+    .min(10)
+    .max(10)
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .required("Phone Number is required."),
 });
 
 export default function Register({ navigation }) {
@@ -185,6 +189,7 @@ export default function Register({ navigation }) {
                         onBlur={handleBlur("phone")}
                         placeholder="98XXXXXXXX"
                         selectionColor="#663399"
+                        placeholderTextColor={"#868686"}
                       ></TextInput>
                       {touched.phone && errors.phone ? (
                         <Text style={bbstyles.error}>{errors.phone}</Text>

@@ -1,1 +1,1 @@
-export const imageLink = "https://thrifted.jcloudia.com";
+export const imageLink = "https://hamrocloset.com";

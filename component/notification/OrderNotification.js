@@ -10,7 +10,6 @@ export default function OrderNotification(props) {
 
   const data = useContext(AuthContext);
   const { decode } = data;
-  console.log(item.order_id);
 
   return props.item.type == "order" ? (
     props.item.user_id._id == decode._id ? (

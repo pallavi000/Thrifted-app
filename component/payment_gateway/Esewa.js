@@ -53,8 +53,8 @@ const Esewa = (props) => {
         amt={props.total} // Amount of product or item or ticket etc
         taxAmt={0} // Tax amount on product or item or ticket etc
         totalAmt={props.total + props.shippingFee} // Total payment amount including tax, service and deliver charge. [i.e tAmt = amt + txAmt + psc + tAmt]
-        env={process.env.ESEWA_PUBLIC_KEY} // Merchant code provided by eSewa
-        testMode={false} // Boolean value for enabling test endpoint and real payment gateway
+        env={process.env.ESEWA_PUBLIC_KEY || "EPAYTEST"} // Merchant code provided by eSewa
+        testMode={process.env.ESEWA_PUBLIC_KEY ? false : true} // Boolean value for enabling test endpoint and real payment gateway
         isVisible={isVisible} // Bool to show modal
         onPaymentComplete={_onPaymentComplete} //  Callback from connectips Web Sdk
         pid={props.pid} // A unique ID of product or item or ticket etc

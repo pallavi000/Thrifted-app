@@ -17,7 +17,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": 5,
+      "bundleIdentifier": "com.snlbaral.HamroCloset2"
     },
     "android": {
       "adaptiveIcon": {

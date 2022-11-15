@@ -14,7 +14,13 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useRef,
+  forwardRef,
+} from "react";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   Raleway_400Regular,
@@ -48,6 +54,7 @@ const validationSchema = Yup.object().shape({
   original: Yup.number().required("Original Price is required"),
   price: Yup.number().required("Price is required"),
   type: Yup.string().required("Product Type is required"),
+  pickupOption: Yup.string().required("Pickup option is required"),
 });
 
 function CreatePost({ navigation }) {
@@ -68,6 +75,16 @@ function CreatePost({ navigation }) {
   const [earningPrice, setEarningPrice] = useState();
   const [openSelectField, setOpenSelectField] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [pickupOptions, setPickupOptions] = useState([
+    {
+      _id: "Door",
+      name: "Pickup From Home",
+    },
+    {
+      _id: "Branch",
+      name: "Drop to Branch",
+    },
+  ]);
   const [productTypes, setProductTypes] = useState([
     {
       _id: "rent",
@@ -89,6 +106,9 @@ function CreatePost({ navigation }) {
     name: "Select Product Type",
   });
   const [selectedBrand, setSelectedBrand] = useState({ name: "Select Brand" });
+  const [selectedPickupOption, setSelectedPickupOption] = useState({
+    name: "Select Pickup option",
+  });
 
   const data = useContext(AuthContext);
   const { token } = data;
@@ -184,17 +204,31 @@ function CreatePost({ navigation }) {
     changeHeader();
   });
 
+  useEffect(() => {
+    formRef.current.setFieldValue("category", selectedCategory._id);
+  }, [selectedCategory]);
+
   const calcEarning = React.useCallback((value) => {
     formRef.current.setFieldValue("price", value);
     var price = value;
     var profit = price - (price * 20) / 100;
+    if (formRef.current.values.pickupOption == "Door") {
+      profit = profit - 15;
+    }
     formRef.current.setFieldValue("earning_price", profit);
     setEarningPrice(profit.toString());
   });
 
   useEffect(() => {
-    formRef.current.setFieldValue("category", selectedCategory._id);
-  }, [selectedCategory]);
+    formRef.current.setFieldValue("pickupOption", selectedPickupOption._id);
+    if (selectedPickupOption._id == "Door") {
+      setEarningPrice((parseInt(earningPrice) - 15).toString());
+      formRef.current.setFieldValue(
+        "earning_price",
+        parseInt(earningPrice) - 15
+      );
+    }
+  }, [selectedPickupOption]);
 
   useEffect(() => {
     formRef.current.setFieldValue("color", selectedColor._id);
@@ -315,6 +349,17 @@ function CreatePost({ navigation }) {
         />
       ) : null}
 
+      {openSelectField === "pickupOption" ? (
+        <SimpleSelect
+          selects={pickupOptions}
+          selectedSelect={selectedPickupOption}
+          setOpenSelectField={setOpenSelectField}
+          setSelectedSelect={setSelectedPickupOption}
+          navigation={navigation}
+          initChangeHeader={changeHeader}
+        />
+      ) : null}
+
       {openSelectField === "brand" ? (
         <BrandSelect
           brands={brands}
@@ -373,6 +418,7 @@ function CreatePost({ navigation }) {
                   image2: "",
                   image3: "",
                   image4: "",
+                  pickupOption: "",
                 }}
                 onSubmit={(values) => createPost(values)}
                 validationSchema={validationSchema}
@@ -598,6 +644,30 @@ function CreatePost({ navigation }) {
 
                       {touched.type && errors.type ? (
                         <Text style={bbstyles.error}>{errors.type}</Text>
+                      ) : null}
+                    </View>
+
+                    <View style={styles.formGroup}>
+                      <Text style={styles.label}>Pickup Option (Required)</Text>
+                      <TouchableOpacity
+                        onPress={() => setOpenSelectField("pickupOption")}
+                      >
+                        <View style={styles.selectField}>
+                          <Text
+                            style={{
+                              color: "black",
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {selectedPickupOption.name}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+
+                      {touched.pickupOption && errors.pickupOption ? (
+                        <Text style={bbstyles.error}>
+                          {errors.pickupOption}
+                        </Text>
                       ) : null}
                     </View>
                   </>

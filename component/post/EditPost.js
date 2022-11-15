@@ -49,6 +49,7 @@ const validationSchema = Yup.object().shape({
   original: Yup.number().required("Original Price is required"),
   price: Yup.number().required("Price is required"),
   type: Yup.string().required("Product Type is required"),
+  pickupOption: Yup.string().required("Pickup option is required"),
 });
 
 const EditPost = ({ navigation, route }) => {
@@ -66,6 +67,16 @@ const EditPost = ({ navigation, route }) => {
   const fill = new Animated.Value(1);
   const [earningPrice, setEarningPrice] = useState(0);
   const [openSelectField, setOpenSelectField] = useState(null);
+  const [pickupOptions, setPickupOptions] = useState([
+    {
+      _id: "Door",
+      name: "Pickup From Home",
+    },
+    {
+      _id: "Branch",
+      name: "Drop to Branch",
+    },
+  ]);
   const [productTypes, setProductTypes] = useState([
     {
       _id: "rent",
@@ -82,6 +93,10 @@ const EditPost = ({ navigation, route }) => {
   const [selectedSize, setSelectedSize] = useState(product.size_id);
   const [selectedType, setSelectedType] = useState({});
   const [selectedBrand, setSelectedBrand] = useState(product.brand_id);
+  const [selectedPickupOption, setSelectedPickupOption] = useState({
+    name: product.pickupOption,
+    _id: product.pickupOption,
+  });
 
   const data = useContext(AuthContext);
   const { token, selectedProduct, setSelectedProduct } = data;
@@ -204,6 +219,10 @@ const EditPost = ({ navigation, route }) => {
   }, [selectedCategory]);
 
   useEffect(() => {
+    formRef.current.setFieldValue("pickupOption", selectedPickupOption._id);
+  }, [selectedPickupOption]);
+
+  useEffect(() => {
     formRef.current.setFieldValue("color", selectedColor._id);
   }, [selectedColor]);
   useEffect(() => {
@@ -323,6 +342,17 @@ const EditPost = ({ navigation, route }) => {
         />
       ) : null}
 
+      {openSelectField === "pickupOption" ? (
+        <SimpleSelect
+          selects={pickupOptions}
+          selectedSelect={selectedPickupOption}
+          setOpenSelectField={setOpenSelectField}
+          setSelectedSelect={setSelectedPickupOption}
+          navigation={navigation}
+          initChangeHeader={changeHeader}
+        />
+      ) : null}
+
       {openSelectField === "brand" ? (
         <BrandSelect
           brands={brands}
@@ -388,6 +418,7 @@ const EditPost = ({ navigation, route }) => {
                     image2: "",
                     image3: "",
                     image4: "",
+                    pickupOptions: product.pickupOption,
                   }}
                   onSubmit={(values) => updatePost(values)}
                   validationSchema={validationSchema}
@@ -629,6 +660,32 @@ const EditPost = ({ navigation, route }) => {
 
                         {touched.type && errors.type ? (
                           <Text style={bbstyles.error}>{errors.type}</Text>
+                        ) : null}
+                      </View>
+
+                      <View style={styles.formGroup}>
+                        <Text style={styles.label}>
+                          Pickup Option (Required)
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => setOpenSelectField("pickupOption")}
+                        >
+                          <View style={styles.selectField}>
+                            <Text
+                              style={{
+                                color: "black",
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {selectedPickupOption.name}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+
+                        {touched.pickupOption && errors.pickupOption ? (
+                          <Text style={bbstyles.error}>
+                            {errors.pickupOption}
+                          </Text>
                         ) : null}
                       </View>
                     </>

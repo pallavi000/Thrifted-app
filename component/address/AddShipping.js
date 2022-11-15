@@ -25,6 +25,7 @@ const validationSchema = Yup.object().shape({
   street: Yup.string().required(),
   phone: Yup.string().required(),
   name: Yup.string().required().required(),
+  municipality: Yup.string().required(),
 });
 
 export default function AddShipping({ navigation }) {
@@ -35,9 +36,13 @@ export default function AddShipping({ navigation }) {
   const [districts, setDistricts] = useState([]);
   const [cities, setCities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [municipalities, setMunicipalities] = useState([]);
 
   const [selectedDistrict, setSelectedDistrict] = useState("Select District");
   const [selectedCity, setSelectedCity] = useState("Select City");
+  const [selectedMunicipality, setSelectedMunicipality] = useState(
+    "Select Municipality"
+  );
 
   const data = useContext(AuthContext);
   const { token } = data;
@@ -80,21 +85,42 @@ export default function AddShipping({ navigation }) {
   useEffect(() => {
     if (selectedDistrict != "Select District") {
       formRef.current.setFieldValue("district", selectedDistrict);
+      formRef.current.setFieldValue("municipality", "");
+      const filtered_municipalities = locations.filter(
+        (loc) => loc.district == selectedDistrict
+      );
+      const municipalities_array = filtered_municipalities.map(
+        (a) => a.municipality
+      );
+      setMunicipalities([...new Set(municipalities_array)]);
+      setSelectedMunicipality("Select Municipality");
+    }
+  }, [selectedDistrict]);
+
+  useEffect(() => {
+    if (selectedMunicipality != "Select Municipality") {
+      formRef.current.setFieldValue("municipality", selectedMunicipality);
       formRef.current.setFieldValue("city", "");
       const filtered_cities = locations.filter(
-        (loc) => loc.district == selectedDistrict
+        (loc) => loc.municipality == selectedMunicipality
       );
       const cities_array = filtered_cities.map((a) => a.city);
       setCities(cities_array);
       setSelectedCity("Select City");
     }
-  }, [selectedDistrict]);
+  }, [selectedMunicipality]);
 
   useEffect(() => {
     if (selectedCity != "Select City") {
       formRef.current.setFieldValue("city", selectedCity);
     }
   }, [selectedCity]);
+
+  useEffect(() => {
+    if (selectedMunicipality != "Select Municipality") {
+      formRef.current.setFieldValue("municipality", selectedMunicipality);
+    }
+  }, [selectedMunicipality]);
 
   if (isLoading)
     return (
@@ -112,6 +138,15 @@ export default function AddShipping({ navigation }) {
           setSelectedSelect={setSelectedDistrict}
           setShowAddressPicker={setShowPicker}
           selects={districts}
+        />
+      )}
+      {showPicker === "municipalities" && (
+        <AddressPicker
+          navigation={navigation}
+          selectedSelect={selectedMunicipality}
+          setSelectedSelect={setSelectedMunicipality}
+          setShowAddressPicker={setShowPicker}
+          selects={municipalities}
         />
       )}
       {showPicker === "cities" && (
@@ -134,6 +169,7 @@ export default function AddShipping({ navigation }) {
               phone: "",
               name: "",
               zipcode: 0,
+              municipality: "",
             }}
             innerRef={formRef}
             onSubmit={(values) => add(values)}
@@ -173,6 +209,28 @@ export default function AddShipping({ navigation }) {
                   </TouchableOpacity>
                   {errors.district && touched.district ? (
                     <Text style={bbstyles.error}>{errors.district}</Text>
+                  ) : null}
+                </View>
+
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>Municipality</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowPicker("municipalities")}
+                  >
+                    <View style={styles.selectField}>
+                      <Text
+                        style={{
+                          color: "black",
+                          textTransform: "capitalize",
+                          fontSize: 16,
+                        }}
+                      >
+                        {selectedMunicipality}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {errors.municipality && touched.municipality ? (
+                    <Text style={bbstyles.error}>{errors.municipality}</Text>
                   ) : null}
                 </View>
 

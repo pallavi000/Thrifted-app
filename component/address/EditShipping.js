@@ -26,6 +26,7 @@ const validationSchema = Yup.object().shape({
   street: Yup.string().required(),
   phone: Yup.string().required(),
   name: Yup.string().required().required(),
+  municipality: Yup.string().required(),
 });
 
 export default function EditShipping({ navigation, route }) {
@@ -37,9 +38,13 @@ export default function EditShipping({ navigation, route }) {
   const [locations, setLocations] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [cities, setCities] = useState([]);
+  const [municipalities, setMunicipalities] = useState([]);
 
   const [selectedDistrict, setSelectedDistrict] = useState(address.district);
   const [selectedCity, setSelectedCity] = useState(address.city);
+  const [selectedMunicipality, setSelectedMunicipality] = useState(
+    address.municipality
+  );
 
   const data = useContext(AuthContext);
   const { token } = data;
@@ -60,8 +65,16 @@ export default function EditShipping({ navigation, route }) {
       const district_array = response.data.map((a) => a.district);
       setDistricts([...new Set(district_array)]);
 
-      const filtered_cities = response.data.filter(
+      const filtered_municipalities = response.data.filter(
         (loc) => loc.district == address.district
+      );
+      const municipalities_array = filtered_municipalities.map(
+        (a) => a.municipality
+      );
+      setMunicipalities([...new Set(municipalities_array)]);
+
+      const filtered_cities = response.data.filter(
+        (loc) => loc.municipality == address.municipality
       );
       const cities_array = filtered_cities.map((a) => a.city);
       setCities(cities_array);
@@ -92,21 +105,42 @@ export default function EditShipping({ navigation, route }) {
   useEffect(() => {
     if (formRef.current && selectedDistrict != "Select District") {
       formRef.current.setFieldValue("district", selectedDistrict);
+      formRef.current.setFieldValue("municipality", "");
+      const filtered_municipalities = locations.filter(
+        (loc) => loc.district == selectedDistrict
+      );
+      const municipalities_array = filtered_municipalities.map(
+        (a) => a.municipality
+      );
+      setMunicipalities([...new Set(municipalities_array)]);
+      setSelectedMunicipality("Select Municipality");
+    }
+  }, [selectedDistrict]);
+
+  useEffect(() => {
+    if (formRef.current && selectedMunicipality != "Select Municipality") {
+      formRef.current.setFieldValue("municipality", selectedMunicipality);
       formRef.current.setFieldValue("city", "");
       const filtered_cities = locations.filter(
-        (loc) => loc.district == selectedDistrict
+        (loc) => loc.municipality == selectedMunicipality
       );
       const cities_array = filtered_cities.map((a) => a.city);
       setCities(cities_array);
       setSelectedCity("Select City");
     }
-  }, [selectedDistrict]);
+  }, [selectedMunicipality]);
 
   useEffect(() => {
     if (formRef.current && selectedCity != "Select City") {
       formRef.current.setFieldValue("city", selectedCity);
     }
   }, [selectedCity]);
+
+  useEffect(() => {
+    if (formRef.current && selectedMunicipality != "Select Municipality") {
+      formRef.current.setFieldValue("municipality", selectedMunicipality);
+    }
+  }, [selectedMunicipality]);
 
   if (isLoading)
     return (
@@ -124,6 +158,15 @@ export default function EditShipping({ navigation, route }) {
           setSelectedSelect={setSelectedDistrict}
           setShowAddressPicker={setShowPicker}
           selects={districts}
+        />
+      )}
+      {showPicker === "municipalities" && (
+        <AddressPicker
+          navigation={navigation}
+          selectedSelect={selectedMunicipality}
+          setSelectedSelect={setSelectedMunicipality}
+          setShowAddressPicker={setShowPicker}
+          selects={municipalities}
         />
       )}
       {showPicker === "cities" && (
@@ -147,6 +190,7 @@ export default function EditShipping({ navigation, route }) {
               phone: address.phone,
               name: address.name,
               zipcode: address.zipcode,
+              municipality: address.municipality,
             }}
             onSubmit={(values) => Edit(values)}
             validationSchema={validationSchema}
@@ -186,6 +230,28 @@ export default function EditShipping({ navigation, route }) {
                   </TouchableOpacity>
                   {errors.district && touched.district ? (
                     <Text style={bbstyles.error}>{errors.district}</Text>
+                  ) : null}
+                </View>
+
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>Municipality</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowPicker("municipalities")}
+                  >
+                    <View style={styles.selectField}>
+                      <Text
+                        style={{
+                          color: "black",
+                          textTransform: "capitalize",
+                          fontSize: 16,
+                        }}
+                      >
+                        {selectedMunicipality}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {errors.municipality && touched.municipality ? (
+                    <Text style={bbstyles.error}>{errors.municipality}</Text>
                   ) : null}
                 </View>
 

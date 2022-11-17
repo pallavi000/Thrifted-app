@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { SafeAreaView, Alert } from "react-native";
 
 import { KhatiSdk } from "rn-all-nepal-payment";
-import { apiErrorNotification } from "../ErrorHandle";
+import { apiErrorNotification, customErrorNotification } from "../ErrorHandle";
 
 const Khalti = (props) => {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -40,12 +40,10 @@ const Khalti = (props) => {
         props.orderSuccess();
       } else if (resp.event === "ERROR") {
         props.setIsSubmitting(false);
-        Alert.alert("Error", "Payment Failed");
+        customErrorNotification("Payment Failed.");
       }
       return;
     } catch (error) {
-      console.log(error.message);
-      console.log(error.request.response);
       props.setIsSubmitting(false);
       apiErrorNotification(error);
     }

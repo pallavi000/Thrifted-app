@@ -3,7 +3,7 @@ import { SafeAreaView, Alert } from "react-native";
 import axios from "axios";
 
 import { EsewaSdk } from "rn-all-nepal-payment";
-import { apiErrorNotification } from "../ErrorHandle";
+import { apiErrorNotification, customErrorNotification } from "../ErrorHandle";
 
 const Esewa = (props) => {
   const [isVisible, setisVisible] = React.useState(false);
@@ -39,6 +39,7 @@ const Esewa = (props) => {
       }
     } else {
       props.setIsSubmitting(false);
+      customErrorNotification("Payment Cancelled.");
     }
     return;
   });
@@ -58,8 +59,8 @@ const Esewa = (props) => {
         isVisible={isVisible} // Bool to show modal
         onPaymentComplete={_onPaymentComplete} //  Callback from connectips Web Sdk
         pid={props.pid} // A unique ID of product or item or ticket etc
-        failureURL={`http://merchant.com.np/page/esewa_payment_failed?q=fu`} // Failure URL: a redirect URL of merchant application where customer will be redirected after FAILURE or PENDING transaction
-        successURL={`http://merchant.com.np/page/esewa_payment_success?q=su`} // Success URL: a redirect URL of merchant application where customer will be redirected after SUCCESSFUL transaction
+        failureURL={`https://hamrocloset.com/payment-failed`} // Failure URL: a redirect URL of merchant application where customer will be redirected after FAILURE or PENDING transaction
+        successURL={`https://hamrocloset.com/payment-success`} // Success URL: a redirect URL of merchant application where customer will be redirected after SUCCESSFUL transaction
         psc={0} // Product service charge amount
         pdc={0} // Product delivery charge amount
       />

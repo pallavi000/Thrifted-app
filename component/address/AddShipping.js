@@ -235,7 +235,7 @@ export default function AddShipping({ navigation }) {
                 </View>
 
                 <View style={styles.formGroup}>
-                  <Text style={styles.label}>City</Text>
+                  <Text style={styles.label}>Nearby Place/Branch</Text>
                   <TouchableOpacity onPress={() => setShowPicker("cities")}>
                     <View style={styles.selectField}>
                       <Text

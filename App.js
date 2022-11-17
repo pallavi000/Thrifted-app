@@ -50,6 +50,7 @@ import * as Notifications from "expo-notifications";
 import { gestureHandlerRootHOC } from "react-native-gesture-handler";
 
 import FeedSetting from "./component/setting/FeedSetting";
+import ChangePickupLocation from "./component/post/ChangePickupLocation";
 
 // axios.defaults.baseURL = "http://localhost:5000/api";
 axios.defaults.baseURL = "https://hamrocloset.com/api";
@@ -409,6 +410,15 @@ export default gestureHandlerRootHOC(function App(props) {
                   headerShadowVisible: false,
                 }}
                 component={Shipping}
+              />
+
+              <Stack.Screen
+                name="Change Pickup Location"
+                options={{
+                  headerTitleAlign: "center",
+                  headerShadowVisible: false,
+                }}
+                component={ChangePickupLocation}
               />
 
               <Stack.Screen

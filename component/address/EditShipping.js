@@ -256,7 +256,7 @@ export default function EditShipping({ navigation, route }) {
                 </View>
 
                 <View style={styles.formGroup}>
-                  <Text style={styles.label}>City</Text>
+                  <Text style={styles.label}>Nearby Place/Branch</Text>
                   <TouchableOpacity onPress={() => setShowPicker("cities")}>
                     <View style={styles.selectField}>
                       <Text

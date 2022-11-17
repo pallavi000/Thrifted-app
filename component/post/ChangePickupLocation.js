@@ -28,7 +28,7 @@ const validationSchema = Yup.object().shape({
   municipality: Yup.string().required(),
 });
 
-const MakeSeller = ({ navigation }) => {
+const ChangePickupLocation = ({ navigation }) => {
   const formRef = useRef();
   const [showPicker, setShowPicker] = useState(null);
   const [locations, setLocations] = useState([]);
@@ -41,6 +41,7 @@ const MakeSeller = ({ navigation }) => {
     "Select Municipality"
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPickupLocation, setCurrentPickupLocation] = useState({});
 
   const [isLoading, setIsLoading] = useState(true);
   const data = useContext(AuthContext);
@@ -63,8 +64,18 @@ const MakeSeller = ({ navigation }) => {
     }
   }
 
+  async function getCurrentPickupLocation() {
+    try {
+      const response = await axios.get("/user/pickup-location/get", config);
+      setCurrentPickupLocation(response.data);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+  }
+
   useEffect(() => {
     getLocations();
+    getCurrentPickupLocation();
   }, []);
 
   useEffect(() => {
@@ -107,21 +118,18 @@ const MakeSeller = ({ navigation }) => {
     }
   }, [selectedMunicipality]);
 
-  function gotoMaterialBuySection() {
-    setIsSeller(true);
-    navigation.navigate("Packing Materials");
-  }
-
   async function add(values) {
     try {
       setIsSubmitting(true);
-      await axios.post("/user/make-seller", values, config);
+      await axios.put(
+        "/user/change-pickup-location/" + currentPickupLocation._id,
+        values,
+        config
+      );
       setIsSubmitting(false);
-      Alert.alert("Packing Materials", "Do you have packing materials?", [
-        { text: "Yes", onPress: setIsSeller },
-        { text: "No", onPress: gotoMaterialBuySection },
-      ]);
+      navigation.goBack();
     } catch (error) {
+      console.log(error.message);
       apiErrorNotification(error);
       setIsSubmitting(false);
     }
@@ -136,21 +144,6 @@ const MakeSeller = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
-      <Text
-        style={{
-          fontWeight: "800",
-          fontSize: 20,
-          fontFamily: "Raleway_800ExtraBold",
-          padding: 20,
-          paddingBottom: 10,
-          marginBottom: 20,
-          borderBottomWidth: 1,
-          borderBottomColor: "#ddd",
-        }}
-      >
-        Become a Seller
-      </Text>
-
       {showPicker === "districts" && (
         <AddressPicker
           navigation={navigation}
@@ -331,7 +324,7 @@ const MakeSeller = ({ navigation }) => {
   );
 };
 
-export default MakeSeller;
+export default ChangePickupLocation;
 
 const styles = StyleSheet.create({
   container: {

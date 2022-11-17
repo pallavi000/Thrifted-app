@@ -22,7 +22,7 @@ import axios from "axios";
 
 export default function Setting({ navigation }) {
   const data = useContext(AuthContext);
-  const { decode, token } = data;
+  const { decode, token, isSeller } = data;
   const [sales, setSales] = useState(false);
   const [newArrival, setNewArrival] = useState(false);
   const [dsc, setDsc] = useState(false);
@@ -168,6 +168,25 @@ export default function Setting({ navigation }) {
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>
+
+          {isSeller && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Change Pickup Location")}
+              style={styles.pagesWrapper}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons name="location-outline" size={20}></Ionicons>
+                <Text style={styles.pageName}>Change Pickup Location</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <MaterialCommunityIcons
+                  name="chevron-double-right"
+                  size={20}
+                  color="#CDCDCD"
+                ></MaterialCommunityIcons>
+              </View>
+            </TouchableOpacity>
+          )}
 
           <View style={styles.pagesWrapper}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>

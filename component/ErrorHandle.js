@@ -6,3 +6,7 @@ export function apiErrorNotification(error) {
     error?.response?.data?.message || "Internal Server Error."
   );
 }
+
+export function customErrorNotification(msg) {
+  Alert.alert("Error", msg || "Internal Server Error.");
+}

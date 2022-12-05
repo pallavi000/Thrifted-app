@@ -40,15 +40,23 @@ export default function OrderTrack({ route }) {
   }, []);
 
   async function getTrackRecord() {
+    const config = {
+      headers: {
+        Authorization: "Token f6fe2f12ebf5595d62887f8968df969360b98c0e",
+      },
+    };
+
     try {
       const response = await axios.get(
-        "/order-track/order/" + order._id,
+        "https://demo.nepalcanmove.com/api/v1/order/status?id=2675",
         config
       );
-      setEvents(response.data);
-      setGroupedEvents(groupNotification(response.data));
+
+      var a = groupNotification(response.data);
+
+      setGroupedEvents(a);
     } catch (error) {
-      apiErrorNotification(error);
+      console.log(error);
     }
   }
 
@@ -56,7 +64,7 @@ export default function OrderTrack({ route }) {
     // this gives an object with dates as keys
     const items = data.reduce((items, item) => {
       if (item) {
-        let date = item.createdAt ? item.createdAt : new Date().toJSON();
+        let date = item.added_time ? item.added_time : new Date().toJSON();
         date = date.split("T")[0];
         if (!items[date]) {
           items[date] = [];
@@ -72,7 +80,7 @@ export default function OrderTrack({ route }) {
         date,
         items: items[date].length
           ? items[date].sort(
-              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+              (a, b) => new Date(b.added_time) - new Date(a.added_time)
             )
           : items[date],
       };
@@ -239,19 +247,17 @@ export default function OrderTrack({ route }) {
 
             <View>
               <Text style={styles.tracking}>Tracking Information</Text>
-              {groupedEvents.map((item) => {
+              {groupedEvents.map((item, index) => {
                 return (
-                  <View key={item.id}>
+                  <View key={index}>
                     <Text style={styles.heading}>
                       {getDisplayDate(item.date)}
                     </Text>
-                    {item.items.map((event) => {
+                    {item.items?.map((event, idx) => {
                       return (
-                        <View key={event._id} style={styles.trackWrapper}>
-                          <Text>{changeDate(event.createdAt)}</Text>
-                          <Text style={styles.trackDetail}>
-                            {event.message}
-                          </Text>
+                        <View key={idx} style={styles.trackWrapper}>
+                          <Text>{changeDate(event.added_time)}</Text>
+                          <Text style={styles.trackDetail}>{event.status}</Text>
                         </View>
                       );
                     })}

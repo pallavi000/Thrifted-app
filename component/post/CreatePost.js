@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  ViewPagerAndroidBase,
 } from "react-native";
 import React, {
   useEffect,

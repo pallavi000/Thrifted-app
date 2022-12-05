@@ -35,6 +35,7 @@ const ChangePickupLocation = ({ navigation }) => {
   const [districts, setDistricts] = useState([]);
   const [cities, setCities] = useState([]);
   const [municipalities, setMunicipalities] = useState([]);
+
   const [selectedDistrict, setSelectedDistrict] = useState("Select District");
   const [selectedCity, setSelectedCity] = useState("Select City");
   const [selectedMunicipality, setSelectedMunicipality] = useState(
@@ -151,6 +152,7 @@ const ChangePickupLocation = ({ navigation }) => {
           setSelectedSelect={setSelectedDistrict}
           setShowAddressPicker={setShowPicker}
           selects={districts}
+          defaultValue={currentPickupLocation.district}
         />
       )}
 
@@ -161,6 +163,7 @@ const ChangePickupLocation = ({ navigation }) => {
           setSelectedSelect={setSelectedMunicipality}
           setShowAddressPicker={setShowPicker}
           selects={municipalities}
+          defaultValue={currentPickupLocation.municipality}
         />
       )}
 
@@ -171,6 +174,7 @@ const ChangePickupLocation = ({ navigation }) => {
           setSelectedSelect={setSelectedCity}
           setShowAddressPicker={setShowPicker}
           selects={cities}
+          defaultValue={currentPickupLocation.city}
         />
       )}
 

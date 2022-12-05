@@ -39,13 +39,17 @@ export default function Checkout({ navigation }) {
   const [khaltiVisible, setKhaltiVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shippings, setShippings] = useState([]);
+  const [sellerPickupLocations, setSellerPickupLocations] = useState([]);
+  const [deliveryOption, setDeliveryOption] = useState("branch");
   const data = useContext(AuthContext);
+
   const { token, subtotal, getCartItems, cartItems } = data;
   const config = {
     headers: {
       "access-token": token,
     },
   };
+
   const [loader, setLoader] = useState(true);
   const IsFocused = useIsFocused();
 
@@ -56,19 +60,19 @@ export default function Checkout({ navigation }) {
     }
   });
 
-  useEffect(() => {
-    if (shippings && shippings.length && shippingAddress?.district) {
-      var shipAddress = shippings.find(
-        (ship) =>
-          ship.location.toLowerCase() == shippingAddress.district.toLowerCase()
-      );
-      if (shipAddress) {
-        setShippingFee(shipAddress.fee);
-      } else {
-        setShippingFee(0);
-      }
-    }
-  }, [shippingAddress, shippings]);
+  // useEffect(() => {
+  //   if (shippings && shippings.length && shippingAddress?.district) {
+  //     var shipAddress = shippings.find(
+  //       (ship) =>
+  //         ship.location.toLowerCase() == shippingAddress.district.toLowerCase()
+  //     );
+  //     if (shipAddress) {
+  //       setShippingFee(shipAddress.fee);
+  //     } else {
+  //       setShippingFee(0);
+  //     }
+  //   }
+  // }, [shippingAddress, shippings]);
 
   useEffect(() => {
     if (addresses && addresses.length && selectedId) {
@@ -89,7 +93,6 @@ export default function Checkout({ navigation }) {
 
   useEffect(() => {
     getaddress();
-    getShippingRates();
     loadSelectedCheckBox();
   }, [IsFocused]);
 
@@ -127,20 +130,62 @@ export default function Checkout({ navigation }) {
     }
   });
 
-  const getShippingRates = React.useCallback(async () => {
+  async function getShippingRates() {
     try {
-      const resp = await axios.get("/shipping", config);
-      setShippings(resp.data);
+      var sellers = [];
+      cartItems.map((item) => {
+        sellers.push(item.seller_id);
+      });
+      sellers = [...new Set(sellers)];
+      const data = {
+        sellers,
+      };
+      const resp = await axios.post(
+        "/shipping/price-list/by-seller-ids",
+        data,
+        config
+      );
+
+      setShippings(resp.data.shipping);
+
+      setSellerPickupLocations(resp.data.locations);
     } catch (error) {
       apiErrorNotification(error);
     }
-  });
+  }
+
+  useEffect(() => {
+    if (
+      shippings.length &&
+      shippingAddress?.district &&
+      sellerPickupLocations.length
+    ) {
+      var shippingCharge = 0;
+      sellerPickupLocations.map((location) => {
+        var find = shippings.find(
+          (ship) =>
+            ship.to == shippingAddress.city && location.city == ship.from
+        );
+        if (find) {
+          shippingCharge +=
+            deliveryOption == "branch" ? find.branch : find.door;
+        }
+      });
+      setShippingFee(shippingCharge);
+      setShippingFee(0);
+    }
+  }, [shippingAddress, shippings, sellerPickupLocations, deliveryOption]);
+
+  useEffect(() => {
+    if (cartItems.length) {
+      getShippingRates();
+    }
+  }, [cartItems]);
 
   const changeBillingAddress = React.useCallback(
     (id) => {
-      console.log("hello");
       var billing = addresses.find((address) => address._id == id);
-      console.log(billing);
+
       if (billing) {
         setBillingAddress(billing);
       }
@@ -196,6 +241,7 @@ export default function Checkout({ navigation }) {
           shippingAddress={shippingAddress}
           billingAddress={billingAddress}
           sameBilling={sameBilling}
+          deliveryOption={deliveryOption}
         />
         <Khalti
           orderSuccess={orderSuccess}
@@ -210,6 +256,7 @@ export default function Checkout({ navigation }) {
           shippingAddress={shippingAddress}
           billingAddress={billingAddress}
           sameBilling={sameBilling}
+          deliveryOption={deliveryOption}
         />
         <View style={styles.cardWrapper}>
           <View style={styles.headerWrapper}>
@@ -350,6 +397,38 @@ export default function Checkout({ navigation }) {
               </View>
             </TouchableOpacity>
           )}
+
+          <View style={styles.headerWrapper}>
+            <Text style={styles.header}>Delivery Option</Text>
+          </View>
+          <View style={styles.card}>
+            <View style={styles.userWrapper}>
+              <RadioButton.Android
+                color="#663399"
+                value="branch"
+                status={deliveryOption === "branch" ? "checked" : "unchecked"}
+                onPress={() => setDeliveryOption("branch")}
+              />
+              <View style={styles.creaditCard}>
+                <View style={styles.cardImageWrapper}>
+                  <Text>Pickup at Branch</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.userWrapper}>
+              <RadioButton.Android
+                color="#663399"
+                value="door"
+                status={deliveryOption === "door" ? "checked" : "unchecked"}
+                onPress={() => setDeliveryOption("door")}
+              />
+              <View style={styles.creaditCard}>
+                <View style={styles.cardImageWrapper}>
+                  <Text>Deliver to My Door</Text>
+                </View>
+              </View>
+            </View>
+          </View>
 
           <View style={styles.headerWrapper}>
             <Text style={styles.header}>Payment Method</Text>

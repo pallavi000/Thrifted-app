@@ -24,6 +24,7 @@ const Esewa = (props) => {
         rid: response.token,
         pid: props.pid,
         shipping_id: props.shippingAddress?._id,
+        deliveryOption: props.deliveryOption,
         billing_id: props.sameBilling
           ? props.shippingAddress?._id
           : props.billingAddress?._id,

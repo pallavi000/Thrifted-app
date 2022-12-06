@@ -25,8 +25,6 @@ export default function OrderTrack({ route }) {
   const data = useContext(AuthContext);
   const { token } = data;
 
-  const [events, setEvents] = useState([]);
-
   const [groupedEvents, setGroupedEvents] = useState([]);
 
   const config = {
@@ -42,22 +40,21 @@ export default function OrderTrack({ route }) {
   async function getTrackRecord() {
     const config = {
       headers: {
-        Authorization: "Token f6fe2f12ebf5595d62887f8968df969360b98c0e",
+        Authorization: "Token 34f88d2017993c827414d0e47ef43d16b7accb1b",
       },
     };
 
     try {
       const response = await axios.get(
-        "https://demo.nepalcanmove.com/api/v1/order/status?id=2675",
+        "https://portal.nepalcanmove.com/api/v1/order/status?id=" +
+          order.shipping_track_id,
         config
       );
 
       var a = groupNotification(response.data);
 
       setGroupedEvents(a);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   const groupNotification = React.useCallback((data) => {

@@ -27,6 +27,7 @@ const SaleDetail = ({ navigation, route }) => {
   const item = route.params;
   const [shippingAddress, setShippingAddress] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDownloadingLabel, setIsDownloadingLabel] = useState(false);
   const { token } = useContext(AuthContext);
   const config = {
     headers: {
@@ -64,6 +65,24 @@ const SaleDetail = ({ navigation, route }) => {
       apiErrorNotification(error);
     }
     setIsSubmitting(false);
+  }
+
+  async function downloadShippingLabel() {
+    setIsDownloadingLabel(true);
+    const data = {
+      order_id: item._id,
+    };
+    try {
+      const response = await axios.post(
+        "/order/generate/shipping-label",
+        data,
+        config
+      );
+      Linking.openURL(response.data);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+    setIsDownloadingLabel(false);
   }
 
   return (
@@ -231,12 +250,18 @@ const SaleDetail = ({ navigation, route }) => {
           paddingVertical: 10,
         }}
       >
-        <TouchableOpacity
-          style={[styles.loginBtn, { marginBottom: 5 }]}
-          onPress={() => Alert.alert("Oops", "Not Yet Implemented.")}
-        >
-          <Text style={styles.login}>Download Shipping Label</Text>
-        </TouchableOpacity>
+        {isDownloadingLabel ? (
+          <TouchableOpacity style={styles.loginBtn}>
+            <ActivityIndicator size={24} color="#fff" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.loginBtn, { marginBottom: 5 }]}
+            onPress={() => downloadShippingLabel()}
+          >
+            <Text style={styles.login}>Download Shipping Label</Text>
+          </TouchableOpacity>
+        )}
 
         {isSubmitting ? (
           <TouchableOpacity style={styles.loginBtn}>

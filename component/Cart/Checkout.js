@@ -40,7 +40,7 @@ export default function Checkout({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shippings, setShippings] = useState([]);
   const [sellerPickupLocations, setSellerPickupLocations] = useState([]);
-  const [deliveryOption, setDeliveryOption] = useState("branch");
+  const [deliveryOption, setDeliveryOption] = useState("Branch");
   const data = useContext(AuthContext);
 
   const { token, subtotal, getCartItems, cartItems } = data;
@@ -168,7 +168,7 @@ export default function Checkout({ navigation }) {
         );
         if (find) {
           shippingCharge +=
-            deliveryOption == "branch" ? find.branch : find.door;
+            deliveryOption == "Branch" ? find.branch : find.door;
         }
       });
       setShippingFee(shippingCharge);
@@ -405,9 +405,9 @@ export default function Checkout({ navigation }) {
             <View style={styles.userWrapper}>
               <RadioButton.Android
                 color="#663399"
-                value="branch"
-                status={deliveryOption === "branch" ? "checked" : "unchecked"}
-                onPress={() => setDeliveryOption("branch")}
+                value="Branch"
+                status={deliveryOption === "Branch" ? "checked" : "unchecked"}
+                onPress={() => setDeliveryOption("Branch")}
               />
               <View style={styles.creaditCard}>
                 <View style={styles.cardImageWrapper}>
@@ -418,9 +418,9 @@ export default function Checkout({ navigation }) {
             <View style={styles.userWrapper}>
               <RadioButton.Android
                 color="#663399"
-                value="door"
-                status={deliveryOption === "door" ? "checked" : "unchecked"}
-                onPress={() => setDeliveryOption("door")}
+                value="Door"
+                status={deliveryOption === "Door" ? "checked" : "unchecked"}
+                onPress={() => setDeliveryOption("Door")}
               />
               <View style={styles.creaditCard}>
                 <View style={styles.cardImageWrapper}>

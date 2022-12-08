@@ -8,9 +8,9 @@ import {
   View,
 } from "react-native";
 import React from "react";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const EmptyCart = (props) => {
-  const { navigation } = props;
+const NoProducts = ({ navigation }) => {
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1, padding: 20 }}>
       <View
@@ -22,21 +22,19 @@ const EmptyCart = (props) => {
         }}
       >
         <View>
-          <Image
-            source={require("../../assets/empty-cart.png")}
-            style={styles.image}
-          />
+          <MaterialIcons style={styles.icon} name="error-outline" size={100} />
         </View>
-        <Text style={styles.header}>Your Cart is Empty</Text>
+        <Text style={styles.header}>No Product Found</Text>
         <Text style={styles.subtitle}>
-          Looks like you haven't added any items yet
+          Please change what appears in your feed or/and follow/add more
+          sellers/interests
         </Text>
         <TouchableOpacity
           style={styles.loginBtn}
-          onPress={() => navigation.navigate("home", { screen: "landing" })}
+          onPress={() => navigation.navigate("Feed Setting")}
         >
           <View>
-            <Text style={styles.loginText}>Go Home</Text>
+            <Text style={styles.loginText}>Change Feed Setting</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -44,13 +42,17 @@ const EmptyCart = (props) => {
   );
 };
 
-export default EmptyCart;
+export default NoProducts;
 
 const styles = StyleSheet.create({
   image: {
     width: Dimensions.get("window").width - 40,
     height: 200,
     resizeMode: "contain",
+  },
+  icon: {
+    color: "#663399",
+    marginBottom: 20,
   },
   header: {
     fontWeight: "700",

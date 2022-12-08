@@ -15,6 +15,7 @@ import BrandCheck from "../ui/BrandCheck";
 import { AuthContext } from "../Context";
 import { apiErrorNotification } from "../ErrorHandle";
 import bbstyles from "../Styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Interest({ navigation }) {
   const [category_ids, setCategory_ids] = useState([]);
@@ -28,7 +29,7 @@ export default function Interest({ navigation }) {
   }, []);
 
   const data = useContext(AuthContext);
-  const { token } = data;
+  const { token, feedSetting, setFeedSetting } = data;
   const config = {
     headers: {
       "access-token": token,
@@ -101,6 +102,10 @@ export default function Interest({ navigation }) {
         data,
         config
       );
+      if (feedSetting) {
+        var duplicate_feed = { ...feedSetting };
+        setFeedSetting(duplicate_feed);
+      }
       navigation.goBack();
     } catch (error) {
       apiErrorNotification(error);

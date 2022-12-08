@@ -39,6 +39,7 @@ import Action from "./Action";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "./Header";
 import HomepagePosts from "./HomepagePosts";
+import NoProducts from "./NoProducts";
 
 export default function Home({ navigation }) {
   const [categories, setCategories] = useState([]);
@@ -49,7 +50,6 @@ export default function Home({ navigation }) {
   const [hasNextPage, setHasNextPage] = useState(true);
   const [notificationToken, setNotificationToken] = useState("");
   const [dataType, setDataType] = useState("cache");
-  const [feedSetting, setFeedSetting] = useState(null);
   const [showDropDown, setShowDropDown] = useState(false);
 
   const data = useContext(AuthContext);
@@ -66,6 +66,8 @@ export default function Home({ navigation }) {
     setUnreadOrderNotificationCount,
     products,
     setProducts,
+    feedSetting,
+    getFeedSetting,
   } = data;
   const config = {
     headers: {
@@ -74,38 +76,13 @@ export default function Home({ navigation }) {
   };
   const isFocused = useIsFocused();
 
-  async function getSwitch() {
-    try {
-      var value = JSON.parse(await AsyncStorage.getItem("feedsettings"));
-      if (value) {
-        if (value.followings && value.interests) {
-          setFeedSetting("all");
-          return "all";
-        } else if (value.followings) {
-          setFeedSetting("followings");
-          return "followings";
-        } else if (value.interests) {
-          setFeedSetting("interests");
-          return "interests";
-        } else {
-          return "followings";
-        }
-      } else {
-        return "followings";
-      }
-    } catch (error) {
-      return "followings";
-    }
-  }
-
   const getProducts = async (currentPage, countPerPage, productOnly) => {
     const data = {
       activePage: currentPage,
       itemsCountPerPage: countPerPage,
       productOnly,
-      feedSetting: feedSetting || (await getSwitch()),
+      feedSetting: getFeedSetting(),
     };
-
     try {
       var sendDate = new Date().getTime();
       const response = await axios.post("/frontend/app/home", data, config);
@@ -183,9 +160,13 @@ export default function Home({ navigation }) {
   }, [token, isFocused]);
 
   useEffect(() => {
+    console.log("active", activePage);
+  }, [activePage]);
+
+  useEffect(() => {
     getProductsFromCache();
     getProducts(activePage, itemsCountPerPage, false);
-  }, []);
+  }, [feedSetting]);
 
   const getUnreadNotificationCount = useCallback(async () => {
     try {
@@ -257,17 +238,21 @@ export default function Home({ navigation }) {
 
           <View style={{ paddingBottom: 50, height: "100%" }}>
             {showDropDown && <DropDownItem />}
-            <HomepagePosts
-              onRefresh={onRefresh}
-              GetNextPage={GetNextPage}
-              hasNextPage={hasNextPage}
-              products={products}
-              setProducts={setProducts}
-              hasCategories={true}
-              categories={categories}
-              dataType={dataType}
-              navigation={navigation}
-            />
+            {activePage === 1 && !products.length ? (
+              <NoProducts navigation={navigation} />
+            ) : (
+              <HomepagePosts
+                onRefresh={onRefresh}
+                GetNextPage={GetNextPage}
+                hasNextPage={hasNextPage}
+                products={products}
+                setProducts={setProducts}
+                hasCategories={true}
+                categories={categories}
+                dataType={dataType}
+                navigation={navigation}
+              />
+            )}
           </View>
         </>
       )}

@@ -87,6 +87,7 @@ export default gestureHandlerRootHOC(function App(props) {
   const [userImage, setUserImage] = useState();
   const [isSeller, setIsSeller] = useState(false);
   const [appReady, setAppReady] = useState(false);
+  const [feedSetting, setFeedSetting] = useState(null);
   const socket = useRef();
   const responseListener = useRef();
   const navigationRef = useRef();
@@ -149,7 +150,6 @@ export default gestureHandlerRootHOC(function App(props) {
 
   useEffect(() => {
     if (socket.current) {
-      console.log("current");
       socket.current.on("connect_error", (err) => handleErrors(err));
       socket.current.on("connect_failed", (err) => handleErrors(err));
       socket.current.on("disconnect", (err) => handleErrors(err));
@@ -168,7 +168,7 @@ export default gestureHandlerRootHOC(function App(props) {
   }, [socket, unreadMessage, unreadNotification, unreadNormalNotificationCount]);
 
   const socketConnect = (decoded) => {
-    socket.current = io("https://thrifted.jcloudia.com", {
+    socket.current = io("https://hamrocloset.com", {
       reconnection: true,
       reconnectionAttempts: "Infinity",
       reconnectionDelay: 1000,
@@ -208,9 +208,51 @@ export default gestureHandlerRootHOC(function App(props) {
     }
   }, []);
 
+  function getFeedSetting() {
+    if (feedSetting) {
+      if (feedSetting.followings && feedSetting.interests) {
+        return "all";
+      } else if (feedSetting.followings) {
+        return "followings";
+      } else if (feedSetting.interests) {
+        return "interests";
+      } else {
+        return "all";
+      }
+    } else {
+      return "all";
+    }
+  }
+
+  useEffect(() => {
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        var data = response.notification.request.content.data;
+        if (data.type == "comment") {
+          navigationRef?.current?.navigate("Comments", data.post_id);
+        }
+        if (data.type == "order") {
+          navigationRef?.current?.navigate("My Sales");
+        }
+        if (data.type == "message") {
+          navigationRef?.current?.navigate("chat", data);
+        }
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
   const getToken = React.useCallback(async () => {
     try {
-      const authConfig = await AsyncStorage.getItem("token");
+      var [value, authConfig] = await Promise.all([
+        AsyncStorage.getItem("feedsettings"),
+        AsyncStorage.getItem("token"),
+      ]);
+      if (value) {
+        setFeedSetting(JSON.parse(value));
+      }
       if (authConfig) {
         setToken(authConfig);
         var token = authConfig;
@@ -233,26 +275,6 @@ export default gestureHandlerRootHOC(function App(props) {
       // Error Handle
     }
   }, [notificationApiCall]);
-
-  useEffect(() => {
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        var data = response.notification.request.content.data;
-        if (data.type == "comment") {
-          navigationRef?.current?.navigate("Comments", data.post_id);
-        }
-        if (data.type == "order") {
-          navigationRef?.current?.navigate("My Sales");
-        }
-        if (data.type == "message") {
-          navigationRef?.current?.navigate("chat", data);
-        }
-      });
-
-    return () => {
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
 
   useEffect(() => {
     getToken();
@@ -308,6 +330,9 @@ export default gestureHandlerRootHOC(function App(props) {
             setToken,
             isSeller,
             setIsSeller,
+            feedSetting,
+            setFeedSetting,
+            getFeedSetting,
           }}
         >
           {isLoggedIn ? (

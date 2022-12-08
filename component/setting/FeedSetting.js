@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   MaterialCommunityIcons,
   MaterialIcons,
@@ -15,10 +15,12 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../Context";
 
 export default function FeedSetting({ navigation }) {
   const [followings, setFollowings] = useState(false);
   const [interests, setInterests] = useState(false);
+  const { setFeedSetting } = useContext(AuthContext);
 
   useEffect(() => {
     getSwitch();
@@ -46,7 +48,7 @@ export default function FeedSetting({ navigation }) {
       setInterests(!interests);
       feedsetting.interests = !interests;
     }
-
+    setFeedSetting(feedsetting);
     await AsyncStorage.setItem("feedsettings", JSON.stringify(feedsetting));
   }
 

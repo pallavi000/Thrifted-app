@@ -73,10 +73,15 @@ export default React.memo(function Action(props) {
   }));
 
   useEffect(() => {
-    if (props.product?.likes.find((like) => like.user_id == decode._id)) {
+    var isLiked = props.product?.likes.find(
+      (like) => like.user_id == decode._id
+    );
+    if (isLiked) {
       setLike(true);
+    } else {
+      setLike(false);
     }
-  }, []);
+  }, [decode, props]);
 
   const addLike = useCallback(async () => {
     currentValue.value = withSpring(0.1, undefined, (isFinished) => {
@@ -143,7 +148,7 @@ export default React.memo(function Action(props) {
     [doubleClick]
   );
 
-  const onShare = useCallback(async () => {
+  const onShare = useCallback(async (item) => {
     try {
       const result = await Share.share({
         message: `${item.name} \n\n रु ${item.price} \n\n${imageLink}/product-detail/${item._id}`,

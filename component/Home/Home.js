@@ -42,7 +42,7 @@ import HomepagePosts from "./HomepagePosts";
 import NoProducts from "./NoProducts";
 
 export default function Home({ navigation }) {
-  const [categories, setCategories] = useState([]);
+  const [stories, setStories] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [itemsCountPerPage, setItemsCountPerPage] = useState(10);
   const [loader, setLoader] = useState(true);
@@ -89,7 +89,9 @@ export default function Home({ navigation }) {
       console.log(response.data.product.length);
       if (!productOnly) {
         setProducts(response.data.product);
-        setCategories(response.data.categories);
+        var userStories = changeStoriesLink(response.data.stories);
+        setStories(userStories);
+        response.data.stories = userStories;
         var receiveDate = new Date().getTime();
         var responseTimeMs = receiveDate - sendDate;
         console.log(responseTimeMs / 1000);
@@ -115,7 +117,7 @@ export default function Home({ navigation }) {
   const storeInCache = useCallback(async (data) => {
     try {
       await AsyncStorage.setItem("products", JSON.stringify(data.product));
-      await AsyncStorage.setItem("categories", JSON.stringify(data.categories));
+      await AsyncStorage.setItem("stories", JSON.stringify(data.stories));
     } catch (error) {
       // Pass
     }
@@ -124,10 +126,10 @@ export default function Home({ navigation }) {
   const getProductsFromCache = useCallback(async () => {
     try {
       const products = await AsyncStorage.getItem("products");
-      const categories = await AsyncStorage.getItem("categories");
-      if (products && categories) {
+      const stories = await AsyncStorage.getItem("stories");
+      if (products && stories) {
         setProducts(JSON.parse(products));
-        setCategories(JSON.parse(categories));
+        setStories(JSON.parse(stories));
         setLoader(false);
       }
     } catch (error) {
@@ -214,6 +216,17 @@ export default function Home({ navigation }) {
     );
   }, []);
 
+  function changeStoriesLink(users) {
+    users.forEach((user) => {
+      user.user_image = imageLink + user.user_image;
+      user.stories.forEach((story) => {
+        story.story_image = imageLink + story.story_image;
+        story.story_video = imageLink + story.story_video;
+      });
+    });
+    return users;
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -247,8 +260,8 @@ export default function Home({ navigation }) {
                 hasNextPage={hasNextPage}
                 products={products}
                 setProducts={setProducts}
-                hasCategories={true}
-                categories={categories}
+                hasStories={true}
+                stories={stories}
                 dataType={dataType}
                 navigation={navigation}
               />

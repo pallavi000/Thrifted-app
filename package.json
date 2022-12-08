@@ -59,7 +59,7 @@
     "react-native-get-random-values": "~1.8.0",
     "react-native-image-crop-picker": "^0.37.2",
     "react-native-image-slider-box": "git+https://github.com/pallavi000/react-native-image-slider-box.git",
-    "react-native-insta-story": "^1.1.8",
+    "react-native-insta-story": "github:snlbaral/react-native-insta-story",
     "react-native-optimized-flatlist": "^1.0.4",
     "react-native-pager-view": "5.4.15",
     "react-native-paper": "^4.11.2",

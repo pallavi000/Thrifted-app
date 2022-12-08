@@ -8,12 +8,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useScrollToTop } from "@react-navigation/native";
 import { imageLink } from "../ImageLink";
 import Action from "./Action";
 import { OptimizedFlatList } from "react-native-optimized-flatlist";
 import InstaStory from "react-native-insta-story";
+import { apiErrorNotification } from "../ErrorHandle";
+import { AuthContext } from "../Context";
+import axios from "axios";
 
 export default React.memo(function HomepagePosts({
   onRefresh,
@@ -22,89 +31,73 @@ export default React.memo(function HomepagePosts({
   setProducts,
   navigation,
   hasNextPage = false,
-  hasCategories = false,
-  categories = null,
+  hasStories = false,
+  stories = null,
   dataType = "real",
 }) {
   const [refreshing, setRefreshing] = useState(false);
   const [enableScroll, setEnableScroll] = useState(true);
+
+  const item = useContext(AuthContext);
+  const { token } = item;
 
   const scRef = useRef(null);
   useScrollToTop(scRef);
 
   const renderItem = ({ item, index }) => originalRenderItem({ item, index });
 
-  const data = [
-    {
-      user_id: 1,
-      user_image:
-        "https://pbs.twimg.com/profile_images/1222140802475773952/61OmyINj.jpg",
-      user_name: "Ahmet Çağlar Durmuş",
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://image.freepik.com/free-vector/universe-mobile-wallpaper-with-planets_79603-600.jpg",
-          swipeText: "Custom swipe text for this story",
-          onPress: () => console.log("story 1 swiped"),
-        },
-        {
-          story_id: 2,
-          story_image:
-            "https://image.freepik.com/free-vector/mobile-wallpaper-with-fluid-shapes_79603-601.jpg",
-        },
-      ],
-    },
-    {
-      user_id: 2,
-      user_image:
-        "https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80",
-      user_name: "Test User",
-      stories: [
-        {
-          story_id: 1,
-          story_image:
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjORKvjcbMRGYPR3QIs3MofoWkD4wHzRd_eg&usqp=CAU",
-          swipeText: "Custom swipe text for this story",
-          onPress: () => console.log("story 1 swiped"),
-        },
-        {
-          story_id: 2,
-          story_image:
-            "https://files.oyebesmartest.com/uploads/preview/vivo-u20-mobile-wallpaper-full-hd-(1)qm6qyz9v60.jpg",
-          swipeText: "Custom swipe text for this story",
-          onPress: () => console.log("story 2 swiped"),
-        },
-      ],
-    },
-  ];
-
   const originalRenderItem = ({ item, index }) => {
     return (
       <View>
-        {index == 0 && hasCategories ? (
-          <InstaStory
-            unPressedBorderColor="#663399"
-            pressedBorderColor="#663399"
-            avatarSize={70}
-            data={data}
-            duration={10}
-            onStart={(item) => console.log(item)}
-            onClose={(item) => console.log("close: ", item)}
-            customSwipeUpComponent={
-              <View>
-                <Text>Swipe</Text>
-              </View>
-            }
-            avatarStyle={{ borderWidth: 2, borderColor: "#ddd" }}
-            style={{
-              marginTop: 5,
-              marginBottom: 10,
-              borderBottomColor: "#ddd",
-              borderBottomWidth: 1,
-              paddingBottom: 10,
-            }}
-          />
+        {index == 0 && hasStories ? (
+          <>
+            <View>
+              {stories.length ? (
+                <InstaStory
+                  unPressedBorderColor="#663399"
+                  pressedBorderColor="#663399"
+                  avatarSize={70}
+                  data={stories}
+                  duration={10}
+                  onStart={(item) => console.log(item)}
+                  onClose={(item) => console.log("close: ", item)}
+                  customSwipeUpComponent={
+                    <View>
+                      <Text>Swipe</Text>
+                    </View>
+                  }
+                  ImageComponent={Image}
+                  HeaderComponent={
+                    <View style={{ marginTop: 10 }}>
+                      <TouchableOpacity
+                        onPress={() => console.log("hello")}
+                        style={styles.story_image_container}
+                      >
+                        <Image
+                          style={styles.story_image}
+                          source={{
+                            uri: "https://pbs.twimg.com/profile_images/1222140802475773952/61OmyINj.jpg",
+                          }}
+                        />
+                        <View style={styles.createStory}>
+                          <Text style={styles.plusIcon}>+</Text>
+                        </View>
+                        <Text style={styles.yourStory}>Your story</Text>
+                      </TouchableOpacity>
+                    </View>
+                  }
+                  ImageComponentStyle={{ borderWidth: 2, borderColor: "#ddd" }}
+                  style={{
+                    marginTop: 5,
+                    marginBottom: 10,
+                    borderBottomColor: "#ddd",
+                    borderBottomWidth: 1,
+                    paddingBottom: 10,
+                  }}
+                />
+              ) : null}
+            </View>
+          </>
         ) : null}
         <Action
           product={item}
@@ -145,6 +138,50 @@ export default React.memo(function HomepagePosts({
 });
 
 const styles = StyleSheet.create({
+  yourStory: {
+    width: 74,
+    marginTop: 3,
+    textAlign: "center",
+    alignItems: "center",
+    fontSize: 11,
+  },
+  createStory: {
+    height: 25,
+    width: 25,
+    backgroundColor: "#0095f6",
+    borderRadius: "50%",
+    position: "absolute",
+    right: 0,
+    bottom: 7,
+    borderWidth: 2,
+    borderColor: "white",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  plusIcon: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  story_image: {
+    height: 72,
+    width: 72,
+    resizeMode: "cover",
+    borderRadius: 35,
+    borderColor: "#ddd",
+    borderWidth: 1,
+  },
+  story_image_container: {
+    height: 72,
+    width: 72,
+    position: "relative",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 5,
+    marginRight: 10,
+  },
   wrapper: {
     flexDirection: "row",
     marginTop: 5,

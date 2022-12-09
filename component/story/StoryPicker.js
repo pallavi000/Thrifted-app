@@ -9,6 +9,8 @@ import {
   Dimensions,
   KeyboardAvoidingViewBase,
   TouchableOpacity,
+  TextInput,
+  TouchableWithoutFeedback,
 } from "react-native";
 import * as imagePicker from "expo-image-picker";
 import { useFormikContext } from "formik";
@@ -19,6 +21,9 @@ import Modal from "react-native-modalbox";
 const StoryPicker = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { setFieldValue, values, touched, errors } = useFormikContext();
+  const [swipeText, setSwipeText] = useState("");
+  const inputRef = useRef();
+  const [showTextField, setShowTextField] = useState(false);
 
   useEffect(() => {
     props.openCameraRef.current = openCamera;
@@ -102,18 +107,21 @@ const StoryPicker = (props) => {
           position: "relative",
         }}
       >
-        <Image
-          source={{ uri: values.image }}
-          style={{
-            width: Dimensions.get("window").width,
-            height: Dimensions.get("window").height - 60,
-            resizeMode: "contain",
-          }}
-        />
+        <TouchableWithoutFeedback onPress={() => inputRef.current.focus()}>
+          <Image
+            source={{ uri: values.image }}
+            style={{
+              width: Dimensions.get("window").width,
+              height: Dimensions.get("window").height - 60,
+              resizeMode: "contain",
+            }}
+          />
+        </TouchableWithoutFeedback>
+
         <Text
           style={{
             position: "absolute",
-            bottom: 10,
+            bottom: 20,
             padding: 5,
             backgroundColor: "black",
             color: "white",
@@ -121,8 +129,31 @@ const StoryPicker = (props) => {
             alignSelf: "center",
           }}
         >
-          Hello,buy this amazing product only in 999
+          {swipeText}
         </Text>
+        <View
+          style={{
+            position: "absolute",
+            alignSelf: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            height: Dimensions.get("window").height - 60,
+          }}
+        >
+          <TextInput
+            ref={inputRef}
+            keyboardType="default"
+            onFocus={() => setShowTextField(true)}
+            onBlur={() => setShowTextField(false)}
+            style={{
+              backgroundColor: "black",
+              color: "white",
+              padding: 5,
+              display: showTextField ? "flex" : "none",
+            }}
+            onChangeText={(text) => setSwipeText(text)}
+          />
+        </View>
       </View>
 
       <View style={{ height: 60, alignItems: "flex-end", marginRight: 20 }}>

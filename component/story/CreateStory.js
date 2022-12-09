@@ -1,13 +1,17 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from "react-native";
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import BottomSheetComponent from "../BottomSheetComponent";
 import Animated from "react-native-reanimated";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import StoryPicker from "./StoryPicker";
+import { AuthContext } from "../Context";
+import axios from "axios";
+import { apiErrorNotification } from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   image: Yup.string().required("Image is required"),
+  swipeText: Yup.string().optional(),
 });
 
 const CreateStory = ({ bottomSheetRef }) => {
@@ -15,9 +19,19 @@ const CreateStory = ({ bottomSheetRef }) => {
   const selectImageRef = useRef();
   const fill = new Animated.Value(1);
   const formRef = useRef();
+  const { token } = useContext(AuthContext);
+  const config = {
+    headers: {
+      "access-token": token,
+    },
+  };
 
-  function createStory(value) {
-    console.log("submit", value);
+  async function createStory(values) {
+    try {
+      await axios.post("/story", values, config);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
   }
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
@@ -40,6 +54,7 @@ const CreateStory = ({ bottomSheetRef }) => {
             innerRef={formRef}
             initialValues={{
               image: "",
+              swipeText: "",
             }}
             onSubmit={(values) => createStory(values)}
             validationSchema={validationSchema}

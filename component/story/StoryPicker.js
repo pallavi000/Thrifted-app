@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   TextInput,
   TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import * as imagePicker from "expo-image-picker";
 import { useFormikContext } from "formik";
@@ -81,8 +82,20 @@ const StoryPicker = (props) => {
   }
 
   function submitForm() {
+    setFieldValue(`swipeText`, swipeText);
     setModalVisible(false);
+    setSwipeText("");
     props.handleSubmit();
+  }
+
+  function handleOnImageClick() {
+    setShowTextField(true);
+    inputRef.current.focus();
+  }
+
+  function closeAndHideTextInput() {
+    setShowTextField(false);
+    Keyboard.dismiss();
   }
 
   return (
@@ -107,30 +120,34 @@ const StoryPicker = (props) => {
           position: "relative",
         }}
       >
-        <TouchableWithoutFeedback onPress={() => inputRef.current.focus()}>
-          <Image
-            source={{ uri: values.image }}
-            style={{
-              width: Dimensions.get("window").width,
-              height: Dimensions.get("window").height - 60,
-              resizeMode: "contain",
-            }}
-          />
+        <TouchableWithoutFeedback onPress={() => handleOnImageClick()}>
+          <View>
+            <Image
+              source={{ uri: values.image }}
+              style={{
+                width: Dimensions.get("window").width,
+                height: Dimensions.get("window").height - 60,
+                resizeMode: "contain",
+              }}
+            />
+
+            <Text
+              style={{
+                position: "absolute",
+                bottom: 20,
+                padding: 5,
+                backgroundColor: "black",
+                color: "white",
+                fontWeight: "500",
+                alignSelf: "center",
+                maxWidth: Dimensions.get("window").width - 50,
+              }}
+            >
+              {swipeText}
+            </Text>
+          </View>
         </TouchableWithoutFeedback>
 
-        <Text
-          style={{
-            position: "absolute",
-            bottom: 20,
-            padding: 5,
-            backgroundColor: "black",
-            color: "white",
-            fontWeight: "500",
-            alignSelf: "center",
-          }}
-        >
-          {swipeText}
-        </Text>
         <View
           style={{
             position: "absolute",
@@ -144,11 +161,14 @@ const StoryPicker = (props) => {
             ref={inputRef}
             keyboardType="default"
             onFocus={() => setShowTextField(true)}
-            onBlur={() => setShowTextField(false)}
+            onEndEditing={() => closeAndHideTextInput()}
+            onSubmitEditing={() => closeAndHideTextInput()}
+            onBlur={() => closeAndHideTextInput()}
             style={{
               backgroundColor: "black",
               color: "white",
               padding: 5,
+              maxWidth: Dimensions.get("window").width - 50,
               display: showTextField ? "flex" : "none",
             }}
             onChangeText={(text) => setSwipeText(text)}

@@ -47,27 +47,34 @@ export default React.memo(function HomepagePosts({
 
   const renderItem = ({ item, index }) => originalRenderItem({ item, index });
 
-  const originalRenderItem = ({ item, index }) => {
-    return (
-      <View>
-        {index == 0 && hasStories ? (
-          <>
-            <View>
+  const originalRenderItem = React.useCallback(
+    ({ item, index }) => {
+      return (
+        <View>
+          {index == 0 && hasStories && dataType == "real" ? (
+            <>
+              <View>
+                <Story stories={stories} />
+              </View>
+            </>
+          ) : index == 0 && hasStories && dataType != "real" ? (
+            <>
               <Story stories={stories} />
-            </View>
-          </>
-        ) : null}
-        <Action
-          product={item}
-          dataType={dataType}
-          products={products}
-          setProducts={setProducts}
-          navigation={navigation}
-          setEnableScroll={setEnableScroll}
-        />
-      </View>
-    );
-  };
+            </>
+          ) : null}
+          <Action
+            product={item}
+            dataType={dataType}
+            products={products}
+            setProducts={setProducts}
+            navigation={navigation}
+            setEnableScroll={setEnableScroll}
+          />
+        </View>
+      );
+    },
+    [stories]
+  );
 
   return (
     <FlatList

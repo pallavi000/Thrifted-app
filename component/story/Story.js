@@ -1,23 +1,77 @@
-import React, { useContext, useRef } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import axios from "axios";
+import React, { useContext, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import InstaStory from "react-native-insta-story";
 import { AuthContext } from "../Context";
+import { apiErrorNotification } from "../ErrorHandle";
 import { imageLink } from "../ImageLink";
 import CreateStory from "./CreateStory";
 
 function Story({ stories }) {
   const { userImage } = useContext(AuthContext);
   const bottomSheetRef = useRef();
-  return (
-    <>
+  const currentStoryRef = useRef();
+  const [data, setData] = useState(stories);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { token } = useContext(AuthContext);
+  const config = {
+    headers: {
+      "access-token": token,
+    },
+  };
+
+  async function DeleteStory() {
+    try {
+      setIsDeleting(true);
+      const id = currentStoryRef.current.story._id;
+      const response = await axios.delete("/story/" + id, config);
+      DeleteStoryState();
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+    setIsDeleting(false);
+  }
+
+  function DeleteStoryState() {
+    var newData = [...data];
+    newData[currentStoryRef.current.dataIndex].stories = newData[
+      currentStoryRef.current.dataIndex
+    ].stories.filter((story) => story._id != currentStoryRef.current.story._id);
+    if (!newData[currentStoryRef.current.dataIndex].stories.length) {
+      newData.splice(currentStoryRef.current.dataIndex, 1);
+    }
+    setData(newData);
+    //currentStoryRef.current.destroy();
+  }
+
+  const RenderItem = React.useCallback(() => {
+    return (
       <InstaStory
         unPressedBorderColor="#663399"
         pressedBorderColor="#663399"
         avatarSize={70}
-        data={stories}
+        data={data}
         duration={10}
-        onStart={(item) => console.log(item)}
-        onClose={(item) => console.log("close: ", item)}
+        onStart={(item) => console.log("hi")}
+        onClose={(item) => console.log("close: ")}
+        currentStoryRef={currentStoryRef}
+        ListItemRightHeaderComponent={
+          !isDeleting ? (
+            <TouchableOpacity onPress={() => DeleteStory()}>
+              <Feather name="trash" size={16} color="white" />
+            </TouchableOpacity>
+          ) : (
+            <ActivityIndicator size={"small"} color="white" />
+          )
+        }
         customSwipeUpComponent={
           <View>
             <Text>Swipe</Text>
@@ -37,7 +91,9 @@ function Story({ stories }) {
                 }}
               />
               <View style={styles.createStory}>
-                <Text style={styles.plusIcon}>+</Text>
+                <Text style={styles.plusIcon}>
+                  <Feather name="plus" color="white" />
+                </Text>
               </View>
               <Text style={styles.yourStory}>Your story</Text>
             </TouchableOpacity>
@@ -52,6 +108,12 @@ function Story({ stories }) {
           paddingBottom: 10,
         }}
       />
+    );
+  }, [data]);
+
+  return (
+    <>
+      <RenderItem />
       <CreateStory bottomSheetRef={bottomSheetRef} />
     </>
   );
@@ -70,8 +132,8 @@ const styles = StyleSheet.create({
   createStory: {
     height: 25,
     width: 25,
-    backgroundColor: "#0095f6",
-    borderRadius: "50%",
+    backgroundColor: "#663399",
+    borderRadius: 12.5,
     position: "absolute",
     right: 0,
     bottom: 7,
@@ -85,6 +147,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "600",
+    alignSelf: "center",
   },
   story_image: {
     height: 72,

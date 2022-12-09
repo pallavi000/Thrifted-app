@@ -23,6 +23,7 @@ import InstaStory from "react-native-insta-story";
 import { apiErrorNotification } from "../ErrorHandle";
 import { AuthContext } from "../Context";
 import axios from "axios";
+import Story from "../story/Story";
 
 export default React.memo(function HomepagePosts({
   onRefresh,
@@ -52,50 +53,7 @@ export default React.memo(function HomepagePosts({
         {index == 0 && hasStories ? (
           <>
             <View>
-              {stories.length ? (
-                <InstaStory
-                  unPressedBorderColor="#663399"
-                  pressedBorderColor="#663399"
-                  avatarSize={70}
-                  data={stories}
-                  duration={10}
-                  onStart={(item) => console.log(item)}
-                  onClose={(item) => console.log("close: ", item)}
-                  customSwipeUpComponent={
-                    <View>
-                      <Text>Swipe</Text>
-                    </View>
-                  }
-                  ImageComponent={Image}
-                  HeaderComponent={
-                    <View style={{ marginTop: 10 }}>
-                      <TouchableOpacity
-                        onPress={() => console.log("hello")}
-                        style={styles.story_image_container}
-                      >
-                        <Image
-                          style={styles.story_image}
-                          source={{
-                            uri: "https://pbs.twimg.com/profile_images/1222140802475773952/61OmyINj.jpg",
-                          }}
-                        />
-                        <View style={styles.createStory}>
-                          <Text style={styles.plusIcon}>+</Text>
-                        </View>
-                        <Text style={styles.yourStory}>Your story</Text>
-                      </TouchableOpacity>
-                    </View>
-                  }
-                  ImageComponentStyle={{ borderWidth: 2, borderColor: "#ddd" }}
-                  style={{
-                    marginTop: 5,
-                    marginBottom: 10,
-                    borderBottomColor: "#ddd",
-                    borderBottomWidth: 1,
-                    paddingBottom: 10,
-                  }}
-                />
-              ) : null}
+              <Story stories={stories} />
             </View>
           </>
         ) : null}

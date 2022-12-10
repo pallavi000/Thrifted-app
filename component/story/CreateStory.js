@@ -8,13 +8,14 @@ import StoryPicker from "./StoryPicker";
 import { AuthContext } from "../Context";
 import axios from "axios";
 import { apiErrorNotification } from "../ErrorHandle";
+import { imageLink } from "../ImageLink";
 
 const validationSchema = Yup.object().shape({
   image: Yup.string().required("Image is required"),
   swipeText: Yup.string().optional(),
 });
 
-const CreateStory = ({ bottomSheetRef }) => {
+const CreateStory = ({ bottomSheetRef, setStories }) => {
   const openCameraRef = useRef();
   const selectImageRef = useRef();
   const fill = new Animated.Value(1);
@@ -28,11 +29,40 @@ const CreateStory = ({ bottomSheetRef }) => {
 
   async function createStory(values) {
     try {
-      await axios.post("/story", values, config);
+      const response = await axios.post("/story", values, config);
+      addToStories(response.data);
     } catch (error) {
       apiErrorNotification(error);
     }
   }
+
+  function addToStories(story) {
+    story.user_image = imageLink + story.user_image;
+    story.story_image = imageLink + story.story_image;
+    story.story_video = imageLink + story.story_video;
+    setStories((prevStories) => {
+      const duplicateStories = [...prevStories];
+      console.log(duplicateStories.length);
+      var existingIndex = duplicateStories.findIndex(
+        (st) => st.user_id == story.user_id
+      );
+      if (existingIndex != -1) {
+        duplicateStories[existingIndex].stories.unshift(story);
+        return duplicateStories;
+      } else {
+        var newStory = {
+          user_id: story.user_id,
+          user_image: story.user_image,
+          user_name: story.user_name,
+          _id: story._id,
+          stories: [story],
+        };
+        console.log([newStory, ...duplicateStories]);
+        return [newStory, ...duplicateStories];
+      }
+    });
+  }
+
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
       <BottomSheetComponent

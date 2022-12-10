@@ -257,6 +257,7 @@ export default gestureHandlerRootHOC(function App(props) {
         setToken(authConfig);
         var token = authConfig;
         var decoded = jwt_decode(token);
+        console.log(decoded);
         setDecode(decoded);
         if (!notificationApiCall) {
           registerForPushNotificationsAsync(token);

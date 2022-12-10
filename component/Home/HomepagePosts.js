@@ -34,6 +34,7 @@ export default React.memo(function HomepagePosts({
   hasNextPage = false,
   hasStories = false,
   stories = null,
+  setStories = null,
   dataType = "real",
 }) {
   const [refreshing, setRefreshing] = useState(false);
@@ -49,17 +50,18 @@ export default React.memo(function HomepagePosts({
 
   const originalRenderItem = React.useCallback(
     ({ item, index }) => {
+      console.log("callback", stories.length);
       return (
         <View>
           {index == 0 && hasStories && dataType == "real" ? (
             <>
               <View>
-                <Story stories={stories} />
+                <Story stories={stories} setStories={setStories} />
               </View>
             </>
           ) : index == 0 && hasStories && dataType != "real" ? (
             <>
-              <Story stories={stories} />
+              <Story stories={stories} setStories={setStories} />
             </>
           ) : null}
           <Action

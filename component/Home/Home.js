@@ -227,6 +227,10 @@ export default function Home({ navigation }) {
     return users;
   }
 
+  useEffect(() => {
+    console.log("eff", stories.length);
+  }, [stories]);
+
   return (
     <SafeAreaView
       style={{
@@ -248,6 +252,10 @@ export default function Home({ navigation }) {
             showDropDown={showDropDown}
             setShowDropDown={setShowDropDown}
           />
+          <Button
+            title="Copy"
+            onPress={() => setStories([...stories, ...stories])}
+          />
 
           <View style={{ paddingBottom: 50, height: "100%" }}>
             {showDropDown && <DropDownItem />}
@@ -262,6 +270,7 @@ export default function Home({ navigation }) {
                 setProducts={setProducts}
                 hasStories={true}
                 stories={stories}
+                setStories={setStories}
                 dataType={dataType}
                 navigation={navigation}
               />

@@ -68,6 +68,7 @@ export default function Home({ navigation }) {
     setProducts,
     feedSetting,
     getFeedSetting,
+    decode,
   } = data;
   const config = {
     headers: {
@@ -83,6 +84,7 @@ export default function Home({ navigation }) {
       productOnly,
       feedSetting: getFeedSetting(),
     };
+    console.log(data.feedSetting, decode);
     try {
       var sendDate = new Date().getTime();
       const response = await axios.post("/frontend/app/home", data, config);
@@ -251,10 +253,6 @@ export default function Home({ navigation }) {
             navigation={navigation}
             showDropDown={showDropDown}
             setShowDropDown={setShowDropDown}
-          />
-          <Button
-            title="Copy"
-            onPress={() => setStories([...stories, ...stories])}
           />
 
           <View style={{ paddingBottom: 50, height: "100%" }}>

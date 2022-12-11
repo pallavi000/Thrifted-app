@@ -172,7 +172,6 @@ export default function Checkout({ navigation }) {
         }
       });
       setShippingFee(shippingCharge);
-      setShippingFee(0);
     }
   }, [shippingAddress, shippings, sellerPickupLocations, deliveryOption]);
 

@@ -10,6 +10,7 @@ import {
   Dimensions,
   KeyboardAvoidingViewBase,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import * as imagePicker from "expo-image-picker";
 import { useFormikContext } from "formik";
@@ -65,7 +66,7 @@ const EditMainImage = (props) => {
 
   async function selectImage() {
     const result = await imagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      allowsEditing: Platform.OS == "ios" ? false : true,
       mediaTypes: imagePicker.MediaTypeOptions.Images,
       base64: true,
     });

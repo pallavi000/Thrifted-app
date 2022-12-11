@@ -42,12 +42,11 @@ const CreateStory = ({ bottomSheetRef, setStories }) => {
     story.story_video = imageLink + story.story_video;
     setStories((prevStories) => {
       const duplicateStories = [...prevStories];
-      console.log(duplicateStories.length);
       var existingIndex = duplicateStories.findIndex(
         (st) => st.user_id == story.user_id
       );
       if (existingIndex != -1) {
-        duplicateStories[existingIndex].stories.unshift(story);
+        duplicateStories[existingIndex].stories.push(story);
         return duplicateStories;
       } else {
         var newStory = {
@@ -57,7 +56,6 @@ const CreateStory = ({ bottomSheetRef, setStories }) => {
           _id: story._id,
           stories: [story],
         };
-        console.log([newStory, ...duplicateStories]);
         return [newStory, ...duplicateStories];
       }
     });

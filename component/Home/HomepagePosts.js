@@ -50,7 +50,6 @@ export default React.memo(function HomepagePosts({
 
   const originalRenderItem = React.useCallback(
     ({ item, index }) => {
-      console.log("callback", stories.length);
       return (
         <View>
           {index == 0 && hasStories && dataType == "real" ? (

@@ -117,10 +117,7 @@ const MakeSeller = ({ navigation }) => {
       setIsSubmitting(true);
       await axios.post("/user/make-seller", values, config);
       setIsSubmitting(false);
-      Alert.alert("Packing Materials", "Do you have packing materials?", [
-        { text: "Yes", onPress: setIsSeller },
-        { text: "No", onPress: gotoMaterialBuySection },
-      ]);
+      setIsSeller(true);
     } catch (error) {
       apiErrorNotification(error);
       setIsSubmitting(false);

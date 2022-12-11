@@ -55,8 +55,7 @@ function Story({ stories, setStories }) {
         avatarSize={70}
         data={stories}
         duration={10}
-        onStart={(item) => console.log("hi")}
-        onClose={(item) => console.log("close: ")}
+        customCloseComponent={<Feather name="x" size={16} color="white" />}
         currentStoryRef={currentStoryRef}
         ListItemRightHeaderComponent={
           <TouchableOpacity onPress={() => DeleteStory()}>

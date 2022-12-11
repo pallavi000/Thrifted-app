@@ -4,6 +4,7 @@ import { SafeAreaView, Alert } from "react-native";
 
 import { KhatiSdk } from "rn-all-nepal-payment";
 import { apiErrorNotification, customErrorNotification } from "../ErrorHandle";
+import Constants from "expo-constants";
 
 const Khalti = (props) => {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -64,7 +65,7 @@ const Khalti = (props) => {
         productIdentity={props.pid} // Unique product identifier at merchant
         onPaymentComplete={_onPaymentComplete} // Callback from Khalti Web Sdk
         productUrl="https://google.com" // Url of product
-        publicKey={"live_public_key_02955b93394c4c92a5d73f48b9bde60d"} // Test or live public key which identifies the merchant
+        publicKey={Constants.manifest?.extra?.KHALTI_SECRET} // Test or live public key which identifies the merchant
       />
     </SafeAreaView>
   );

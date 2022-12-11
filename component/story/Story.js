@@ -57,16 +57,28 @@ function Story({ stories, setStories }) {
         duration={10}
         customCloseComponent={<Feather name="x" size={16} color="white" />}
         currentStoryRef={currentStoryRef}
-        ListItemRightHeaderComponent={
-          <TouchableOpacity onPress={() => DeleteStory()}>
-            <Feather name="trash" size={16} color="white" />
-          </TouchableOpacity>
-        }
-        customSwipeUpComponent={
+        ListItemRightHeaderComponent={(story) => {
+          return story.user_id == decode._id ? (
+            <TouchableOpacity onPress={() => DeleteStory()}>
+              <Feather name="trash" size={16} color="white" />
+            </TouchableOpacity>
+          ) : null;
+        }}
+        customSwipeUpComponent={(story) => (
           <View>
-            <Text>Swipe</Text>
+            <Text
+              style={{
+                backgroundColor: "black",
+                color: "white",
+                fontWeight: "500",
+                alignSelf: "center",
+                maxWidth: react_native_1.Dimensions.get("window").width - 50,
+              }}
+            >
+              {story.swipeText}
+            </Text>
           </View>
-        }
+        )}
         ImageComponent={Image}
         HeaderComponent={
           <View style={{ marginTop: 10 }}>
@@ -89,7 +101,8 @@ function Story({ stories, setStories }) {
             </TouchableOpacity>
           </View>
         }
-        ImageComponentStyle={{ borderWidth: 2, borderColor: "#ddd" }}
+        ImageCircleStyle={{ borderWidth: 2, borderColor: "#ddd" }}
+        ImageListItemStyle={{ resizeMode: "contain", width: 420, height: 420 }}
         style={{
           marginTop: 5,
           marginBottom: 10,

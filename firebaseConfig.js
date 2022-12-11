@@ -4,6 +4,7 @@ import { initializeAuth } from "firebase/auth";
 import "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getReactNativePersistence } from "firebase/auth/react-native";
+import Constants from "expo-constants";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -11,7 +12,7 @@ import { getReactNativePersistence } from "firebase/auth/react-native";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyC4SAwbzoRtxGWv_HnjR9Wk9Mu6Ts8PALg",
+  apiKey: Constants.manifest?.extra?.FIREBASE_API_KEY,
   authDomain: "thrifted-1be13.firebaseapp.com",
   projectId: "thrifted-1be13",
   storageBucket: "thrifted-1be13.appspot.com",

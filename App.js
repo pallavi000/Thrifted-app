@@ -51,9 +51,10 @@ import { gestureHandlerRootHOC } from "react-native-gesture-handler";
 
 import FeedSetting from "./component/setting/FeedSetting";
 import ChangePickupLocation from "./component/post/ChangePickupLocation";
+import Constants from "expo-constants";
 
 // axios.defaults.baseURL = "http://localhost:5000/api";
-axios.defaults.baseURL = "https://hamrocloset.com/api";
+axios.defaults.baseURL = Constants.manifest?.extra?.API_URL;
 
 const Stack = createNativeStackNavigator();
 

@@ -4,6 +4,7 @@ import axios from "axios";
 
 import { EsewaSdk } from "rn-all-nepal-payment";
 import { apiErrorNotification, customErrorNotification } from "../ErrorHandle";
+import Constants from "expo-constants";
 
 const Esewa = (props) => {
   const [isVisible, setisVisible] = React.useState(false);
@@ -55,7 +56,7 @@ const Esewa = (props) => {
         amt={props.total} // Amount of product or item or ticket etc
         taxAmt={0} // Tax amount on product or item or ticket etc
         totalAmt={props.total + props.shippingFee} // Total payment amount including tax, service and deliver charge. [i.e tAmt = amt + txAmt + psc + tAmt]
-        env={process.env.ESEWA_PUBLIC_KEY || "NP-ES-TMPVT"} // Merchant code provided by eSewa
+        env={Constants.manifest?.extra?.ESEWA_SECRET} // Merchant code provided by eSewa
         testMode={false} // Boolean value for enabling test endpoint and real payment gateway
         isVisible={isVisible} // Bool to show modal
         onPaymentComplete={_onPaymentComplete} //  Callback from connectips Web Sdk

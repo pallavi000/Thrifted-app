@@ -8,15 +8,17 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { AuthContext, districts, zipcodes } from "../Context";
+import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
 import axios from "axios";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 import AddressPicker from "../address/AddressPicker";
 
 const validationSchema = Yup.object().shape({
@@ -118,6 +120,7 @@ const MakeSeller = ({ navigation }) => {
       await axios.post("/user/make-seller", values, config);
       setIsSubmitting(false);
       setIsSeller(true);
+      customSuccessNotification("User marked as seller.");
     } catch (error) {
       apiErrorNotification(error);
       setIsSubmitting(false);

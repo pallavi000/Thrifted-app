@@ -6,36 +6,25 @@ import {
   View,
   Dimensions,
   SafeAreaView,
-  ScrollView,
   Image,
   TouchableOpacity,
-  Alert,
   FlatList,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import bbstyles from "../Styles";
-import {
-  Raleway_400Regular,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
 import axios from "axios";
 import { AuthContext } from "../Context";
 import { imageLink } from "../ImageLink";
-import { NavigationContainer, useIsFocused } from "@react-navigation/native";
-import {
-  EvilIcons,
-  Feather,
-  FontAwesome,
-  SimpleLineIcons,
-} from "@expo/vector-icons";
-import BottomSheet from "reanimated-bottom-sheet";
+import { useIsFocused } from "@react-navigation/native";
+import { EvilIcons, Feather, SimpleLineIcons } from "@expo/vector-icons";
 import Animated from "react-native-reanimated";
 import * as imagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import "react-native-get-random-values";
-import { v4 as uuidv4 } from "uuid";
-import { apiErrorNotification } from "../ErrorHandle";
+import FastImage from "react-native-fast-image";
+import BottomSheetComponent from "../BottomSheetComponent";
+import { customErrorNotification } from "../ErrorHandle";
 
 export default function Closet(props) {
   const sheetRef = useRef(null);
@@ -62,6 +51,8 @@ export default function Closet(props) {
   const [salePageNo, setSalesPageNo] = useState(1);
   const [totalSales, setTotalSales] = useState(0);
   const [salesHasNextPage, setSalesHasNextPage] = useState(true);
+  const selectImageRef = useRef();
+  const openCameraRef = useRef();
 
   const config = {
     headers: {
@@ -195,12 +186,12 @@ export default function Closet(props) {
     ]);
   });
 
-  const selectImage = React.useCallback(async () => {
+  selectImageRef.current = React.useCallback(async () => {
     const { granted } = await imagePicker.getMediaLibraryPermissionsAsync();
     if (!granted) {
       const result = await imagePicker.requestMediaLibraryPermissionsAsync();
       if (!result.granted) {
-        return Alert.alert("Error", "Permission denied");
+        return customErrorNotification("Permission denied");
       }
     }
     const imageResult = await imagePicker.launchImageLibraryAsync({
@@ -218,12 +209,12 @@ export default function Closet(props) {
     }
   });
 
-  const openCamera = React.useCallback(async () => {
+  openCameraRef.current = React.useCallback(async () => {
     const { granted } = await imagePicker.getCameraPermissionsAsync();
     if (!granted) {
       const result = await imagePicker.requestCameraPermissionsAsync();
       if (!result.granted) {
-        return Alert.alert("Error", "Permission denied");
+        return customErrorNotification("Permission denied");
       }
     }
     const imageResult = await imagePicker.launchCameraAsync({
@@ -313,66 +304,7 @@ export default function Closet(props) {
     }
   });
 
-  const renderHeader = React.useCallback(() => (
-    <>
-      <View
-        style={{
-          backgroundColor: "#fff",
-          padding: 10,
-          alignItems: "center",
-          paddingTop: 20,
-          borderTopWidth: 1,
-          borderTopColor: "#ddd",
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "Raleway_600SemiBold",
-            fontSize: 20,
-            color: "black",
-            borderTopWidth: 5,
-            borderTopColor: "#663399",
-            paddingTop: 5,
-            borderRadius: 3,
-          }}
-        >
-          Choose Image
-        </Text>
-      </View>
-    </>
-  ));
-
-  const renderContent = React.useCallback(() => {
-    return (
-      <View
-        style={{
-          backgroundColor: "#fff",
-          height: 300,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => selectImage()}
-          style={[styles.cameraIconWrapper, { borderRadius: 0 }]}
-        >
-          <Image
-            style={styles.cameraIcon}
-            source={require("../../assets/gallery.png")}
-          />
-          <Text style={styles.loginText}>Select Image</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => openCamera()}
-          style={[styles.cameraIconWrapper, { borderRadius: 0 }]}
-        >
-          <Image
-            style={styles.cameraIcon}
-            source={require("../../assets/camera.png")}
-          />
-          <Text style={styles.loginText}>Open Camera</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  });
+  const ImageComponent = __DEV__ ? Image : FastImage;
 
   const closetHeader = () => {
     return (
@@ -577,17 +509,12 @@ export default function Closet(props) {
 
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
-      <BottomSheet
-        ref={sheetRef}
-        snapPoints={[300, 0]}
-        borderRadius={10}
-        initialSnap={1}
-        enabledContentTapInteraction={false}
-        renderHeader={renderHeader}
-        renderContent={renderContent}
-        callbackNode={fill}
+      <BottomSheetComponent
+        sheetRef={sheetRef}
+        openCameraRef={openCameraRef}
+        selectImageRef={selectImageRef}
+        fill={fill}
       />
-
       {loading ? (
         <View style={bbstyles.loaderContainer}>
           <ActivityIndicator size={"large"} color="#663399" />
@@ -617,10 +544,10 @@ export default function Closet(props) {
                   style={styles.productImage}
                   key={item._id}
                 >
-                  <Image
+                  <ImageComponent
                     source={{ uri: imageLink + item.image }}
                     style={styles.closetImage}
-                  ></Image>
+                  />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
@@ -629,10 +556,10 @@ export default function Closet(props) {
                   }
                   style={styles.productImage}
                 >
-                  <Image
+                  <ImageComponent
                     source={{ uri: imageLink + item.product_id.image }}
                     style={styles.closetImage}
-                  ></Image>
+                  />
                 </TouchableOpacity>
               )
             }

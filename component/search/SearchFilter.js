@@ -7,17 +7,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
 import { Fontisto, Ionicons } from "@expo/vector-icons";
 import BrandFilter from "../Product/filters/BrandFilter";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import CategoryFilter from "./CategoryFilter";
-import { useIsFocused } from "@react-navigation/native";
 
 export default function SearchFilter(props) {
   const [showBrand, setShowBrand] = useState(false);

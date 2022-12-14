@@ -2,7 +2,6 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Dimensions,
   SafeAreaView,
@@ -20,7 +19,10 @@ import * as Yup from "yup";
 import { firebaseAuth } from "../../firebaseConfig";
 import { PhoneAuthProvider } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
-import { apiErrorNotification } from "./../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "./../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string().required("Phone  is required"),
@@ -46,7 +48,7 @@ export default function ForgotPassword({ navigation }) {
       data.code = verifyId;
       var response = await axios.post("/user/forgot/password", data);
       if (response.data) {
-        Alert.alert("Otp has been sent to your phone");
+        customSuccessNotification("Otp has been sent to your phone.");
         navigation.navigate("resetpassword", { verificationId });
       }
       setIsSubmitting(false);

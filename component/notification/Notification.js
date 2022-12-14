@@ -2,26 +2,14 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
-  ScrollView,
   SafeAreaView,
   FlatList,
-  TouchableWithoutFeedback,
   ActivityIndicator,
-  Alert,
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../Context";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { imageLink } from "../ImageLink";
-import { format } from "timeago.js";
 import LikeNotification from "./LikeNotification";
 import CommentNotification from "./CommentNotification";
 import FollowNotification from "./FollowNotification";
@@ -85,7 +73,6 @@ export default function Notification({ navigation }) {
         setOriginalNotifications([...originalNotifications, notification]);
       });
       socket.current.on("orderNotification", (notification) => {
-        console.log("order", notification);
         setOrderNotifications(
           groupNotification([...originalOrderNotifications, notification])
         );

@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
-  Alert,
 } from "react-native";
 import React, { useEffect, useContext, useState, useLayoutEffect } from "react";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";

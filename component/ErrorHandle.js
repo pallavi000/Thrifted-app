@@ -1,12 +1,33 @@
-import { Alert } from "react-native";
+import Toast from "react-native-root-toast";
 
 export function apiErrorNotification(error) {
-  Alert.alert(
-    "Error",
-    error?.response?.data?.message || "Internal Server Error."
-  );
+  customErrorNotification(error?.response?.data?.message);
 }
 
 export function customErrorNotification(msg) {
-  Alert.alert("Error", msg || "Internal Server Error.");
+  Toast.show(msg || "Some Error Ocurred!", {
+    duration: Toast.durations.LONG,
+    position: -70,
+    shadow: true,
+    animation: true,
+    hideOnPress: true,
+    delay: 0,
+    backgroundColor: "#dc3545",
+    textColor: "#fff",
+    opacity: 1,
+  });
+}
+
+export function customSuccessNotification(msg) {
+  Toast.show(msg || "Success!", {
+    duration: Toast.durations.LONG,
+    position: -70,
+    shadow: true,
+    animation: true,
+    hideOnPress: true,
+    delay: 0,
+    backgroundColor: "#28a745",
+    textColor: "#fff",
+    opacity: 1,
+  });
 }

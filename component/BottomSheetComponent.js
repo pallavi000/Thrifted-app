@@ -6,7 +6,7 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import React, { useRef } from "react";
+import React from "react";
 import BottomSheet from "reanimated-bottom-sheet";
 import Animated from "react-native-reanimated";
 
@@ -65,7 +65,7 @@ const BottomSheetComponent = ({
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.loginBtn, { borderRadius: 0 }]}
-          onPress={() => selectImageRef.current()}
+          onPress={() => openCameraRef.current()}
         >
           <Image
             style={styles.cameraIcon}

@@ -1,3 +1,4 @@
+.env
 node_modules/
 .expo/
 dist/
@@ -72,5 +73,7 @@ buck-out/
 .expo/
 web-build/
 dist/
+
+android/
 
 # @end expo-cli

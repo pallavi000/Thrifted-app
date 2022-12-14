@@ -1,28 +1,14 @@
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   RefreshControl,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
 } from "react-native";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useRef, useState } from "react";
 import { useScrollToTop } from "@react-navigation/native";
-import { imageLink } from "../ImageLink";
 import Action from "./Action";
-import { OptimizedFlatList } from "react-native-optimized-flatlist";
-import InstaStory from "react-native-insta-story";
-import { apiErrorNotification } from "../ErrorHandle";
 import { AuthContext } from "../Context";
-import axios from "axios";
 import Story from "../story/Story";
 
 export default React.memo(function HomepagePosts({
@@ -36,6 +22,7 @@ export default React.memo(function HomepagePosts({
   stories = null,
   setStories = null,
   dataType = "real",
+  bottomSheetRef = {},
 }) {
   const [refreshing, setRefreshing] = useState(false);
   const [enableScroll, setEnableScroll] = useState(true);
@@ -55,12 +42,20 @@ export default React.memo(function HomepagePosts({
           {index == 0 && hasStories && dataType == "real" ? (
             <>
               <View>
-                <Story stories={stories} setStories={setStories} />
+                <Story
+                  stories={stories}
+                  bottomSheetRef={bottomSheetRef}
+                  setStories={setStories}
+                />
               </View>
             </>
           ) : index == 0 && hasStories && dataType != "real" ? (
             <>
-              <Story stories={stories} setStories={setStories} />
+              <Story
+                stories={stories}
+                bottomSheetRef={bottomSheetRef}
+                setStories={setStories}
+              />
             </>
           ) : null}
           <Action

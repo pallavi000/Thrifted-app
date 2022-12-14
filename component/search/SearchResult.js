@@ -10,11 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Raleway_400Regular,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
+
 import { imageLink } from "../ImageLink";
 import axios from "axios";
 import SearchFilter from "./SearchFilter";

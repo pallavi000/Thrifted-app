@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
-  Alert,
   Text,
   View,
   TouchableOpacity,
@@ -17,7 +16,10 @@ import axios from "axios";
 import bbstyles from "../Styles";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   currentPassword: Yup.string().required("Current Password is required."),
@@ -42,7 +44,7 @@ const ChangePassword = ({ navigation }) => {
     try {
       setIsSubmitting(true);
       var response = await axios.post("/user/change/password", data, config);
-      Alert.alert("Success", "Password has been changed.");
+      customSuccessNotification("Password has been changed.");
       setIsSubmitting(false);
       navigation.goBack();
     } catch (error) {

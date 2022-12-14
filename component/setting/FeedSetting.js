@@ -7,13 +7,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
-import {
-  MaterialCommunityIcons,
-  MaterialIcons,
-  Feather,
-  Ionicons,
-  FontAwesome,
-} from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../Context";
 

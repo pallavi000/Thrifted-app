@@ -2,12 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
-  Button,
   Image,
   Alert,
   StyleSheet,
   Dimensions,
-  KeyboardAvoidingViewBase,
   TouchableOpacity,
   TextInput,
   TouchableWithoutFeedback,
@@ -15,8 +13,7 @@ import {
 } from "react-native";
 import * as imagePicker from "expo-image-picker";
 import { useFormikContext } from "formik";
-import { FontAwesome, Feather, MaterialIcons } from "@expo/vector-icons";
-import { imageLink } from "../ImageLink";
+import { MaterialIcons } from "@expo/vector-icons";
 import Modal from "react-native-modalbox";
 
 const StoryPicker = (props) => {

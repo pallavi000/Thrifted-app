@@ -11,11 +11,7 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { Feather, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import {
-  Raleway_400Regular,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
+
 import { AuthContext } from "../Context";
 import axios from "axios";
 import bbstyles from "../Styles";

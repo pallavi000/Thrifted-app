@@ -8,19 +8,18 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import React, { useContext, useState } from "react";
-import {
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
+
 import { Formik } from "formik";
 import * as Yup from "yup";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { AuthContext } from "../Context";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required(),
@@ -43,6 +42,7 @@ const ChangeProfile = ({ navigation, route }) => {
     try {
       const response = await axios.post("/user/change/profile", data, config);
       setIsSubmitting(false);
+      customSuccessNotification("User info updated.");
       navigation.goBack();
     } catch (error) {
       apiErrorNotification(error);

@@ -5,14 +5,11 @@ import {
   View,
   ScrollView,
   SafeAreaView,
-  Dimensions,
   Image,
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState, useContext, useLayoutEffect } from "react";
-import { Raleway_600SemiBold } from "@expo-google-fonts/raleway";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { imageLink } from "../ImageLink";
 import bbstyles from "../Styles";

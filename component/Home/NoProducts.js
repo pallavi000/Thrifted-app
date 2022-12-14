@@ -1,6 +1,5 @@
 import {
   Dimensions,
-  Image,
   SafeAreaView,
   StyleSheet,
   Text,

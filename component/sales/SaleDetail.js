@@ -7,14 +7,12 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { imageLink } from "../ImageLink";
 import {
   Feather,
-  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";

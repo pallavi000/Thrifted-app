@@ -4,17 +4,13 @@ import {
   View,
   Image,
   TouchableOpacity,
-  FlatList,
   Dimensions,
-  Alert,
   Share,
-  ScrollView,
 } from "react-native";
 import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -22,20 +18,15 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { AuthContext } from "../Context";
 import { imageLink } from "../ImageLink";
-import { Raleway_500Medium } from "@expo-google-fonts/raleway";
 import Animated, {
-  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
 
 import { SliderBox } from "react-native-image-slider-box";
-// import FastImage from "react-native-fast-image";
-import {
-  InstagramProvider,
-  ElementContainer,
-} from "@postillon/react-native-instagram-zoomable";
+import FastImage from "react-native-fast-image";
+import { customErrorNotification } from "../ErrorHandle";
 
 export default React.memo(function Action(props) {
   const [comment, setComment] = useState("");
@@ -43,7 +34,6 @@ export default React.memo(function Action(props) {
   const { navigation } = props;
   const [product, setProduct] = useState(props.product);
   const [doubleClick, setDoubleClick] = useState(0);
-  const [imageIndex, setImageIndex] = useState(0);
   const data = useContext(AuthContext);
   const { token, decode, products } = data;
   const config = {
@@ -159,15 +149,9 @@ export default React.memo(function Action(props) {
         // dismissed
       }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      customErrorNotification(error.message);
     }
   }, []);
-
-  function getCurrentImageIndex(index) {
-    console.log(imageIndex);
-    if (!index && index !== 0) return imageIndex;
-    setImageIndex(index);
-  }
 
   return (
     <>
@@ -205,23 +189,17 @@ export default React.memo(function Action(props) {
             </View>
           ) : null}
 
-          <View style={{ zIndex: 8 }}>
-            <InstagramProvider>
-              <ElementContainer>
-                <SliderBox
-                  images={parseImages(product.image, product.feature_image)}
-                  // ImageComponent={FastImage}
-                  ImageComponentStyle={styles.productImage}
-                  currentImageEmitter={getCurrentImageIndex}
-                  dotColor="#663399"
-                  imageLoadingColor="#663399"
-                  activeOpacity={1}
-                  onCurrentImagePressed={() => singleOrDoubleClick(product)}
-                  pagingEnabled
-                />
-              </ElementContainer>
-            </InstagramProvider>
-          </View>
+          <SliderBox
+            images={parseImages(product.image, product.feature_image)}
+            ImageComponent={__DEV__ ? Image : FastImage}
+            ImageComponentStyle={styles.productImage}
+            dotColor="#663399"
+            imageLoadingColor="#663399"
+            activeOpacity={1}
+            onCurrentImagePressed={() => singleOrDoubleClick(product)}
+            pagingEnabled
+            enablePinchable={__DEV__ ? false : true}
+          />
 
           <View style={styles.productreview}>
             <TouchableOpacity

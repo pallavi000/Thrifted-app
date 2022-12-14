@@ -8,15 +8,17 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { AuthContext, districts, zipcodes } from "../Context";
+import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
 import axios from "axios";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 import AddressPicker from "../address/AddressPicker";
 
 const validationSchema = Yup.object().shape({
@@ -128,9 +130,9 @@ const ChangePickupLocation = ({ navigation }) => {
         config
       );
       setIsSubmitting(false);
+      customSuccessNotification("Pickup location changed.");
       navigation.goBack();
     } catch (error) {
-      console.log(error.message);
       apiErrorNotification(error);
       setIsSubmitting(false);
     }

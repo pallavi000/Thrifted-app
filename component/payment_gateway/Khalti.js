@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect } from "react";
-import { SafeAreaView, Alert } from "react-native";
+import { SafeAreaView } from "react-native";
 
 import { KhatiSdk } from "rn-all-nepal-payment";
 import { apiErrorNotification, customErrorNotification } from "../ErrorHandle";

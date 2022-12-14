@@ -8,7 +8,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
@@ -16,7 +15,10 @@ import * as Yup from "yup";
 import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
 import axios from "axios";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 import AddressPicker from "./AddressPicker";
 
 const validationSchema = Yup.object().shape({
@@ -73,7 +75,7 @@ export default function AddShipping({ navigation }) {
       setIsSubmitting(true);
       values.zipcode = 0;
       await axios.post("/address", values, config);
-      Alert.alert("Success", "Address has been added");
+      customSuccessNotification("Address has been added");
       setIsSubmitting(false);
       navigation.goBack();
     } catch (error) {

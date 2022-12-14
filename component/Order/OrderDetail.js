@@ -8,14 +8,11 @@ import {
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
-  Alert,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { imageLink } from "../ImageLink";
 import {
   Feather,
-  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";

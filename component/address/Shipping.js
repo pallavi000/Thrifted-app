@@ -18,7 +18,10 @@ import { useIsFocused } from "@react-navigation/native";
 import CustomCheckBox from "../ui/CustomCheckBox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import bbstyles from "../Styles";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 export default function Shipping(props) {
   const [addresses, setAddresses] = useState([]);
@@ -82,6 +85,7 @@ export default function Shipping(props) {
             setSelection(0);
           }
         }
+        customSuccessNotification("Address Deleted.");
         setIsSubmitting(0);
       } catch (error) {
         setIsSubmitting(0);

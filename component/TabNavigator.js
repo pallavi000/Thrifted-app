@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image } from "react-native";
-import React, { useContext, useEffect } from "react";
+import { StyleSheet, Text, Image } from "react-native";
+import React, { useContext } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AuthContext } from "./Context";
 import { Feather } from "@expo/vector-icons";

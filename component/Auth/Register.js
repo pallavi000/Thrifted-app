@@ -6,7 +6,6 @@ import {
   Dimensions,
   Text,
   SafeAreaView,
-  Alert,
   View,
   TouchableOpacity,
   TextInput,
@@ -23,7 +22,10 @@ import { firebaseAuth, firebaseApp } from "../../firebaseConfig";
 import { PhoneAuthProvider } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import OTP from "./OTP";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email("Email is required."),
@@ -56,6 +58,7 @@ export default function Register({ navigation }) {
       setVerificationId(response);
       setOtpScreen(true);
       setIsSubmitting(false);
+      customSuccessNotification("Otp has been sent to your phone.");
     } catch (error) {
       apiErrorNotification(error);
       setIsSubmitting(false);
@@ -83,6 +86,7 @@ export default function Register({ navigation }) {
         setIsSubmitting(false);
         setToken(response.data.token);
         setIsLoggedIn(true);
+        customSuccessNotification("User Registration successful.");
       }
     } catch (error) {
       setOtpScreen(false);

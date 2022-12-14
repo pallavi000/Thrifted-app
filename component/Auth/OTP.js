@@ -4,9 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
-  Alert,
   TextInput,
-  Button,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";

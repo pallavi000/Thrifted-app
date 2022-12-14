@@ -5,7 +5,6 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  StatusBar,
 } from "react-native";
 import React from "react";
 import { Feather, Fontisto } from "@expo/vector-icons";

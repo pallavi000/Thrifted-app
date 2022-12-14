@@ -9,9 +9,8 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  Alert,
 } from "react-native";
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../Context";
 import axios from "axios";
@@ -19,7 +18,10 @@ import bbstyles from "../Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -40,6 +42,7 @@ export default function Login({ navigation }) {
       setToken(response.data.token);
       setIsSubmitting(false);
       setIsLoggedIn(true);
+      customSuccessNotification("Login successful.");
     } catch (error) {
       setIsSubmitting(false);
       apiErrorNotification(error);

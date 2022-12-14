@@ -4,44 +4,32 @@ import {
   View,
   SafeAreaView,
   ScrollView,
-  Image,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Dimensions,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  ViewPagerAndroidBase,
 } from "react-native";
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  useRef,
-  forwardRef,
-} from "react";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
+import React, { useEffect, useState, useContext, useRef } from "react";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { AuthContext } from "../Context";
 import MainImage from "../Image/MainImage";
-import BottomSheet from "reanimated-bottom-sheet";
-import Animated from "react-native-reanimated";
 import CategorySelect from "./selects/CategorySelect";
 import SimpleSelect from "./selects/SimpleSelect";
 import BrandSelect from "./selects/BrandSelect";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 import MakeSeller from "./MakeSeller";
+import BottomSheetComponent from "../BottomSheetComponent";
+import Animated from "react-native-reanimated";
 
 const validationSchema = Yup.object().shape({
   image1: Yup.string().required("Image is required"),
@@ -57,6 +45,43 @@ const validationSchema = Yup.object().shape({
   type: Yup.string().required("Product Type is required"),
   pickupOption: Yup.string().required("Pickup option is required"),
 });
+
+const initPickupOptions = [
+  {
+    _id: "Door",
+    name: "Pickup From Home",
+  },
+  {
+    _id: "Branch",
+    name: "Drop to Branch",
+  },
+];
+
+const initProductTypes = [
+  {
+    _id: "rent",
+    name: "Rent",
+  },
+  {
+    _id: "sale",
+    name: "Sale",
+  },
+];
+
+const initSelectedCategory = {
+  name: "Select Category",
+};
+const initSelectedColor = { name: "Select Color" };
+const initSelectedSize = {
+  name: "Select Product Size",
+};
+const initSelectedProductType = {
+  name: "Select Product Type",
+};
+const initSelectedBrand = { name: "Select Brand" };
+const initSelectedPickupOption = {
+  name: "Select Pickup option",
+};
 
 function CreatePost({ navigation }) {
   const { isSeller } = useContext(AuthContext);
@@ -76,40 +101,17 @@ function CreatePost({ navigation }) {
   const [earningPrice, setEarningPrice] = useState();
   const [openSelectField, setOpenSelectField] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [pickupOptions, setPickupOptions] = useState([
-    {
-      _id: "Door",
-      name: "Pickup From Home",
-    },
-    {
-      _id: "Branch",
-      name: "Drop to Branch",
-    },
-  ]);
-  const [productTypes, setProductTypes] = useState([
-    {
-      _id: "rent",
-      name: "Rent",
-    },
-    {
-      _id: "sale",
-      name: "Sale",
-    },
-  ]);
-  const [selectedCategory, setSelectedCategory] = useState({
-    name: "Select Category",
-  });
-  const [selectedColor, setSelectedColor] = useState({ name: "Select Color" });
-  const [selectedSize, setSelectedSize] = useState({
-    name: "Select Product Size",
-  });
-  const [selectedType, setSelectedType] = useState({
-    name: "Select Product Type",
-  });
-  const [selectedBrand, setSelectedBrand] = useState({ name: "Select Brand" });
-  const [selectedPickupOption, setSelectedPickupOption] = useState({
-    name: "Select Pickup option",
-  });
+  const [pickupOptions, setPickupOptions] = useState(initPickupOptions);
+  const [productTypes, setProductTypes] = useState(initProductTypes);
+  const [selectedCategory, setSelectedCategory] =
+    useState(initSelectedCategory);
+  const [selectedColor, setSelectedColor] = useState(initSelectedColor);
+  const [selectedSize, setSelectedSize] = useState(initSelectedSize);
+  const [selectedType, setSelectedType] = useState(initSelectedProductType);
+  const [selectedBrand, setSelectedBrand] = useState(initSelectedBrand);
+  const [selectedPickupOption, setSelectedPickupOption] = useState(
+    initSelectedPickupOption
+  );
 
   const data = useContext(AuthContext);
   const { token } = data;
@@ -123,7 +125,7 @@ function CreatePost({ navigation }) {
   function addPost() {
     var errors = Object.values(formRef.current.errors);
     if (errors && errors.length > 0) {
-      Alert.alert("Error", errors[0]);
+      customErrorNotification(errors[0]);
       return;
     }
     formRef.current.handleSubmit();
@@ -197,7 +199,14 @@ function CreatePost({ navigation }) {
     loadingHeader();
     try {
       const response = await axios.post("/product/create/post", values, config);
-      Alert.alert("Success", "Post has been Created!");
+      customSuccessNotification("Post has been created.");
+      formRef.current.resetForm();
+      setSelectedCategory(initSelectedCategory);
+      setSelectedColor(initSelectedColor);
+      setSelectedBrand(initSelectedBrand);
+      setSelectedSize(initSelectedSize);
+      setSelectedType(initSelectedProductType);
+      setSelectedPickupOption(initSelectedPickupOption);
       navigation.navigate("landing");
     } catch (error) {
       apiErrorNotification(error);
@@ -243,67 +252,6 @@ function CreatePost({ navigation }) {
   useEffect(() => {
     formRef.current.setFieldValue("brand", selectedBrand._id);
   }, [selectedBrand]);
-
-  const renderHeader = React.useCallback(() => (
-    <>
-      <View
-        style={{
-          backgroundColor: "#fff",
-          padding: 10,
-          alignItems: "center",
-          paddingTop: 20,
-          borderTopWidth: 1,
-          borderTopColor: "#ddd",
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "Raleway_600SemiBold",
-            fontSize: 20,
-            color: "black",
-            borderTopWidth: 5,
-            borderTopColor: "#663399",
-            paddingTop: 5,
-            borderRadius: 3,
-          }}
-        >
-          Choose Image
-        </Text>
-      </View>
-    </>
-  ));
-
-  const renderContent = React.useCallback(() => {
-    return (
-      <View
-        style={{
-          backgroundColor: "#fff",
-          height: 300,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => selectImageRef.current()}
-          style={[styles.loginBtn, { borderRadius: 0 }]}
-        >
-          <Image
-            style={styles.cameraIcon}
-            source={require("../../assets/gallery.png")}
-          />
-          <Text style={styles.loginText}>Select Image</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => openCameraRef.current()}
-          style={[styles.loginBtn, { borderRadius: 0 }]}
-        >
-          <Image
-            style={styles.cameraIcon}
-            source={require("../../assets/camera.png")}
-          />
-          <Text style={styles.loginText}>Open Camera</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  });
 
   return (
     <>
@@ -378,17 +326,11 @@ function CreatePost({ navigation }) {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
-          <BottomSheet
-            ref={sheetRef}
-            enablePanDownToClose
-            snapPoints={[300, 0]}
-            borderRadius={10}
-            initialSnap={1}
-            enabledContentTapInteraction={false}
-            renderHeader={renderHeader}
-            renderContent={renderContent}
-            enabledGestureInteraction={true}
-            callbackNode={fill}
+          <BottomSheetComponent
+            sheetRef={sheetRef}
+            openCameraRef={openCameraRef}
+            selectImageRef={selectImageRef}
+            fill={fill}
           />
 
           <ScrollView style={{ position: "relative" }}>
@@ -449,6 +391,7 @@ function CreatePost({ navigation }) {
                         onChangeText={handleChange("name")}
                         onBlur={handleBlur("name")}
                         selectionColor="#663399"
+                        value={values.name}
                       />
                       {errors.name && touched.name ? (
                         <Text style={bbstyles.error}>{errors.name}</Text>
@@ -466,6 +409,7 @@ function CreatePost({ navigation }) {
                         onBlur={handleBlur("detail")}
                         selectionColor="#663399"
                         multiline={true}
+                        value={values.detail}
                       />
                       {errors.detail && touched.detail ? (
                         <Text style={bbstyles.error}>{errors.detail}</Text>
@@ -501,6 +445,7 @@ function CreatePost({ navigation }) {
                         onChangeText={handleChange("stock")}
                         onBlur={handleBlur("stock")}
                         selectionColor="#663399"
+                        value={values.stock}
                       ></TextInput>
                       {errors.stock && touched.stock ? (
                         <Text style={bbstyles.error}>{errors.stock}</Text>
@@ -556,6 +501,7 @@ function CreatePost({ navigation }) {
                             onChangeText={handleChange("custombrand")}
                             onBlur={handleBlur.custombrand}
                             selectionColor="#663399"
+                            value={values.custombrand}
                           />
                           <Text style={bbstyles.error}>
                             {errors.custombrand}
@@ -563,7 +509,9 @@ function CreatePost({ navigation }) {
                         </View>
                       ) : null}
 
-                      <Text style={bbstyles.error}>{errors.brand}</Text>
+                      {touched.brand && errors.brand ? (
+                        <Text style={bbstyles.error}>{errors.brand}</Text>
+                      ) : null}
                     </View>
 
                     <View style={styles.formGroup}>
@@ -596,6 +544,7 @@ function CreatePost({ navigation }) {
                         onChangeText={handleChange("original")}
                         onBlur={handleBlur("original")}
                         selectionColor="#663399"
+                        value={values.original}
                       ></TextInput>
                       {touched.original && errors.original ? (
                         <Text style={bbstyles.error}>{errors.original}</Text>
@@ -609,6 +558,7 @@ function CreatePost({ navigation }) {
                         onChangeText={(value) => calcEarning(value)}
                         onBlur={handleBlur("price")}
                         selectionColor="#663399"
+                        value={values.price}
                       ></TextInput>
                       {touched.price && errors.price ? (
                         <Text style={bbstyles.error}>{errors.price}</Text>

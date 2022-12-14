@@ -3,19 +3,13 @@ import {
   Text,
   View,
   SafeAreaView,
-  ScrollView,
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
   FlatList,
 } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
+
 import { AuthContext } from "../Context";
 import axios from "axios";
 import bbstyles from "../Styles";

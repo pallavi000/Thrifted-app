@@ -1,11 +1,7 @@
-import { StyleSheet, TouchableOpacity, Button, Text, View } from "react-native";
+import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import React from "react";
-import {
-  Raleway_400Regular,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
+
 import BottomSheet from "reanimated-bottom-sheet";
-import Animated from "react-native-reanimated";
 
 const Sort = (props) => {
   const changeSorting = React.useCallback((sort) => {

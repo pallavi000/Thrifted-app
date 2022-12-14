@@ -3,7 +3,6 @@ import {
   Text,
   View,
   SafeAreaView,
-  ScrollView,
   FlatList,
   Image,
   TextInput,
@@ -12,10 +11,7 @@ import {
 } from "react-native";
 import React, { useEffect, useContext, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-} from "@expo-google-fonts/raleway";
+
 import axios from "axios";
 import { imageLink } from "../ImageLink";
 import { AuthContext } from "../Context";

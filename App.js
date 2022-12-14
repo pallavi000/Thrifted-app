@@ -1,11 +1,7 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect, useContext, useRef } from "react";
-import { Alert, StyleSheet, Image, Text, View } from "react-native";
-import {
-  NavigationContainer,
-  StackActions,
-  useNavigation,
-} from "@react-navigation/native";
+import React, { useState, useEffect, useRef } from "react";
+import { StyleSheet } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./component/Auth/Login";
 import Register from "./component/Auth/Register";
@@ -45,13 +41,14 @@ import Redeem from "./component/redeem/Redeem";
 import EditPost from "./component/post/EditPost";
 import OrderTrack from "./component/Order/OrderTrack";
 import OrderSuccess from "./component/Order/OrderSuccess";
-import Interest from "./component/Auth/Interest";
 import * as Notifications from "expo-notifications";
 import { gestureHandlerRootHOC } from "react-native-gesture-handler";
 
 import FeedSetting from "./component/setting/FeedSetting";
 import ChangePickupLocation from "./component/post/ChangePickupLocation";
 import Constants from "expo-constants";
+import { RootSiblingParent } from "react-native-root-siblings";
+import { customErrorNotification } from "./component/ErrorHandle";
 
 // axios.defaults.baseURL = "http://localhost:5000/api";
 axios.defaults.baseURL = Constants.manifest?.extra?.API_URL;
@@ -84,6 +81,7 @@ export default gestureHandlerRootHOC(function App(props) {
     useState(0);
   const [unreadOrderNotificationCount, setUnreadOrderNotificationCount] =
     useState(0);
+  const [stories, setStories] = useState([]);
 
   const [userImage, setUserImage] = useState();
   const [isSeller, setIsSeller] = useState(false);
@@ -114,10 +112,10 @@ export default gestureHandlerRootHOC(function App(props) {
           finalStatus = status;
         }
         if (finalStatus !== "granted") {
-          Alert.alert(
-            "Error",
-            "Failed to get push token for push notification!"
+          customErrorNotification(
+            "Failed to get push token for push notification."
           );
+
           return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
@@ -146,7 +144,7 @@ export default gestureHandlerRootHOC(function App(props) {
   }, []);
 
   function handleErrors(e) {
-    console.log(e);
+    //console.log(e);
   }
 
   useEffect(() => {
@@ -156,7 +154,7 @@ export default gestureHandlerRootHOC(function App(props) {
       socket.current.on("disconnect", (err) => handleErrors(err));
 
       socket.current.on("conversation", (conversation) => {
-        console.log("app");
+        //console.log("app");
       });
       socket.current.on("receiveMessage", (message) => {
         setUnreadMessage(unreadMessage + 1);
@@ -258,7 +256,6 @@ export default gestureHandlerRootHOC(function App(props) {
         setToken(authConfig);
         var token = authConfig;
         var decoded = jwt_decode(token);
-        console.log(decoded);
         setDecode(decoded);
         if (!notificationApiCall) {
           registerForPushNotificationsAsync(token);
@@ -296,7 +293,7 @@ export default gestureHandlerRootHOC(function App(props) {
   return !appReady ? (
     <LoadingScreen />
   ) : (
-    <>
+    <RootSiblingParent>
       <NavigationContainer ref={navigationRef}>
         <AuthContext.Provider
           value={{
@@ -335,6 +332,8 @@ export default gestureHandlerRootHOC(function App(props) {
             feedSetting,
             setFeedSetting,
             getFeedSetting,
+            stories,
+            setStories,
           }}
         >
           {isLoggedIn ? (
@@ -349,11 +348,15 @@ export default gestureHandlerRootHOC(function App(props) {
               <Stack.Screen
                 options={{
                   headerStyle: {
-                    backgroundColor: "#f5f5ff",
+                    backgroundColor: "#fff",
                     borderWidth: 0,
                   },
                   headerTitleAlign: "center",
-                  headerShadowVisible: false,
+                  headerShadowVisible: true,
+                  headerTitleStyle: {
+                    fontSize: 18,
+                    fontWeight: "700",
+                  },
                 }}
                 name="Product Detail"
                 component={ProductDetail}
@@ -589,7 +592,7 @@ export default gestureHandlerRootHOC(function App(props) {
           )}
         </AuthContext.Provider>
       </NavigationContainer>
-    </>
+    </RootSiblingParent>
   );
 });
 

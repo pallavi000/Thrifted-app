@@ -4,39 +4,32 @@ import {
   View,
   SafeAreaView,
   ScrollView,
-  Image,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   ActivityIndicator,
   Dimensions,
-  StatusBar,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import React, { useEffect, useState, useContext, useRef } from "react";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import * as Yup from "yup";
 import { Formik } from "formik";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { AuthContext } from "../Context";
-import { Picker } from "@react-native-picker/picker";
-import MainImage from "../Image/MainImage";
-import BottomSheet from "reanimated-bottom-sheet";
 import Animated from "react-native-reanimated";
 import CategorySelect from "./selects/CategorySelect";
 import SimpleSelect from "./selects/SimpleSelect";
 import BrandSelect from "./selects/BrandSelect";
 import EditMainImage from "../Image/EditMainImage";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
+import BottomSheetComponent from "../BottomSheetComponent";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Product Name is required"),
@@ -118,7 +111,7 @@ const EditPost = ({ navigation, route }) => {
   function editPost() {
     var errors = Object.values(formRef.current.errors);
     if (errors && errors.length > 0) {
-      Alert.alert("Error", errors[0]);
+      customErrorNotification(errors[0]);
       return;
     }
     formRef.current.handleSubmit();
@@ -193,6 +186,7 @@ const EditPost = ({ navigation, route }) => {
       );
       setSelectedProduct(response.data);
       setIsSubmitting(false);
+      customSuccessNotification("Product detail updated.");
       navigation.goBack();
     } catch (error) {
       setIsSubmitting(false);
@@ -234,67 +228,6 @@ const EditPost = ({ navigation, route }) => {
   useEffect(() => {
     formRef.current.setFieldValue("brand", selectedBrand._id);
   }, [selectedBrand]);
-
-  const renderHeader = React.useCallback(() => (
-    <>
-      <View
-        style={{
-          backgroundColor: "#fff",
-          padding: 10,
-          alignItems: "center",
-          paddingTop: 20,
-          borderTopWidth: 1,
-          borderTopColor: "#ddd",
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "Raleway_600SemiBold",
-            fontSize: 20,
-            color: "black",
-            borderTopWidth: 5,
-            borderTopColor: "#663399",
-            paddingTop: 5,
-            borderRadius: 3,
-          }}
-        >
-          Choose Image
-        </Text>
-      </View>
-    </>
-  ));
-
-  const renderContent = React.useCallback(() => {
-    return (
-      <View
-        style={{
-          backgroundColor: "#fff",
-          height: 300,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => selectImageRef.current()}
-          style={[styles.loginBtn, { borderRadius: 0 }]}
-        >
-          <Image
-            style={styles.cameraIcon}
-            source={require("../../assets/gallery.png")}
-          />
-          <Text style={styles.loginText}>Select Image</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => openCameraRef.current()}
-          style={[styles.loginBtn, { borderRadius: 0 }]}
-        >
-          <Image
-            style={styles.cameraIcon}
-            source={require("../../assets/camera.png")}
-          />
-          <Text style={styles.loginText}>Open Camera</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  });
 
   return (
     <>
@@ -379,15 +312,11 @@ const EditPost = ({ navigation, route }) => {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
           >
-            <BottomSheet
-              ref={sheetRef}
-              snapPoints={[300, 0]}
-              borderRadius={10}
-              initialSnap={1}
-              enabledContentTapInteraction={false}
-              renderHeader={renderHeader}
-              renderContent={renderContent}
-              callbackNode={fill}
+            <BottomSheetComponent
+              sheetRef={sheetRef}
+              openCameraRef={openCameraRef}
+              selectImageRef={selectImageRef}
+              fill={fill}
             />
 
             <ScrollView>

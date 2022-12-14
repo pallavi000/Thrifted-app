@@ -197,7 +197,7 @@ export default function Setting({ navigation }) {
               {user ? (
                 <Text>Rs. {user.balance}</Text>
               ) : (
-                <ActivityIndicator size={"small"} color="#fa4a0c" />
+                <ActivityIndicator size={"small"} color="#663399" />
               )}
             </View>
           </View>
@@ -213,7 +213,7 @@ export default function Setting({ navigation }) {
               {user ? (
                 <Text>Rs. {user.pendingBalance}</Text>
               ) : (
-                <ActivityIndicator size={"small"} color="#fa4a0c" />
+                <ActivityIndicator size={"small"} color="#663399" />
               )}
             </View>
           </View>

@@ -6,43 +6,33 @@ import React, {
   useState,
 } from "react";
 import {
-  Image,
   StyleSheet,
   StatusBar,
   Text,
   TouchableOpacity,
-  Dimensions,
-  TouchableWithoutFeedback,
-  RefreshControl,
-  TextInput,
   View,
-  ScrollView,
-  FlatList,
   ActivityIndicator,
-  Alert,
-  Button,
+  Image,
 } from "react-native";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Ionicons,
-  Feather,
-  MaterialIcons,
-  Fontisto,
-  FontAwesome,
-} from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import bbstyles from "../Styles";
 import { imageLink } from "../ImageLink";
-import { AuthContext } from "../Context";
+import { AuthContext, timeSince } from "../Context";
 import { useIsFocused } from "@react-navigation/native";
-import Action from "./Action";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "./Header";
 import HomepagePosts from "./HomepagePosts";
 import NoProducts from "./NoProducts";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
+import CreateStory from "../story/CreateStory";
+import Animated from "react-native-reanimated";
 
 export default function Home({ navigation }) {
-  const [stories, setStories] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [itemsCountPerPage, setItemsCountPerPage] = useState(10);
   const [loader, setLoader] = useState(true);
@@ -69,6 +59,8 @@ export default function Home({ navigation }) {
     feedSetting,
     getFeedSetting,
     decode,
+    stories,
+    setStories,
   } = data;
   const config = {
     headers: {
@@ -84,11 +76,9 @@ export default function Home({ navigation }) {
       productOnly,
       feedSetting: getFeedSetting(),
     };
-    console.log(data.feedSetting, decode);
     try {
       var sendDate = new Date().getTime();
       const response = await axios.post("/frontend/app/home", data, config);
-      console.log(response.data.product.length);
       if (!productOnly) {
         setProducts(response.data.product);
         var userStories = changeStoriesLink(response.data.stories);
@@ -111,7 +101,7 @@ export default function Home({ navigation }) {
       setLoader(false);
       setNextPage(false);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
       setLoader(false);
     }
   };
@@ -183,9 +173,10 @@ export default function Home({ navigation }) {
     }
   }, []);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setActivePage(1);
-    getProducts(1, itemsCountPerPage, false);
+    await getProducts(1, itemsCountPerPage, false);
+    customSuccessNotification("Page Refreshed.");
   });
 
   const goToRentSalePage = (type) => {
@@ -224,20 +215,21 @@ export default function Home({ navigation }) {
       user.stories.forEach((story) => {
         story.story_image = imageLink + story.story_image;
         story.story_video = imageLink + story.story_video;
+        story.date = timeSince(story.createdAt);
       });
     });
     return users;
   }
 
-  useEffect(() => {
-    console.log("eff", stories.length);
-  }, [stories]);
+  const bottomSheetRef = useRef();
+  const fill = new Animated.Value(1);
 
   return (
     <SafeAreaView
       style={{
         backgroundColor: "white",
         flex: 1,
+        position: "relative",
       }}
     >
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
@@ -246,7 +238,14 @@ export default function Home({ navigation }) {
           <ActivityIndicator size={"large"} color="#663399" />
         </View>
       ) : (
-        <>
+        <Animated.View
+          style={[
+            styles.container,
+            {
+              opacity: Animated.add(0.3, Animated.multiply(fill, 1.0)),
+            },
+          ]}
+        >
           <Header
             unreadMessage={unreadMessage}
             unreadNotification={unreadNotification}
@@ -271,11 +270,17 @@ export default function Home({ navigation }) {
                 setStories={setStories}
                 dataType={dataType}
                 navigation={navigation}
+                bottomSheetRef={bottomSheetRef}
               />
             )}
           </View>
-        </>
+        </Animated.View>
       )}
+      <CreateStory
+        bottomSheetRef={bottomSheetRef}
+        setStories={setStories}
+        fill={fill}
+      />
     </SafeAreaView>
   );
 }

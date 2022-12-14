@@ -7,7 +7,6 @@ import {
   FlatList,
   TextInput,
   Keyboard,
-  Alert,
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
@@ -18,7 +17,10 @@ import { format } from "timeago.js";
 import { AuthContext } from "../Context";
 import axios from "axios";
 import bbstyles from "../Styles";
-import { apiErrorNotification } from "./../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "./../ErrorHandle";
 
 export default function Comment({ navigation, route }) {
   const [newComment, setNewComment] = useState("");
@@ -34,6 +36,7 @@ export default function Comment({ navigation, route }) {
       "access-token": token,
     },
   };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getComments = React.useCallback(async () => {
     try {
@@ -41,7 +44,7 @@ export default function Comment({ navigation, route }) {
       setComments(response.data);
       setLoader(false);
     } catch (error) {
-      Alert.alert("Error", error.request.response);
+      apiErrorNotification(error);
     }
   });
 
@@ -76,7 +79,7 @@ export default function Comment({ navigation, route }) {
         }
         setComments(newcomments);
       } catch (error) {
-        console.log(error.request.response);
+        apiErrorNotification(error);
       }
     },
     [comments]
@@ -92,8 +95,8 @@ export default function Comment({ navigation, route }) {
   });
 
   const addComment = async (com) => {
-    console.log("hello");
     if (com.trim().length == 0) return;
+    setIsSubmitting(true);
     Keyboard.dismiss();
     setNewComment("");
     try {
@@ -112,9 +115,11 @@ export default function Comment({ navigation, route }) {
         newproducts[index].comments_count += 1;
         setProducts(newproducts);
       }
+      customSuccessNotification("Comment posted successfully.");
     } catch (error) {
       apiErrorNotification(error);
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -189,7 +194,13 @@ export default function Comment({ navigation, route }) {
             selectionColor="#663399"
           ></TextInput>
         </View>
-        {newComment.trim() ? (
+        {isSubmitting ? (
+          <ActivityIndicator
+            style={{ opacity: 0.5 }}
+            size={"small"}
+            color="#663399"
+          />
+        ) : newComment.trim() ? (
           <TouchableOpacity onPress={() => addComment(newComment)}>
             <Text style={styles.post}>Post</Text>
           </TouchableOpacity>

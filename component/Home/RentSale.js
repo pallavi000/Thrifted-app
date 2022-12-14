@@ -4,7 +4,6 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import React, {
@@ -18,6 +17,7 @@ import bbstyles from "../Styles";
 import axios from "axios";
 import HomepagePosts from "./HomepagePosts";
 import { AuthContext } from "../Context";
+import { customSuccessNotification } from "../ErrorHandle";
 
 const RentSale = ({ navigation, route }) => {
   const [loader, setLoader] = useState(true);
@@ -82,9 +82,10 @@ const RentSale = ({ navigation, route }) => {
     }
   }, [nextPage, activePage]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setActivePage(1);
-    getProducts(1, itemsCountPerPage);
+    await getProducts(1, itemsCountPerPage);
+    customSuccessNotification("Page Refreshed.");
   });
 
   return (

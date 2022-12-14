@@ -1,20 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Button,
   Image,
-  Modal,
   Alert,
   StyleSheet,
   Dimensions,
-  KeyboardAvoidingViewBase,
   TouchableOpacity,
 } from "react-native";
 import * as imagePicker from "expo-image-picker";
 import { useFormikContext } from "formik";
-import { FontAwesome, Feather } from "@expo/vector-icons";
-import { imageLink } from "../ImageLink";
+import { Feather } from "@expo/vector-icons";
 
 const MainImage = (props) => {
   const [modalVisible, setModalVisible] = useState(false);

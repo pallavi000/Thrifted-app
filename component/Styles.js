@@ -1,11 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
-import {
-  useFonts,
-  Raleway_700Bold,
-  Raleway_800ExtraBold,
-  Raleway_600SemiBold,
-  Raleway_400Regular,
-} from "@expo-google-fonts/raleway";
+import { StyleSheet } from "react-native";
 
 const bbstyles = StyleSheet.create({
   bgWhite: {

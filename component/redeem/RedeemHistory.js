@@ -4,15 +4,10 @@ import {
   Text,
   View,
   SafeAreaView,
-  ScrollView,
   FlatList,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
-import {
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
 import axios from "axios";
 import { AuthContext } from "../Context";
 import bbstyles from "../Styles";

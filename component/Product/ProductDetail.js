@@ -9,13 +9,11 @@ import React, {
 import {
   View,
   ActivityIndicator,
-  Alert,
   Text,
   Image,
   SafeAreaView,
   Dimensions,
   StyleSheet,
-  Button,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
@@ -28,11 +26,10 @@ import Animated from "react-native-reanimated";
 import { useIsFocused } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
-  ElementContainer,
-  InstagramProvider,
-} from "@postillon/react-native-instagram-zoomable";
-import { apiErrorNotification } from "../ErrorHandle";
-// import FastImage from "react-native-fast-image";
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
+import FastImage from "react-native-fast-image";
 
 export default function ProductDetail({ navigation, route }) {
   const [showFullDesc, setShowFullDesc] = useState(false);
@@ -43,7 +40,6 @@ export default function ProductDetail({ navigation, route }) {
   const fall = new Animated.Value(1);
   const IsFocused = useIsFocused();
   const [product, setProduct] = useState(route.params);
-  const [imageIndex, setImageIndex] = useState(0);
 
   const data = useContext(AuthContext);
   const {
@@ -101,8 +97,7 @@ export default function ProductDetail({ navigation, route }) {
       };
       const response = await axios.post("/order/ongoing", data, config);
       setAlreadyOrdered(true);
-      Alert.alert(
-        "Notification",
+      customSuccessNotification(
         "This product has been already ordered. Please prepare the parcel and handover to our agent."
       );
     } catch (error) {
@@ -174,7 +169,6 @@ export default function ProductDetail({ navigation, route }) {
   }, []);
 
   const getFollowersCount = useCallback((user) => {
-    console.log(user);
     if (user.followers && user.followers.length > 0) {
       const num = user.followers.length;
       if (num >= 1000000) {
@@ -187,11 +181,6 @@ export default function ProductDetail({ navigation, route }) {
     }
     return 0;
   }, []);
-
-  function getCurrentImageIndex(index) {
-    if (!index && index !== 0) return imageIndex;
-    setImageIndex(index);
-  }
 
   const renderContent = useCallback(() => (
     <View
@@ -239,22 +228,18 @@ export default function ProductDetail({ navigation, route }) {
           }}
         >
           <View style={{ zIndex: 7 }}>
-            <InstagramProvider>
-              <View style={styles.detailImage}>
-                <ElementContainer>
-                  <SliderBox
-                    images={parseImages(product.image, product.feature_image)}
-                    // ImageComponent={FastImage}
-                    ImageComponentStyle={styles.productImage}
-                    dotColor="#663399"
-                    resizeMode="contain"
-                    imageLoadingColor="#663399"
-                    currentImageEmitter={getCurrentImageIndex}
-                    pagingEnabled
-                  />
-                </ElementContainer>
-              </View>
-            </InstagramProvider>
+            <View style={styles.detailImage}>
+              <SliderBox
+                images={parseImages(product.image, product.feature_image)}
+                ImageComponent={__DEV__ ? Image : FastImage}
+                ImageComponentStyle={styles.productImage}
+                dotColor="#663399"
+                resizeMode="contain"
+                imageLoadingColor="#663399"
+                pagingEnabled
+                enablePinchable={__DEV__ ? false : true}
+              />
+            </View>
           </View>
 
           <View style={styles.detailContainer}>

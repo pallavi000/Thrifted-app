@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 export default {
   expo: {
     name: "Hamro Closet",
@@ -36,7 +38,7 @@ export default {
     },
     extra: {
       eas: {
-        projectId: "73860936-5567-4ac0-a29f-0ae5bf17dd74",
+        projectId: "ade30955-f231-4f32-929f-7a05ae0e475f",
       },
       KHALTI_SECRET: process.env.KHALTI_SECRET,
       ESEWA_SECRET: process.env.ESEWA_SECRET,

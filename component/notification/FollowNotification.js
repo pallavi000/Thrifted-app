@@ -4,10 +4,9 @@ import {
   View,
   TouchableOpacity,
   Image,
-  Alert,
   ActivityIndicator,
 } from "react-native";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { imageLink } from "../ImageLink";
 import { format } from "timeago.js";
 import { AuthContext } from "../Context";
@@ -18,21 +17,17 @@ export default function FollowNotification(props) {
   const item = props.item;
   const navigation = props.navigation;
   const [isReady, setIsReady] = useState(true);
-  const [isFollowBack, setIsFollowBack] = useState(false);
-
   const data = useContext(AuthContext);
   const { token, decode } = data;
+  const [isFollowBack, setIsFollowBack] = useState(
+    item.follower?.followers?.includes(decode._id) ? true : false
+  );
+
   const config = {
     headers: {
       "access-token": token,
     },
   };
-
-  useEffect(() => {
-    if (item.follower.followers.includes(decode._id)) {
-      setIsFollowBack(true);
-    }
-  }, []);
 
   async function followBack() {
     setIsReady(false);
@@ -57,8 +52,6 @@ export default function FollowNotification(props) {
       };
       const response = await axios.post("/chat/newchat", data, config);
       setIsReady(true);
-      console.log(response.data);
-
       const receiver = {
         user: item.follower,
         conversation: response.data,

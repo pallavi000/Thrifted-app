@@ -7,17 +7,16 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { Entypo, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+
 import axios from "axios";
 import { AuthContext } from "../Context";
-import { apiErrorNotification } from "../ErrorHandle";
+import { customErrorNotification } from "../ErrorHandle";
 import { v4 as uuidv4 } from "uuid";
+import Constants from "expo-constants";
 
 export default function OrderTrack({ route }) {
   const order = route.params;
@@ -26,6 +25,7 @@ export default function OrderTrack({ route }) {
   const { token } = data;
 
   const [groupedEvents, setGroupedEvents] = useState([]);
+  const [isOrderTrackFetched, setIsOrderTrackFetched] = useState(false);
 
   const config = {
     headers: {
@@ -40,21 +40,20 @@ export default function OrderTrack({ route }) {
   async function getTrackRecord() {
     const config = {
       headers: {
-        Authorization: "Token 34f88d2017993c827414d0e47ef43d16b7accb1b",
+        Authorization: Constants.manifest?.extra?.NCM_HEADER,
       },
     };
-
     try {
       const response = await axios.get(
-        "https://portal.nepalcanmove.com/api/v1/order/status?id=" +
-          order.shipping_track_id,
+        `${Constants.manifest?.extra?.NCM_API}/order/status?id=${order.shipping_track_id}`,
         config
       );
-
       var a = groupNotification(response.data);
-
       setGroupedEvents(a);
-    } catch (error) {}
+    } catch (error) {
+      customErrorNotification("Order Track Information Fetch Failed.");
+    }
+    setIsOrderTrackFetched(true);
   }
 
   const groupNotification = React.useCallback((data) => {
@@ -244,23 +243,33 @@ export default function OrderTrack({ route }) {
 
             <View>
               <Text style={styles.tracking}>Tracking Information</Text>
-              {groupedEvents.map((item, index) => {
-                return (
-                  <View key={index}>
-                    <Text style={styles.heading}>
-                      {getDisplayDate(item.date)}
-                    </Text>
-                    {item.items?.map((event, idx) => {
-                      return (
-                        <View key={idx} style={styles.trackWrapper}>
-                          <Text>{changeDate(event.added_time)}</Text>
-                          <Text style={styles.trackDetail}>{event.status}</Text>
-                        </View>
-                      );
-                    })}
-                  </View>
-                );
-              })}
+              {!isOrderTrackFetched ? (
+                <View style={{ marginTop: 10 }}>
+                  <ActivityIndicator size={"large"} color="#663399" />
+                </View>
+              ) : (
+                <>
+                  {groupedEvents.map((item, index) => {
+                    return (
+                      <View key={index}>
+                        <Text style={styles.heading}>
+                          {getDisplayDate(item.date)}
+                        </Text>
+                        {item.items?.map((event, idx) => {
+                          return (
+                            <View key={idx} style={styles.trackWrapper}>
+                              <Text>{changeDate(event.added_time)}</Text>
+                              <Text style={styles.trackDetail}>
+                                {event.status}
+                              </Text>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    );
+                  })}
+                </>
+              )}
             </View>
           </View>
         </View>

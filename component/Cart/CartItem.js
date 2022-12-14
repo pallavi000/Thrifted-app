@@ -5,9 +5,7 @@ import {
   ActivityIndicator,
   Text,
   SafeAreaView,
-  Alert,
   Image,
-  Dimensions,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -16,7 +14,10 @@ import axios from "axios";
 import { AuthContext } from "../Context";
 import { imageLink } from "../ImageLink";
 import EmptyCart from "./EmptyCart";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 export default function CartItem({ navigation }) {
   const data = useContext(AuthContext);
@@ -43,6 +44,7 @@ export default function CartItem({ navigation }) {
         setCartItems(products);
         retotal(products);
         setDeletingItemId(0);
+        customSuccessNotification("Item deleted from your cart.");
       } catch (error) {
         apiErrorNotification(error);
         setDeletingItemId(0);

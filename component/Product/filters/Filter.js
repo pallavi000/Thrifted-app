@@ -7,12 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import {
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
+
 import { Fontisto, Ionicons } from "@expo/vector-icons";
 import BrandFilter from "./BrandFilter";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";

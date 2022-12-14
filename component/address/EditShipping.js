@@ -8,7 +8,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
@@ -16,9 +15,11 @@ import * as Yup from "yup";
 import bbstyles from "../Styles";
 import axios from "axios";
 import { AuthContext } from "../Context";
-import { apiErrorNotification } from "./../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "./../ErrorHandle";
 import AddressPicker from "./AddressPicker";
-import ZipCodePicker from "./ZipCodePicker";
 
 const validationSchema = Yup.object().shape({
   district: Yup.string().required(),
@@ -93,7 +94,7 @@ export default function EditShipping({ navigation, route }) {
         data,
         config
       );
-      Alert.alert("Success", "Address has been updated");
+      customSuccessNotification("Address has been updated");
       setIsSubmitting(false);
       navigation.goBack();
     } catch (error) {

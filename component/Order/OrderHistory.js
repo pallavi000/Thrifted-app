@@ -3,16 +3,11 @@ import {
   Text,
   Dimensions,
   View,
-  ScrollView,
   SafeAreaView,
   TouchableOpacity,
   Image,
 } from "react-native";
-import React, { useEffect } from "react";
-import {
-  Raleway_400Regular,
-  Raleway_700Bold,
-} from "@expo-google-fonts/raleway";
+import React from "react";
 
 export default function OrderHistory({
   navigation,

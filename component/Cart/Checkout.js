@@ -7,7 +7,6 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ScrollView,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
@@ -24,7 +23,10 @@ import Khalti from "../payment_gateway/Khalti";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import bbstyles from "../Styles";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 export default function Checkout({ navigation }) {
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -199,12 +201,13 @@ export default function Checkout({ navigation }) {
 
   const orderSuccess = React.useCallback(() => {
     getCartItems();
+    customSuccessNotification("Order Placed Successfully.");
     navigation.navigate("Order Success");
   });
 
   const payment = React.useCallback(() => {
     if (!paymentMethod) {
-      Alert.alert("Please Select Payment Method");
+      customSuccessNotification("Please Select Payment Method");
       return;
     }
     if (paymentMethod == "khalti") {

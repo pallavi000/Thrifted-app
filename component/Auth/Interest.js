@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   FlatList,
   SafeAreaView,
@@ -13,9 +12,11 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import BrandCheck from "../ui/BrandCheck";
 import { AuthContext } from "../Context";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 import bbstyles from "../Styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Interest({ navigation }) {
   const [category_ids, setCategory_ids] = useState([]);
@@ -106,6 +107,7 @@ export default function Interest({ navigation }) {
         var duplicate_feed = { ...feedSetting };
         setFeedSetting(duplicate_feed);
       }
+      customSuccessNotification("Interests updated.");
       navigation.goBack();
     } catch (error) {
       apiErrorNotification(error);

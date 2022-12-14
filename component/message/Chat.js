@@ -3,12 +3,10 @@ import {
   Text,
   View,
   SafeAreaView,
-  ScrollView,
   Image,
   FlatList,
   Dimensions,
   TextInput,
-  Alert,
   Platform,
   KeyboardAvoidingView,
   ActivityIndicator,
@@ -24,20 +22,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  Feather,
-  Octicons,
-  Ionicons,
-  Fontisto,
-  FontAwesome,
-} from "@expo/vector-icons";
+import { Feather, Ionicons, FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import { AuthContext } from "../Context";
 import bbstyles from "../Styles";
 import { format } from "timeago.js";
 import { imageLink } from "../ImageLink";
 import Emoticons from "react-native-emoticons";
-import { apiErrorNotification } from "../ErrorHandle";
+import { apiErrorNotification, customErrorNotification } from "../ErrorHandle";
 
 export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
@@ -136,11 +128,11 @@ export default function Chat({ route, navigation }) {
   }, []);
 
   const videoCall = React.useCallback(() => {
-    Alert.alert("Oops!!", "Feature not yet enabled.");
+    customErrorNotification("Feature not yet enabled.");
   });
 
   const call = React.useCallback(() => {
-    Alert.alert("Oops!!", "Feature not yet enabled.");
+    customErrorNotification("Feature not yet enabled.");
   }, []);
 
   useEffect(() => {

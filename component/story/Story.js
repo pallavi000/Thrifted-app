@@ -1,23 +1,25 @@
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
-import React, { useContext, useRef, useState, useEffect } from "react";
+import React, { useContext, useRef } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Image,
   StyleSheet,
-  ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import InstaStory from "react-native-insta-story";
 import { AuthContext } from "../Context";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 import { imageLink } from "../ImageLink";
-import CreateStory from "./CreateStory";
+import FastImage from "react-native-fast-image";
 
-function Story({ stories, setStories }) {
+function Story({ stories, setStories, bottomSheetRef }) {
   const { userImage } = useContext(AuthContext);
-  const bottomSheetRef = useRef();
   const currentStoryRef = useRef();
   const { token, decode } = useContext(AuthContext);
   const config = {
@@ -31,6 +33,7 @@ function Story({ stories, setStories }) {
       DeleteStoryState();
       const id = currentStoryRef.current.story._id;
       const response = await axios.delete("/story/" + id, config);
+      customSuccessNotification("Story deleted.");
     } catch (error) {
       apiErrorNotification(error);
     }
@@ -64,22 +67,25 @@ function Story({ stories, setStories }) {
             </TouchableOpacity>
           ) : null;
         }}
-        customSwipeUpComponent={(story) => (
-          <View>
-            <Text
-              style={{
-                backgroundColor: "black",
-                color: "white",
-                fontWeight: "500",
-                alignSelf: "center",
-                maxWidth: react_native_1.Dimensions.get("window").width - 50,
-              }}
-            >
-              {story.swipeText}
-            </Text>
-          </View>
-        )}
-        ImageComponent={Image}
+        customSwipeUpComponent={(story) => {
+          return (
+            <View>
+              <Text
+                style={{
+                  backgroundColor: "black",
+                  color: "white",
+                  fontWeight: "500",
+                  alignSelf: "center",
+                  alignItems: "center",
+                  maxWidth: Dimensions.get("window").width - 50,
+                }}
+              >
+                {story?.swipeText}
+              </Text>
+            </View>
+          );
+        }}
+        ImageComponent={__DEV__ ? Image : FastImage}
         HeaderComponent={
           <View style={{ marginTop: 10 }}>
             <TouchableOpacity
@@ -102,7 +108,7 @@ function Story({ stories, setStories }) {
           </View>
         }
         ImageCircleStyle={{ borderWidth: 2, borderColor: "#ddd" }}
-        ImageListItemStyle={{ resizeMode: "contain", width: 420, height: 420 }}
+        ImageListItemStyle={{ resizeMode: "contain" }}
         style={{
           marginTop: 5,
           marginBottom: 10,
@@ -112,12 +118,11 @@ function Story({ stories, setStories }) {
         }}
       />
     );
-  }, [stories]);
+  }, [stories, bottomSheetRef]);
 
   return (
     <>
       <RenderItem />
-      <CreateStory bottomSheetRef={bottomSheetRef} setStories={setStories} />
     </>
   );
 }

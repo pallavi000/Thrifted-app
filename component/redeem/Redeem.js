@@ -5,22 +5,23 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
-  Alert,
   TextInput,
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
 import React, { useContext, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { Raleway_600SemiBold } from "@expo-google-fonts/raleway";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import bbstyles from "../Styles";
 import { AuthContext } from "../Context";
 import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
-import { apiErrorNotification } from "../ErrorHandle";
+import {
+  apiErrorNotification,
+  customErrorNotification,
+  customSuccessNotification,
+} from "../ErrorHandle";
 
 const validationSchema = Yup.object().shape({
   balance: Yup.number()
@@ -46,13 +47,12 @@ export default function Redeem({ navigation, route }) {
     setIsSubmitting(true);
     try {
       if (user.balance < data.balance) {
-        return Alert.alert(
-          "Error",
+        return customErrorNotification(
           "Your balance is less than requested amount."
         );
       }
       var response = await axios.post("/user/withdraw", data, config);
-      Alert.alert("Success", "Your transaction request has been submitted");
+      customSuccessNotification("Your transaction request has been submitted.");
       navigation.navigate("Redeemption History");
       setIsSubmitting(false);
     } catch (error) {

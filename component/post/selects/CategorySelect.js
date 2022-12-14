@@ -2,15 +2,11 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   ScrollView,
   Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import bbstyles from "../../Styles";
-import { Raleway_600SemiBold } from "@expo-google-fonts/raleway";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const CategorySelect = (props) => {

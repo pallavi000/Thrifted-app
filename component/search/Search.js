@@ -4,7 +4,6 @@ import {
   View,
   SafeAreaView,
   TextInput,
-  Alert,
   ActivityIndicator,
   Keyboard,
 } from "react-native";
@@ -12,7 +11,6 @@ import React, { useRef, useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import bbstyles from "../Styles";
-import { apiErrorNotification } from "../ErrorHandle";
 
 const Search = ({ navigation }) => {
   const searchRef = useRef(null);

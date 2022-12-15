@@ -31,6 +31,7 @@ import {
 } from "../ErrorHandle";
 import CreateStory from "../story/CreateStory";
 import Animated from "react-native-reanimated";
+import HamroImagePicker from "../HamroImagePicker/HamroImagePicker";
 
 export default function Home({ navigation }) {
   const [activePage, setActivePage] = useState(1);
@@ -254,7 +255,7 @@ export default function Home({ navigation }) {
             setShowDropDown={setShowDropDown}
           />
 
-          <View style={{ paddingBottom: 50, height: "100%" }}>
+          <View style={{ paddingBottom: 70, height: "100%" }}>
             {showDropDown && <DropDownItem />}
             {activePage === 1 && !products.length ? (
               <NoProducts navigation={navigation} />
@@ -272,6 +273,7 @@ export default function Home({ navigation }) {
                 navigation={navigation}
                 bottomSheetRef={bottomSheetRef}
               />
+              // <HamroImagePicker />
             )}
           </View>
         </Animated.View>

@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from "react-native";
 import React, { useEffect, useContext, useState, useLayoutEffect } from "react";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { Entypo, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { AuthContext } from "../Context";
 import { FlatList } from "react-native-gesture-handler";
@@ -59,7 +59,7 @@ export default function Messages({ navigation }) {
       title: decode.name,
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate("New Chat")}>
-          <FontAwesome5 name="plus" size={20} />
+          <Entypo name="new-message" size={20} style={{ marginRight: 5 }} />
         </TouchableOpacity>
       ),
     });
@@ -180,11 +180,12 @@ export default function Messages({ navigation }) {
           <View style={bbstyles.loaderContainer}>
             <ActivityIndicator size={"large"} color="#663399" />
           </View>
-        ) : chats && chats.length > 0 ? (
+        ) : chats && chats.length ? (
           <FlatList
             data={chats}
             onEndReached={() => chatnextPage()}
             keyExtractor={(item) => item._id}
+            contentContainerStyle={{}}
             ListFooterComponent={() =>
               hasNextPageMessage ? (
                 <View style={{ padding: 20 }}>
@@ -204,28 +205,46 @@ export default function Messages({ navigation }) {
                       style={styles.image}
                     ></Image>
                   </View>
-                  <View style={styles.userDetailwrpper}>
-                    <Text style={styles.name}>{getName(item)}</Text>
-                    <Text
-                      style={
-                        getUnreadCount(item) > 0
-                          ? styles.userMessageBold
-                          : styles.userMessage
-                      }
+                  <View style={styles.userDetailWrapper}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
                     >
-                      {item.last_message}
-                    </Text>
+                      <Text style={styles.name}>{getName(item)}</Text>
+                      <Text style={styles.activeStatus}>
+                        {format(item.updatedAt)}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        ellipsizeMode="tail"
+                        numberOfLines={2}
+                        style={
+                          getUnreadCount(item) > 0
+                            ? styles.userMessageBold
+                            : styles.userMessage
+                        }
+                      >
+                        {item.last_message}
+                      </Text>
+                      <View style={styles.statusWrapper}>
+                        {getUnreadCount(item) > 0 ? (
+                          <Text style={styles.activeIndicator}>
+                            {getUnreadCount(item)}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
                   </View>
-                </View>
-                <View style={styles.statusWrapper}>
-                  {getUnreadCount(item) > 0 ? (
-                    <Text style={styles.activeIndicator}>
-                      {getUnreadCount(item)}
-                    </Text>
-                  ) : null}
-                  <Text style={styles.activeStatus}>
-                    {format(item.updatedAt)}
-                  </Text>
                 </View>
               </TouchableOpacity>
             )}
@@ -306,6 +325,10 @@ const styles = StyleSheet.create({
   userWrapper: {
     flexDirection: "row",
     alignItems: "center",
+    width: Dimensions.get("window").width - 40,
+  },
+  userDetailWrapper: {
+    width: Dimensions.get("window").width - 114,
   },
   image: {
     height: 56,
@@ -335,17 +358,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "400",
     fontFamily: "Raleway_400Regular",
+    maxWidth: "90%",
   },
   userMessageBold: {
     fontSize: 12,
     fontFamily: "Raleway_600SemiBold",
+    maxWidth: "90%",
   },
   activeStatus: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "400",
     fontFamily: "Raleway_400Regular",
     color: "rgba(0, 0, 0, 0.4)",
-    marginTop: 10,
   },
   statusWrapper: {
     justifyContent: "center",
@@ -357,7 +381,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     // backgroundColor:'#4CD964',
     backgroundColor: "#FF2424",
-    fontSize: 12,
+    fontSize: 10,
     color: "white",
     textAlign: "center",
     lineHeight: 16,

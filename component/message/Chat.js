@@ -30,6 +30,8 @@ import { format } from "timeago.js";
 import { imageLink } from "../ImageLink";
 import Emoticons from "react-native-emoticons";
 import { apiErrorNotification, customErrorNotification } from "../ErrorHandle";
+import SendMessage from "./SendMessage";
+import ChatMessageItem from "./ChatMessageItem";
 
 export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
@@ -37,7 +39,6 @@ export default function Chat({ route, navigation }) {
   const [loader, setLoader] = useState(true);
   const messageInput = useRef(null);
   const flatListRef = useRef(null);
-  const [showTimer, setShowTimer] = useState(0);
   const [showEmoji, setShowEmoji] = useState(false);
   const [hasNextPageMessage, setHasNextPageMessage] = useState(true);
   const [pageNo, setPageNo] = useState(1);
@@ -77,7 +78,6 @@ export default function Chat({ route, navigation }) {
         config
       );
       socket.current.emit("sendMessage", response.data);
-
       setMessages([response.data, ...messages]);
     } catch (error) {
       apiErrorNotification(error);
@@ -177,10 +177,6 @@ export default function Chat({ route, navigation }) {
     } catch (error) {}
   };
 
-  const changeShowTimer = React.useCallback((id) => {
-    setShowTimer(id);
-  });
-
   const emojiIconPress = React.useCallback(() => {
     Keyboard.dismiss();
     setShowEmoji(!showEmoji);
@@ -225,184 +221,25 @@ export default function Chat({ route, navigation }) {
                   </View>
                 ) : null
               }
-              // onContentSizeChange={() =>
-              //   flatListRef.current.scrollToEnd({ animated: true })
-              // }
-              renderItem={({ item }) =>
-                item.sender_id != decode._id ? (
-                  <View style={styles.dFlex}>
-                    <Image
-                      source={{ uri: imageLink + receiver.user.image }}
-                      style={styles.image}
-                    ></Image>
-                    <Pressable
-                      onPress={() => changeShowTimer(item._id)}
-                      style={[styles.dFlex, styles.self]}
-                    >
-                      <View style={{ flexGrow: 1 }}>
-                        <Text style={styles.message}>{item.message}</Text>
-                        {showTimer == item._id ? (
-                          <Text style={styles.sentTimeReceiver}>
-                            {format(item.createdAt)}
-                          </Text>
-                        ) : null}
-                      </View>
-                    </Pressable>
-                  </View>
-                ) : (
-                  <Pressable
-                    onPress={() => changeShowTimer(item._id)}
-                    style={[styles.dFlex, styles.sender]}
-                  >
-                    <View style={{ flexGrow: 1 }}>
-                      <Text style={styles.senderMessage}>{item.message}</Text>
-                      {showTimer == item._id ? (
-                        <Text style={styles.sentTime}>
-                          {format(item.createdAt)}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </Pressable>
-                )
-              }
+              renderItem={({ item }) => (
+                <ChatMessageItem
+                  item={item}
+                  decode={decode}
+                  receiver={receiver}
+                />
+              )}
             />
           )}
 
-          <View style={styles.chatWrapper}>
-            <TouchableOpacity onPress={() => emojiIconPress()}>
-              <Feather name="smile" size={20}></Feather>
-            </TouchableOpacity>
-            <View style={{ flexGrow: 1, marginHorizontal: 15 }}>
-              <TextInput
-                style={styles.messageInput}
-                keyboardType="default"
-                placeholder="Start typing..."
-                ref={messageInput}
-                value={message}
-                onChangeText={(text) => setMessage(text)}
-                selectionColor="#663399"
-              ></TextInput>
-            </View>
-            <View style={styles.messageSend}>
-              <Ionicons
-                name="at-sharp"
-                size={20}
-                color="#3D3D3D"
-                style={styles.hash}
-              />
-              {message ? (
-                <TouchableWithoutFeedback onPress={() => sendMessage()}>
-                  <Ionicons
-                    name="send-outline"
-                    size={20}
-                    color="#3D3D3D"
-                  ></Ionicons>
-                </TouchableWithoutFeedback>
-              ) : (
-                <Ionicons
-                  name="send-outline"
-                  size={20}
-                  color="#8E8E93"
-                ></Ionicons>
-              )}
-            </View>
-          </View>
+          <SendMessage
+            message={message}
+            setMessage={setMessage}
+            sendMessage={sendMessage}
+            messageInput={messageInput}
+            emojiIconPress={emojiIconPress}
+          />
         </>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  messageContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    height: Dimensions.get("window").height - 140,
-  },
-  dFlex: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  sentTime: {
-    textAlign: "right",
-    paddingHorizontal: 10,
-    fontSize: 10,
-    color: "#8E8E93",
-  },
-  sentTimeReceiver: {
-    textAlign: "left",
-    paddingHorizontal: 10,
-    fontSize: 10,
-    color: "#8E8E93",
-  },
-  image: {
-    height: 40,
-    width: 40,
-    borderRadius: 25,
-  },
-  message: {
-    fontSize: 16,
-    fontWeight: "500",
-    fontFamily: "Raleway_500Medium",
-    backgroundColor: "#E4E4E4D4",
-    padding: 10,
-    paddingHorizontal: 20,
-    paddingLeft: 10,
-    borderRadius: 15,
-    borderBottomLeftRadius: 0,
-    marginLeft: 10,
-    maxWidth: "70%",
-    alignSelf: "flex-start",
-    overflow: "hidden",
-  },
-  senderMessage: {
-    fontSize: 16,
-    fontWeight: "500",
-    fontFamily: "Raleway_500Medium",
-    backgroundColor: "#E4E4E4D4",
-    padding: 10,
-    paddingHorizontal: 20,
-    borderRadius: 15,
-    borderBottomRightRadius: 0,
-    paddingLeft: 10,
-    backgroundColor: "#663399",
-    color: "white",
-    maxWidth: "90%",
-    alignSelf: "flex-end",
-    flexGrow: 1,
-    overflow: "hidden",
-  },
-  self: {
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    marginVertical: 5,
-  },
-  sender: {
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-    marginVertical: 5,
-  },
-  chatWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 5,
-    paddingHorizontal: 20,
-    borderTopColor: "#E5E5EA",
-    borderTopWidth: 1,
-    height: 60,
-    bottom: 0,
-  },
-  messageSend: {
-    flexDirection: "row",
-  },
-  hash: {
-    marginRight: 10,
-  },
-  messageInput: {
-    height: 40,
-    color: "#666668",
-    fontFamily: "Raleway_400Regular",
-    width: Dimensions.get("window").width - 130,
-  },
-});

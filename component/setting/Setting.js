@@ -95,7 +95,7 @@ export default function Setting({ navigation }) {
               <MaterialCommunityIcons
                 name="chevron-double-right"
                 size={20}
-                color="#CDCDCD"
+                color="#663399"
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>
@@ -111,7 +111,7 @@ export default function Setting({ navigation }) {
               <MaterialCommunityIcons
                 name="chevron-double-right"
                 size={20}
-                color="#CDCDCD"
+                color="#663399"
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>
@@ -128,7 +128,7 @@ export default function Setting({ navigation }) {
               <MaterialCommunityIcons
                 name="chevron-double-right"
                 size={20}
-                color="#CDCDCD"
+                color="#663399"
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>
@@ -145,62 +145,10 @@ export default function Setting({ navigation }) {
               <MaterialCommunityIcons
                 name="chevron-double-right"
                 size={20}
-                color="#CDCDCD"
+                color="#663399"
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>
-
-          <View style={styles.border}></View>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Addresses")}
-            style={styles.pagesWrapper}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Ionicons name="location-outline" size={20}></Ionicons>
-              <Text style={styles.pageName}>My Addresses</Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <MaterialCommunityIcons
-                name="chevron-double-right"
-                size={20}
-                color="#CDCDCD"
-              ></MaterialCommunityIcons>
-            </View>
-          </TouchableOpacity>
-
-          {isSeller && (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Change Pickup Location")}
-              style={styles.pagesWrapper}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Ionicons name="location-outline" size={20}></Ionicons>
-                <Text style={styles.pageName}>Change Pickup Location</Text>
-              </View>
-              <View style={{ flexDirection: "row" }}>
-                <MaterialCommunityIcons
-                  name="chevron-double-right"
-                  size={20}
-                  color="#CDCDCD"
-                ></MaterialCommunityIcons>
-              </View>
-            </TouchableOpacity>
-          )}
-
-          <View style={styles.pagesWrapper}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <FontAwesome name="money" size={20}></FontAwesome>
-              <Text style={styles.pageName}>My Balance</Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {user ? (
-                <Text>Rs. {user.balance}</Text>
-              ) : (
-                <ActivityIndicator size={"small"} color="#663399" />
-              )}
-            </View>
-          </View>
 
           <View style={styles.border}></View>
 
@@ -217,22 +165,34 @@ export default function Setting({ navigation }) {
               )}
             </View>
           </View>
+
+          <View style={styles.pagesWrapper}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <FontAwesome name="money" size={20}></FontAwesome>
+              <Text style={styles.pageName}>My Balance</Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              {user ? (
+                <Text>Rs. {user.balance}</Text>
+              ) : (
+                <ActivityIndicator size={"small"} color="#663399" />
+              )}
+            </View>
+          </View>
+
           <TouchableOpacity
             onPress={() => navigation.navigate("Redeem", user)}
             style={styles.pagesWrapper}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <MaterialCommunityIcons
-                name="briefcase"
-                size={20}
-              ></MaterialCommunityIcons>
+              <MaterialIcons name="redeem" size={20} />
               <Text style={styles.pageName}>Redeem</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <MaterialCommunityIcons
                 name="chevron-double-right"
                 size={20}
-                color="#CDCDCD"
+                color="#663399"
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>
@@ -252,7 +212,7 @@ export default function Setting({ navigation }) {
               <MaterialCommunityIcons
                 name="chevron-double-right"
                 size={20}
-                color="#CDCDCD"
+                color="#663399"
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>
@@ -260,21 +220,53 @@ export default function Setting({ navigation }) {
           <View style={styles.border}></View>
 
           <TouchableOpacity
+            onPress={() => navigation.navigate("Addresses")}
+            style={styles.pagesWrapper}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <MaterialIcons name="location-history" size={20} />
+              <Text style={styles.pageName}>My Addresses</Text>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <MaterialCommunityIcons
+                name="chevron-double-right"
+                size={20}
+                color="#663399"
+              ></MaterialCommunityIcons>
+            </View>
+          </TouchableOpacity>
+
+          {isSeller && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Change Pickup Location")}
+              style={styles.pagesWrapper}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons name="location-outline" size={20}></Ionicons>
+                <Text style={styles.pageName}>Change Pickup Location</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <MaterialCommunityIcons
+                  name="chevron-double-right"
+                  size={20}
+                  color="#663399"
+                ></MaterialCommunityIcons>
+              </View>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
             onPress={() => navigation.navigate("Feed Setting")}
             style={styles.pagesWrapper}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <MaterialCommunityIcons
-                name="history"
-                size={20}
-              ></MaterialCommunityIcons>
+              <MaterialIcons name="app-settings-alt" size={20} />
               <Text style={styles.pageName}>Feed Setting</Text>
             </View>
             <View style={{ flexDirection: "row" }}>
               <MaterialCommunityIcons
                 name="chevron-double-right"
                 size={20}
-                color="#CDCDCD"
+                color="#663399"
               ></MaterialCommunityIcons>
             </View>
           </TouchableOpacity>

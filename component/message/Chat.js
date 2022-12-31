@@ -56,12 +56,12 @@ export default function Chat({ route, navigation }) {
   useEffect(() => {
     if (socket.current) {
       socket.current.on("receiveMessage", (message) => {
-        setMessages([message, ...messages]);
+        setMessages((prevMessages) => [message, ...prevMessages]);
       });
     }
-  }, [socket, messages]);
+  }, [socket]);
 
-  const sendMessage = React.useCallback(async () => {
+  const sendMessage = async () => {
     try {
       Keyboard.dismiss();
       messageInput.current.clear();
@@ -80,9 +80,10 @@ export default function Chat({ route, navigation }) {
       socket.current.emit("sendMessage", response.data);
       setMessages([response.data, ...messages]);
     } catch (error) {
+      console.log(error, "error");
       apiErrorNotification(error);
     }
-  }, [messages, message]);
+  };
 
   const changeHeader = React.useCallback(() => {
     navigation.setOptions({

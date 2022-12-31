@@ -51,6 +51,7 @@ export default function OrderTrack({ route }) {
       var a = groupNotification(response.data);
       setGroupedEvents(a);
     } catch (error) {
+      console.log(error.message);
       customErrorNotification("Order Track Information Fetch Failed.");
     }
     setIsOrderTrackFetched(true);

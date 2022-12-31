@@ -38,12 +38,14 @@ export default {
     },
     extra: {
       eas: {
-        projectId: "ade30955-f231-4f32-929f-7a05ae0e475f",
+        projectId: "8673e797-0b02-49f9-acf1-e2ec5f22fd8c",
       },
       KHALTI_SECRET: process.env.KHALTI_SECRET,
       ESEWA_SECRET: process.env.ESEWA_SECRET,
       API_URL: process.env.API_URL,
       FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
+      NCM_API: process.env.NCM_API,
+      NCM_HEADER: process.env.NCM_HEADER,
     },
   },
 };

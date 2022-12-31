@@ -48,12 +48,13 @@ const Esewa = (props) => {
 
   useEffect(() => {
     setisVisible(props.visible);
+    console.log(props.total + props.shippingFee);
   }, [props]);
 
   return (
     <SafeAreaView>
       <EsewaSdk
-        amt={props.total} // Amount of product or item or ticket etc
+        amt={props.total + props.shippingFee} // Amount of product or item or ticket etc
         taxAmt={0} // Tax amount on product or item or ticket etc
         totalAmt={props.total + props.shippingFee} // Total payment amount including tax, service and deliver charge. [i.e tAmt = amt + txAmt + psc + tAmt]
         env={Constants.manifest?.extra?.ESEWA_SECRET} // Merchant code provided by eSewa

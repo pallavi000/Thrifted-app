@@ -23,6 +23,9 @@ export default React.memo(function HomepagePosts({
   setStories = null,
   dataType = "real",
   bottomSheetRef = {},
+  setStoryPicker,
+  storySubmitted,
+  setStorySubmitted,
 }) {
   const [refreshing, setRefreshing] = useState(false);
   const [enableScroll, setEnableScroll] = useState(true);
@@ -46,6 +49,9 @@ export default React.memo(function HomepagePosts({
                   stories={stories}
                   bottomSheetRef={bottomSheetRef}
                   setStories={setStories}
+                  setStoryPicker={setStoryPicker}
+                  storySubmitted={storySubmitted}
+                  setStorySubmitted={setStorySubmitted}
                 />
               </View>
             </>
@@ -55,6 +61,9 @@ export default React.memo(function HomepagePosts({
                 stories={stories}
                 bottomSheetRef={bottomSheetRef}
                 setStories={setStories}
+                setStoryPicker={setStoryPicker}
+                storySubmitted={storySubmitted}
+                setStorySubmitted={setStorySubmitted}
               />
             </>
           ) : null}
@@ -69,7 +78,7 @@ export default React.memo(function HomepagePosts({
         </View>
       );
     },
-    [stories]
+    [stories, storySubmitted]
   );
 
   return (

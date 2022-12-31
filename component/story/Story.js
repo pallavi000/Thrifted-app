@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
-import React, { useContext, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -17,8 +17,25 @@ import {
 } from "../ErrorHandle";
 import { imageLink } from "../ImageLink";
 import FastImage from "react-native-fast-image";
+import Animated, {
+  Easing,
+  EasingNode,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
-function Story({ stories, setStories, bottomSheetRef }) {
+function Story({
+  stories,
+  setStories,
+  bottomSheetRef,
+  setStoryPicker,
+  storySubmitted,
+  setStorySubmitted,
+}) {
   const { userImage } = useContext(AuthContext);
   const currentStoryRef = useRef();
   const { token, decode } = useContext(AuthContext);
@@ -30,9 +47,11 @@ function Story({ stories, setStories, bottomSheetRef }) {
 
   async function DeleteStory() {
     try {
+      setStorySubmitted(true);
       DeleteStoryState();
       const id = currentStoryRef.current.story._id;
       const response = await axios.delete("/story/" + id, config);
+      setStorySubmitted(false);
       customSuccessNotification("Story deleted.");
     } catch (error) {
       apiErrorNotification(error);
@@ -87,9 +106,9 @@ function Story({ stories, setStories, bottomSheetRef }) {
         }}
         ImageComponent={__DEV__ ? Image : FastImage}
         HeaderComponent={
-          <View style={{ marginTop: 10 }}>
+          <View style={{ marginTop: 10, marginBottom: 3 }}>
             <TouchableOpacity
-              onPress={() => bottomSheetRef.current.snapTo(0)}
+              onPress={() => setStoryPicker(true)}
               style={styles.story_image_container}
             >
               <Image
@@ -107,15 +126,8 @@ function Story({ stories, setStories, bottomSheetRef }) {
             </TouchableOpacity>
           </View>
         }
-        ImageCircleStyle={{ borderWidth: 2, borderColor: "#ddd" }}
+        ImageCircleStyle={{ borderWidth: 2, borderColor: "#fff" }}
         ImageListItemStyle={{ resizeMode: "contain" }}
-        style={{
-          marginTop: 5,
-          marginBottom: 10,
-          borderBottomColor: "#ddd",
-          borderBottomWidth: 1,
-          paddingBottom: 10,
-        }}
       />
     );
   }, [stories, bottomSheetRef]);
@@ -123,15 +135,71 @@ function Story({ stories, setStories, bottomSheetRef }) {
   return (
     <>
       <RenderItem />
+
+      {storySubmitted ? (
+        <ProgressAnimation storySubmitted={storySubmitted} />
+      ) : null}
+
+      <View
+        style={{
+          marginTop: 2,
+          marginBottom: 10,
+          borderBottomColor: "#ddd",
+          borderBottomWidth: 1,
+          paddingBottom: 10,
+        }}
+      ></View>
     </>
   );
 }
+
+const ProgressAnimation = ({ storySubmitted }) => {
+  const startValues = useSharedValue(0);
+  const lgs = useAnimatedStyle(() => ({
+    width: `100%`,
+    height: 3,
+    backgroundColor: "#663399",
+    position: "absolute",
+    top: 0,
+    left: startValues.value,
+  }));
+
+  useEffect(() => {
+    console.log(storySubmitted);
+    if (storySubmitted) {
+      startValues.value = 0;
+      startValues.value = withRepeat(
+        withTiming(Dimensions.get("window").width, { duration: 800 }),
+        -1,
+        true,
+        (finished) => {
+          const resultStr = finished
+            ? "All repeats are completed"
+            : "withRepeat cancelled";
+          console.log(resultStr);
+        }
+      );
+    }
+  }, [storySubmitted]);
+
+  return (
+    <View
+      style={{
+        position: "relative",
+        height: 3,
+        backgroundColor: "#4CAF50",
+        marginTop: 15,
+      }}
+    >
+      <Animated.View style={lgs}></Animated.View>
+    </View>
+  );
+};
 
 export default Story;
 
 const styles = StyleSheet.create({
   yourStory: {
-    width: 74,
     marginTop: 3,
     textAlign: "center",
     alignItems: "center",

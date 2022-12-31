@@ -32,6 +32,7 @@ import {
 import CreateStory from "../story/CreateStory";
 import Animated from "react-native-reanimated";
 import HamroImagePicker from "../HamroImagePicker/HamroImagePicker";
+import * as FileSystem from "expo-file-system";
 
 export default function Home({ navigation }) {
   const [activePage, setActivePage] = useState(1);
@@ -42,6 +43,8 @@ export default function Home({ navigation }) {
   const [notificationToken, setNotificationToken] = useState("");
   const [dataType, setDataType] = useState("cache");
   const [showDropDown, setShowDropDown] = useState(false);
+  const [storyPicker, setStoryPicker] = useState(false);
+  const [storySubmitted, setStorySubmitted] = useState(false);
 
   const data = useContext(AuthContext);
   const {
@@ -225,6 +228,63 @@ export default function Home({ navigation }) {
   const bottomSheetRef = useRef();
   const fill = new Animated.Value(1);
 
+  async function handleStorySubmit({ hasMultiple, data }) {
+    setStorySubmitted(true);
+    if (hasMultiple) {
+      await Promise.all(
+        data.map(async (item) => {
+          await createStory(item);
+          return item;
+        })
+      );
+    } else {
+      await createStory(data);
+    }
+    setStorySubmitted(false);
+    customSuccessNotification("Story created.");
+  }
+
+  async function createStory(value) {
+    try {
+      const base64 = await FileSystem.readAsStringAsync(value.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      const data = {
+        image: `data:image/png;base64, ${base64}`,
+      };
+      const response = await axios.post("/story", data, config);
+      addToStories(response.data);
+    } catch (error) {
+      apiErrorNotification(error);
+    }
+  }
+
+  function addToStories(story) {
+    story.user_image = imageLink + story.user_image;
+    story.story_image = imageLink + story.story_image;
+    story.story_video = imageLink + story.story_video;
+    story.date = timeSince(story.createdAt);
+    setStories((prevStories) => {
+      const duplicateStories = [...prevStories];
+      var existingIndex = duplicateStories.findIndex(
+        (st) => st.user_id == story.user_id
+      );
+      if (existingIndex != -1) {
+        duplicateStories[existingIndex].stories.push(story);
+        return duplicateStories;
+      } else {
+        var newStory = {
+          user_id: story.user_id,
+          user_image: story.user_image,
+          user_name: story.user_name,
+          _id: story._id,
+          stories: [story],
+        };
+        return [newStory, ...duplicateStories];
+      }
+    });
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -255,6 +315,15 @@ export default function Home({ navigation }) {
             setShowDropDown={setShowDropDown}
           />
 
+          <HamroImagePicker
+            handlePickerClose={setStoryPicker}
+            enablePicker={storyPicker}
+            handleSubmit={handleStorySubmit}
+            enableEditor={true}
+            enableMultiSelect={true}
+            headerText="New Story"
+          />
+
           <View style={{ paddingBottom: 70, height: "100%" }}>
             {showDropDown && <DropDownItem />}
             {activePage === 1 && !products.length ? (
@@ -272,8 +341,10 @@ export default function Home({ navigation }) {
                 dataType={dataType}
                 navigation={navigation}
                 bottomSheetRef={bottomSheetRef}
+                setStoryPicker={setStoryPicker}
+                storySubmitted={storySubmitted}
+                setStorySubmitted={setStorySubmitted}
               />
-              // <HamroImagePicker />
             )}
           </View>
         </Animated.View>

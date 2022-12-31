@@ -30,6 +30,9 @@ import {
 import MakeSeller from "./MakeSeller";
 import BottomSheetComponent from "../BottomSheetComponent";
 import Animated from "react-native-reanimated";
+import CustomImagePicker from "./CustomImagePicker";
+import HamroImagePicker from "../HamroImagePicker/HamroImagePicker";
+import * as FileSystem from "expo-file-system";
 
 const validationSchema = Yup.object().shape({
   image1: Yup.string().required("Image is required"),
@@ -45,6 +48,21 @@ const validationSchema = Yup.object().shape({
   type: Yup.string().required("Product Type is required"),
   pickupOption: Yup.string().required("Pickup option is required"),
 });
+
+const dummyImageData = [
+  {
+    isCover: false,
+    name: "image2",
+  },
+  {
+    isCover: false,
+    name: "image3",
+  },
+  {
+    isCover: false,
+    name: "image4",
+  },
+];
 
 const initPickupOptions = [
   {
@@ -93,6 +111,7 @@ function CreatePost({ navigation }) {
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [showBrand, setShowBrand] = useState(false);
+  const [imagePicker, setImagePicker] = useState(false);
   const formRef = useRef();
   const sheetRef = useRef(null);
   const openCameraRef = useRef();
@@ -130,6 +149,28 @@ function CreatePost({ navigation }) {
     }
     formRef.current.handleSubmit();
   }
+
+  const handleMultipleImageSubmit = async ({ hasMultiple, data }) => {
+    if (hasMultiple) {
+      data.map(async (image, index) => {
+        const base64 = await FileSystem.readAsStringAsync(image.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        formRef.current.setFieldValue(
+          `image${index + 1}`,
+          `data:image/png;base64, ${base64}`
+        );
+      });
+    } else {
+      const base64 = await FileSystem.readAsStringAsync(data.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      formRef.current.setFieldValue(
+        `image1`,
+        `data:image/png;base64, ${base64}`
+      );
+    }
+  };
 
   const loadingHeader = React.useCallback(() => {
     navigation.setOptions({
@@ -321,6 +362,16 @@ function CreatePost({ navigation }) {
       ) : null}
 
       <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+        <HamroImagePicker
+          handlePickerClose={setImagePicker}
+          enablePicker={imagePicker}
+          handleSubmit={handleMultipleImageSubmit}
+          enableEditor={true}
+          enableMultiSelect={true}
+          headerText="Select Image"
+          multipleSelectEnabled={true}
+          multiSelectOptions={{ minimumImageCount: 1, maximumImageCount: 4 }}
+        />
         <KeyboardAvoidingView
           keyboardVerticalOffset={-500}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -376,11 +427,51 @@ function CreatePost({ navigation }) {
                   handleBlur,
                 }) => (
                   <>
-                    <MainImage
+                    {/* <MainImage
                       sheetRef={sheetRef}
                       openCameraRef={openCameraRef}
                       selectImageRef={selectImageRef}
-                    />
+                    /> */}
+
+                    <View style={styles.uploadImageWrapper}>
+                      <CustomImagePicker
+                        data={{
+                          isCover: true,
+                          name: "image1",
+                        }}
+                      />
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          marginTop: 20,
+                        }}
+                      >
+                        {dummyImageData.map((data) => {
+                          return (
+                            <CustomImagePicker data={data} key={data.name} />
+                          );
+                        })}
+                      </View>
+
+                      <TouchableOpacity
+                        onPress={() => setImagePicker(true)}
+                        style={styles.uploadBtn}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            fontFamily: "Raleway_500Medium",
+                            color: "#868686",
+                          }}
+                        >
+                          Upload Photos
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
                     <View style={styles.formGroup}>
                       <Text style={styles.label}>
                         What are you selling? (Required)
@@ -637,6 +728,10 @@ export default CreatePost;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+  },
+  uploadImageWrapper: {
+    alignItems: "center",
+    marginBottom: 20,
   },
   cameraIcon: {
     height: 30,

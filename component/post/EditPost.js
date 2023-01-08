@@ -60,6 +60,8 @@ const EditPost = ({ navigation, route }) => {
   const fill = new Animated.Value(1);
   const [earningPrice, setEarningPrice] = useState(0);
   const [openSelectField, setOpenSelectField] = useState(null);
+  const [commission, setCommission] = useState(0);
+  const [pickupCharge, setPickupCharge] = useState(0);
   const [pickupOptions, setPickupOptions] = useState([
     {
       _id: "Door",
@@ -173,6 +175,8 @@ const EditPost = ({ navigation, route }) => {
       setSizes(response.data.sizes);
       setCategories(response.data.categories);
       setBrands(response.data.brands);
+      setPickupCharge(response.data.pickupCharge);
+      setCommission(response.data.commission);
     } catch (error) {}
   });
 
@@ -197,7 +201,10 @@ const EditPost = ({ navigation, route }) => {
   const calcEarning = React.useCallback((value) => {
     formRef.current.setFieldValue("price", value.toString());
     var price = value;
-    var profit = price - (price * 20) / 100;
+    var profit = price - (price * commission) / 100;
+    if (formRef.current.values.pickupOption == "Door") {
+      profit = profit - pickupCharge;
+    }
     formRef.current.setFieldValue("earning_price", profit.toString());
     setEarningPrice(profit.toString());
   });
@@ -214,6 +221,13 @@ const EditPost = ({ navigation, route }) => {
 
   useEffect(() => {
     formRef.current.setFieldValue("pickupOption", selectedPickupOption._id);
+    if (selectedPickupOption._id == "Door") {
+      setEarningPrice((parseInt(earningPrice) - pickupCharge).toString());
+      formRef.current.setFieldValue(
+        "earning_price",
+        parseInt(earningPrice) - pickupCharge
+      );
+    }
   }, [selectedPickupOption]);
 
   useEffect(() => {
@@ -347,7 +361,7 @@ const EditPost = ({ navigation, route }) => {
                     image2: "",
                     image3: "",
                     image4: "",
-                    pickupOptions: product.pickupOption,
+                    pickupOption: product.pickupOption,
                   }}
                   onSubmit={(values) => updatePost(values)}
                   validationSchema={validationSchema}

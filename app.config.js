@@ -5,6 +5,8 @@ export default {
     name: "Hamro Closet",
     slug: "HamroCloset",
     version: "1.0.0",
+    runtimeVersion: "exposdk:45.0.0",
+    // runtimeVersion: "0.0.1",
     orientation: "portrait",
     icon: "./assets/icon.png",
     splash: {
@@ -27,6 +29,7 @@ export default {
         backgroundColor: "#ffffff",
       },
       package: "com.thriftmarket.HamroCloset",
+      versionCode: 1.0,
     },
     web: {
       favicon: "./assets/favicon.png",

@@ -1,7 +1,6 @@
 import { ImageBackground, StyleSheet, View } from "react-native";
 import React, { useRef, useState } from "react";
 import FileCollector from "./FileCollector";
-import { ImageEditor } from "expo-image-editor";
 import Modal from "react-native-modalbox";
 
 const HamroImagePicker = ({
@@ -41,12 +40,8 @@ const HamroImagePicker = ({
   const modalRef = useRef();
 
   const submitSingleData = (data) => {
-    if (enableEditor) {
-      setSelectedImageData(data);
-    } else {
-      handleSubmit({ hasMultiple: false, data });
-      modalRef.current.close();
-    }
+    handleSubmit({ hasMultiple: false, data });
+    modalRef.current.close();
   };
 
   const submitMultipleData = (data) => {
@@ -80,28 +75,6 @@ const HamroImagePicker = ({
               headerText={headerText}
               submitMultipleData={submitMultipleData}
               multipleSelectEnabled={multipleSelectEnabled}
-            />
-
-            <ImageEditor
-              visible={enableEditor && selectedImageData.id ? true : false}
-              onCloseEditor={() => setSelectedImageData({})}
-              imageUri={selectedImageData?.uri}
-              onEditingComplete={(result) => {
-                handleSubmit({ hasMultiple: false, data: result });
-                modalRef.current.close();
-              }}
-              asView={editorOptions.asView}
-              mode={editorOptions.mode}
-              fixedCropAspectRatio={editorOptions.fixedCropAspectRatio}
-              lockAspectRatio={editorOptions.lockAspectRatio}
-              minimumCropDimensions={editorOptions.minimumCropDimensions}
-              throttleBlur={editorOptions.throttleBlur}
-              allowedTransformOperations={
-                editorOptions.allowedTransformOperations
-              }
-              allowedAdjustmentOperations={
-                editorOptions.allowedAdjustmentOperations
-              }
             />
           </View>
         </View>

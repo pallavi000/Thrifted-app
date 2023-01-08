@@ -28,11 +28,10 @@ import { SliderBox } from "react-native-image-slider-box";
 import FastImage from "react-native-fast-image";
 import { customErrorNotification } from "../ErrorHandle";
 
-export default React.memo(function Action(props) {
+export default React.memo(function Action({ product: newProduct, navigation }) {
   const [comment, setComment] = useState("");
   const [like, setLike] = useState(false);
-  const { navigation } = props;
-  const [product, setProduct] = useState(props.product);
+  const [product, setProduct] = useState(newProduct);
   const [doubleClick, setDoubleClick] = useState(0);
   const data = useContext(AuthContext);
   const { token, decode, products } = data;
@@ -63,17 +62,15 @@ export default React.memo(function Action(props) {
   }));
 
   useEffect(() => {
-    var isLiked = props.product?.likes.find(
-      (like) => like.user_id == decode._id
-    );
+    var isLiked = product?.likes.find((like) => like.user_id == decode._id);
     if (isLiked) {
       setLike(true);
     } else {
       setLike(false);
     }
-  }, [decode, props]);
+  }, [decode, newProduct]);
 
-  const addLike = useCallback(async () => {
+  const addLike = async () => {
     currentValue.value = withSpring(0.1, undefined, (isFinished) => {
       if (isFinished) {
         currentValue.value = withSpring(1);
@@ -95,7 +92,7 @@ export default React.memo(function Action(props) {
       }
       setLike(!like);
       const response = await axios.post(
-        "/post/like/post/" + props.product._id,
+        "/post/like/post/" + product._id,
         data,
         config
       );
@@ -107,7 +104,7 @@ export default React.memo(function Action(props) {
       }
       setLike(like);
     }
-  }, [like]);
+  };
 
   const parseImages = useCallback((image, images) => {
     var arr = [imageLink + image];
@@ -198,6 +195,7 @@ export default React.memo(function Action(props) {
             activeOpacity={1}
             onCurrentImagePressed={() => singleOrDoubleClick(product)}
             pagingEnabled
+            resizeMode="contain"
             enablePinchable={__DEV__ ? false : true}
           />
 
@@ -375,8 +373,9 @@ const styles = StyleSheet.create({
   productImage: {
     height: 400,
     width: Dimensions.get("window").width,
-    resizeMode: "cover",
+    resizeMode: "contain",
     zIndex: 99,
+    flex: 1,
   },
   typeWrapper: {
     display: "flex",

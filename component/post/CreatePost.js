@@ -128,6 +128,8 @@ function CreatePost({ navigation }) {
   const [selectedSize, setSelectedSize] = useState(initSelectedSize);
   const [selectedType, setSelectedType] = useState(initSelectedProductType);
   const [selectedBrand, setSelectedBrand] = useState(initSelectedBrand);
+  const [commission, setCommission] = useState(0);
+  const [pickupCharge, setPickupCharge] = useState(0);
   const [selectedPickupOption, setSelectedPickupOption] = useState(
     initSelectedPickupOption
   );
@@ -233,6 +235,8 @@ function CreatePost({ navigation }) {
       setSizes(response.data.sizes);
       setCategories(response.data.categories);
       setBrands(response.data.brands);
+      setCommission(response.data.commission);
+      setPickupCharge(response.data.pickupCharge);
     } catch (error) {}
   });
 
@@ -262,9 +266,9 @@ function CreatePost({ navigation }) {
   const calcEarning = React.useCallback((value) => {
     formRef.current.setFieldValue("price", value);
     var price = value;
-    var profit = price - (price * 20) / 100;
+    var profit = price - (price * commission) / 100;
     if (formRef.current.values.pickupOption == "Door") {
-      profit = profit - 15;
+      profit = profit - pickupCharge;
     }
     formRef.current.setFieldValue("earning_price", profit);
     setEarningPrice(profit.toString());
@@ -273,10 +277,10 @@ function CreatePost({ navigation }) {
   useEffect(() => {
     formRef.current.setFieldValue("pickupOption", selectedPickupOption._id);
     if (selectedPickupOption._id == "Door") {
-      setEarningPrice((parseInt(earningPrice) - 15).toString());
+      setEarningPrice((parseInt(earningPrice) - pickupCharge).toString());
       formRef.current.setFieldValue(
         "earning_price",
-        parseInt(earningPrice) - 15
+        parseInt(earningPrice) - pickupCharge
       );
     }
   }, [selectedPickupOption]);

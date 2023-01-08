@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "pc-api-7139414454111027871-77",
+  "private_key_id": "2cbb2c356f882d73624f63e1305174a0b2a5cfe0",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDAHk2zuQN7jhpK\ntdxz2pqdZ3BP6WW1jtv3vnwqC2GBe3SRdTdTQ1f3O2ZR41wGLGw6jz7Aq9dTNXgO\nihY3TEU5/MJobS3kdYW+DHbXfprjqxUPEpKhi5ulMvAqJDwH3NGYdTP+WWHj+u0z\nwq9C5YgP8WMxkqfX0LQVY8mWwgSfyDn4KF+S44ReCy5ko/B3xdz6Bbgocgx67yop\nV3FpIS71ctPZRnsTWYJYpmSSoRoMAsocGpGBpCeksDAXMkFoJefJpwj/qGCawCPl\noTkK3PLTg9hzherPQwfEz9ZDs6nQgEWCShWWgqwLm7KQKup0ClwJyGVeidknSOu1\nDBgHIJYBAgMBAAECggEAFB/4hsTw6vP3UsUwizL78v9/bIzn+ngKbdjWkTbw/LXY\nf6uWOJLQ4lVRbMQ9gxNgi6qEFH3LyBZ39Znx0CgdW6uGbUGmnDcoDpZSqqnuAr8M\nrTAGYTAf2qh2hQuXqEExnuAEKsw6ghMVNFCxYvdqud97mG6i8MDBjzi383gZMOgu\nREJujqZAMwtsOW9eHDcO1oZaZCHFzvo6re3ltXN/7gL0scta0FHfEC9MsVgR6Cmc\nE0y2uK+X0P+pW2mrvL4x9PcmID0f5H4yZxVbVevA/Ov8RHhxgfa1Ip2J90bj4L9D\nxHz9+ZOYAg6Q9fuEGuNOcJ2uTyPT0vEez60Exw45GwKBgQDjVGN36PkGMiD7+KeC\nOUtXQkV/dwqkzFRGkCvuHMiZybsdNrjOLKq+3uiD+wf8oyqBwycghc9At7K5qnYe\nm/A+zAcuDzddEIJAnOUxSDRO4Pl9eu/bT8edLcXfoa5vmjDPQuJ4uNh8nmgc1j8l\nLZXO+Kt/uS9Iu/FtF+qfavMKTwKBgQDYWROi9FWxpsFGH08M7WLJFBqm8Mci15da\nZbtwlAcXKyARMjQ1CHdpUCzOahBVR4z99s/0BGpKbHWj5ymDcYFDhPtqq5uWad1f\noOvR8OUHPLRWJMdu04svrDNW6mFW8FGLGhFs2lMl3/ICoQZWFLbQpq7+ov5C0/qP\nKMyoTppWrwKBgCYdRAAaw4XSac1VR2CCEquypMxWPSacS5T5HyRxFwER3ZlsT1fi\nDU6rOPjH4fLtuHbBLZI6XSFQq1qNxfgj1QfyVVHXo0SrO+txYsv8eyiud6YeMpDm\ns2UbA44XIZP8mipl4Gq1MzbRqEsNcNDe77sf3kEv30mmmTfdRq0r1UvpAoGAXbdw\nZyVaPaNTk7GaR6pJIXtg9DHWwUQMny70XBbzX1jiAjDyJortVyRQ1HVjb92XuKeC\ne1yyQlzrNL284OB5MytW0WVW93gSWgtWO9ITE+h64dn6vgpK/7KjZqIO2l8to4j+\nRV3pqL1ykyr3mLBOZOHfahRm+cHjhsIQrVOnTacCgYEAtkXzNP1VgB+PzFqdhmzV\nqWo6qXL0j/ap9MZuSjXeDV1+IxK/2XNM40LqDvCPTFYfkEks9cumJj47bgVP4XxD\nS4etmuUG0uoYLL1MNPBGtjrl8UlDi2Km7yBMwOxPZNQZrGqk86NWQQSEAcwCFqld\n9VEe/wU9wgKdoxMNHmsHZpQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "hamrocloset@pc-api-7139414454111027871-77.iam.gserviceaccount.com",
+  "client_id": "113250001011799603365",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hamrocloset%40pc-api-7139414454111027871-77.iam.gserviceaccount.com"
+}

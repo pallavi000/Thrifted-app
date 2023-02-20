@@ -34,12 +34,7 @@ export default React.memo(function Action({ product: newProduct, navigation }) {
   const [product, setProduct] = useState(newProduct);
   const [doubleClick, setDoubleClick] = useState(0);
   const data = useContext(AuthContext);
-  const { token, decode, products } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config, decode, products } = data;
 
   useEffect(() => {
     if (products.length) {

@@ -30,12 +30,7 @@ const ChangeProfile = ({ navigation, route }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const user = route.params;
   const data = useContext(AuthContext);
-  const { token } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   const changeProfile = React.useCallback(async (data) => {
     setIsSubmitting(true);

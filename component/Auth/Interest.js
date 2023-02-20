@@ -30,12 +30,7 @@ export default function Interest({ navigation }) {
   }, []);
 
   const data = useContext(AuthContext);
-  const { token, feedSetting, setFeedSetting } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config, feedSetting, setFeedSetting } = data;
 
   async function getCategories() {
     setIsLoading(true);

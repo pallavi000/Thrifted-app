@@ -44,14 +44,8 @@ export default function Chat({ route, navigation }) {
   const [pageNo, setPageNo] = useState(1);
 
   const data = useContext(AuthContext);
-  const { token, decode, unreadMessage, setUnreadMessage, socket } = data;
+  const { config, decode, unreadMessage, setUnreadMessage, socket } = data;
   const receiver = route.params;
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   useEffect(() => {
     if (socket.current) {

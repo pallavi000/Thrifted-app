@@ -46,12 +46,7 @@ const MakeSeller = ({ navigation }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const data = useContext(AuthContext);
-  const { token, setIsSeller } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config, setIsSeller } = data;
 
   async function getLocations() {
     try {

@@ -50,7 +50,7 @@ export default function Home({ navigation }) {
   const {
     unreadMessage,
     setUnreadMessage,
-    token,
+    config,
     unreadNotification,
     setUnreadNotification,
     socket,
@@ -66,11 +66,7 @@ export default function Home({ navigation }) {
     stories,
     setStories,
   } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+
   const isFocused = useIsFocused();
 
   const getProducts = async (currentPage, countPerPage, productOnly) => {
@@ -151,11 +147,11 @@ export default function Home({ navigation }) {
   }, []);
 
   useEffect(() => {
-    if (token) {
+    if (config) {
       getUnreadMessageCount();
       getUnreadNotificationCount();
     }
-  }, [token, isFocused]);
+  }, [config, isFocused]);
 
   useEffect(() => {
     console.log("active", activePage);

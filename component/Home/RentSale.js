@@ -27,7 +27,7 @@ const RentSale = ({ navigation, route }) => {
   const [nextPage, setNextPage] = useState(true);
   const [hasNextPage, setHasNextPage] = useState(true);
   const data = useContext(AuthContext);
-  const { token } = data;
+  const { config } = data;
   const { type, feedSetting } = route.params;
 
   useLayoutEffect(() => {
@@ -38,11 +38,6 @@ const RentSale = ({ navigation, route }) => {
 
   // TODO: Change API
   const getProducts = async (currentPage, countPerPage) => {
-    const config = {
-      headers: {
-        "access-token": token,
-      },
-    };
     const data = {
       activePage: currentPage,
       itemsCountPerPage: countPerPage,

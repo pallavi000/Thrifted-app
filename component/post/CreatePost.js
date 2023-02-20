@@ -135,13 +135,7 @@ function CreatePost({ navigation }) {
   );
 
   const data = useContext(AuthContext);
-  const { token } = data;
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   function addPost() {
     var errors = Object.values(formRef.current.errors);
@@ -266,11 +260,13 @@ function CreatePost({ navigation }) {
   const calcEarning = React.useCallback((value) => {
     formRef.current.setFieldValue("price", value);
     var price = value;
+
     var profit = price - (price * commission) / 100;
     if (formRef.current.values.pickupOption == "Door") {
       profit = profit - pickupCharge;
     }
     formRef.current.setFieldValue("earning_price", profit);
+
     setEarningPrice(profit.toString());
   });
 

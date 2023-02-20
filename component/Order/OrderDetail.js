@@ -25,12 +25,7 @@ export default function OrderDetail({ navigation, route }) {
   const item = route.params;
   const [shippingAddress, setShippingAddress] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { token } = useContext(AuthContext);
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = useContext(AuthContext);
 
   useEffect(() => {
     if (item.addresses.length) {

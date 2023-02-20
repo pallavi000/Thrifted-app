@@ -94,13 +94,7 @@ const EditPost = ({ navigation, route }) => {
   });
 
   const data = useContext(AuthContext);
-  const { token, selectedProduct, setSelectedProduct } = data;
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config, selectedProduct, setSelectedProduct } = data;
 
   const getProductType = React.useCallback((type) => {
     var type = productTypes.find((pt) => pt._id == type);

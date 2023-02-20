@@ -19,7 +19,7 @@ import { apiErrorNotification } from "../ErrorHandle";
 export default function MyOrder({ navigation }) {
   const [items, setItems] = useState([]);
   const data = useContext(AuthContext);
-  const { token } = data;
+  const { config } = data;
   const [loader, setLoader] = useState(true);
   const [tab, setTab] = useState("processing");
   const [delivered, setDelivered] = useState([]);
@@ -32,12 +32,6 @@ export default function MyOrder({ navigation }) {
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [orderPageNo, setOrderPageNo] = useState(1);
   const [orderHasNextPage, setOrderHasNextPage] = useState(true);
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   useEffect(() => {
     getOrder();

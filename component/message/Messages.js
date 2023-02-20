@@ -24,18 +24,12 @@ export default function Messages({ navigation }) {
   const isFocused = useIsFocused();
   const [loader, setLoader] = useState(true);
   const data = useContext(AuthContext);
-  const { token, titleShown, setTitleShown, decode, socket } = data;
+  const { config, titleShown, setTitleShown, decode, socket } = data;
   const [chats, setChats] = useState([]);
   const [originalChats, setOriginalChats] = useState([]);
 
   const [hasNextPageMessage, setHasNextPageMessage] = useState(true);
   const [pageNo, setPageNo] = useState(1);
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   useEffect(() => {
     if (socket.current) {

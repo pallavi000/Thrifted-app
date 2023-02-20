@@ -33,12 +33,7 @@ const ChangePassword = ({ navigation }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const data = useContext(AuthContext);
-  const { token } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   const changePassword = React.useCallback(async (data) => {
     try {

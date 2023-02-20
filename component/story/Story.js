@@ -38,12 +38,7 @@ function Story({
 }) {
   const { userImage } = useContext(AuthContext);
   const currentStoryRef = useRef();
-  const { token, decode } = useContext(AuthContext);
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config, decode } = useContext(AuthContext);
 
   async function DeleteStory() {
     try {

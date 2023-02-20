@@ -21,14 +21,8 @@ import {
 
 export default function CartItem({ navigation }) {
   const data = useContext(AuthContext);
-  const { cartItems, setCartItems, token, subtotal, retotal } = data;
+  const { cartItems, setCartItems, config, subtotal, retotal } = data;
   const [deletingItemId, setDeletingItemId] = useState(0);
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   const removeCart = React.useCallback(
     async (item) => {

@@ -45,18 +45,13 @@ export default function ProductDetail({ navigation, route }) {
   const {
     cartCount,
     setCartCount,
-    token,
+    config,
     cartItems,
     decode,
     setSelectedProduct,
     selectedProduct,
   } = data;
   const { getCartItems } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   useEffect(() => {
     setSelectedProduct(route.params);

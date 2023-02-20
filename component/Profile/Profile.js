@@ -23,12 +23,7 @@ export default function Profile({ navigation }) {
   const [loader, setLoader] = useState(true);
   const isFocused = useIsFocused();
   const data = useContext(AuthContext);
-  const { token } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   const getUser = React.useCallback(async () => {
     try {

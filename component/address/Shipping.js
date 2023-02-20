@@ -31,12 +31,7 @@ export default function Shipping(props) {
   const [loader, setLoader] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(0);
   const data = useContext(AuthContext);
-  const { token } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   const loadSelectedCheckBox = React.useCallback(async () => {
     var addressId = await AsyncStorage.getItem("shippingId");

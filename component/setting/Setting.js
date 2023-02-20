@@ -22,17 +22,11 @@ import axios from "axios";
 
 export default function Setting({ navigation }) {
   const data = useContext(AuthContext);
-  const { decode, token, isSeller } = data;
+  const { decode, config, isSeller } = data;
   const [sales, setSales] = useState(false);
   const [newArrival, setNewArrival] = useState(false);
   const [dsc, setDsc] = useState(false);
   const [user, setUser] = useState();
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   async function setSwitch() {
     var notifications = await AsyncStorage.getItem("notifications");

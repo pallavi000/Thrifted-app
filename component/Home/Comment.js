@@ -30,12 +30,8 @@ export default function Comment({ navigation, route }) {
   const post_id = route.params;
 
   const data = useContext(AuthContext);
-  const { decode, token, userImage, products, setProducts } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { decode, config, userImage, products, setProducts } = data;
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getComments = React.useCallback(async () => {

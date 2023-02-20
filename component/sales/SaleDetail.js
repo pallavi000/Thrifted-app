@@ -26,12 +26,7 @@ const SaleDetail = ({ navigation, route }) => {
   const [shippingAddress, setShippingAddress] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDownloadingLabel, setIsDownloadingLabel] = useState(false);
-  const { token } = useContext(AuthContext);
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = useContext(AuthContext);
 
   const changeDate = React.useCallback((createdAt) => {
     var arr = createdAt.split("T");

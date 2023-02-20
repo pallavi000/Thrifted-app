@@ -18,16 +18,10 @@ export default function FollowNotification(props) {
   const navigation = props.navigation;
   const [isReady, setIsReady] = useState(true);
   const data = useContext(AuthContext);
-  const { token, decode } = data;
+  const { config, decode } = data;
   const [isFollowBack, setIsFollowBack] = useState(
     item.follower?.followers?.includes(decode._id) ? true : false
   );
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   async function followBack() {
     setIsReady(false);

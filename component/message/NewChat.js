@@ -24,13 +24,7 @@ export default function NewChat({ navigation }) {
   const [originalUsers, setOriginalUsers] = useState([]);
 
   const data = useContext(AuthContext);
-  const { token } = data;
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   useEffect(() => {
     getUser();

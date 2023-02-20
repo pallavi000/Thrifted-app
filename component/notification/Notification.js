@@ -27,7 +27,7 @@ export default function Notification({ navigation }) {
   const [notifications, setNotifications] = useState([]);
   const [originalNotifications, setOriginalNotifications] = useState([]);
   const {
-    token,
+    config,
     unreadNotification,
     setUnreadNotification,
     socket,
@@ -46,11 +46,6 @@ export default function Notification({ navigation }) {
     []
   );
   const [tab, setTab] = useState("normal");
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   useEffect(() => {
     getNotification();

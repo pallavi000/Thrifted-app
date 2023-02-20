@@ -47,12 +47,7 @@ export default function AddShipping({ navigation }) {
   );
 
   const data = useContext(AuthContext);
-  const { token } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   useEffect(() => {
     getLocations();

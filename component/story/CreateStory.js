@@ -21,12 +21,7 @@ const CreateStory = ({ bottomSheetRef, setStories, fill }) => {
   const openCameraRef = useRef();
   const selectImageRef = useRef();
   const formRef = useRef();
-  const { token } = useContext(AuthContext);
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = useContext(AuthContext);
 
   async function createStory(values) {
     try {

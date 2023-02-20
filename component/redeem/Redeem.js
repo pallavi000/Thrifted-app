@@ -33,15 +33,9 @@ const validationSchema = Yup.object().shape({
 
 export default function Redeem({ navigation, route }) {
   const data = useContext(AuthContext);
-  const { token } = data;
+  const { config } = data;
   const user = route.params;
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   const RedeemForm = React.useCallback(async (data) => {
     setIsSubmitting(true);

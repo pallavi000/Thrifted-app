@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -74,7 +74,6 @@ export default gestureHandlerRootHOC(function App(props) {
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [notificationApiCall, setNotificationApiCall] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({});
-
   const [unreadMessage, setUnreadMessage] = useState(0);
   const [unreadNotification, setUnreadNotification] = useState(0);
   const [unreadNormalNotificationCount, setUnreadNormalNotificationCount] =
@@ -94,6 +93,14 @@ export default gestureHandlerRootHOC(function App(props) {
   const [titleShown, setTitleShown] = useState({
     display: "flex",
   });
+
+  const config = useMemo(() => {
+    return {
+      headers: {
+        "access-token": token,
+      },
+    };
+  }, [token]);
 
   // notification
   const registerForPushNotificationsAsync = React.useCallback(
@@ -122,11 +129,7 @@ export default gestureHandlerRootHOC(function App(props) {
         const data = {
           token,
         };
-        const response = await axios.post(
-          "/frontend/notification/token",
-          data,
-          config
-        );
+        const response = await axios.post("/frontend/notification/token", data);
       } catch (error) {}
     }
   );
@@ -195,11 +198,6 @@ export default gestureHandlerRootHOC(function App(props) {
 
   const getCartItems = React.useCallback(async (token) => {
     try {
-      const config = {
-        headers: {
-          "access-token": token,
-        },
-      };
       const response = await axios.get("/addtocart/cartcount", config);
       retotal(response.data);
     } catch (error) {
@@ -306,6 +304,7 @@ export default gestureHandlerRootHOC(function App(props) {
             cartCount,
             setCartCount,
             token,
+            config,
             decode,
             cartItems,
             subtotal,

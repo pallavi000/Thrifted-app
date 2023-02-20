@@ -45,12 +45,7 @@ export default function Checkout({ navigation }) {
   const [deliveryOption, setDeliveryOption] = useState("Branch");
   const data = useContext(AuthContext);
 
-  const { token, subtotal, getCartItems, cartItems } = data;
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config, subtotal, getCartItems, cartItems } = data;
 
   const [loader, setLoader] = useState(true);
   const IsFocused = useIsFocused();

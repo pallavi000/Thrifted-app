@@ -22,16 +22,10 @@ export default function OrderTrack({ route }) {
   const order = route.params;
 
   const data = useContext(AuthContext);
-  const { token } = data;
+  const { config } = data;
 
   const [groupedEvents, setGroupedEvents] = useState([]);
   const [isOrderTrackFetched, setIsOrderTrackFetched] = useState(false);
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   useEffect(() => {
     getTrackRecord();

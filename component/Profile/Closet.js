@@ -33,7 +33,7 @@ export default function Closet(props) {
   const [user, setUser] = useState([]);
   const navigation = props.navigation;
   const data = useContext(AuthContext);
-  const { decode, token, setUserImage } = data;
+  const { decode, config, setUserImage } = data;
   const [sorting, setSorting] = useState("-_id");
   const [modalVisible, setModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState("listing");
@@ -53,12 +53,6 @@ export default function Closet(props) {
   const [salesHasNextPage, setSalesHasNextPage] = useState(true);
   const selectImageRef = useRef();
   const openCameraRef = useRef();
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
 
   useEffect(() => {
     getProducts();

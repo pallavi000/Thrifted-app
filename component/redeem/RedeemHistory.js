@@ -22,13 +22,7 @@ export default function RedeemHistory({ navigation }) {
   const [hasNextPage, setNextPage] = useState(true);
 
   const data = useContext(AuthContext);
-  const { token } = data;
-
-  const config = {
-    headers: {
-      "access-token": token,
-    },
-  };
+  const { config } = data;
 
   useEffect(() => {
     getHistory();
